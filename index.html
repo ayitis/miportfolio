@@ -1,180 +1,55 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>360grados · Aya Arbaoui</title>
-  <meta name="description" content="360grados: dirección artística, fotografía y creación de contenido para redes, flyers, branding y contenido digital y físico.">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      color: #1a1a1a;
-      background: #fafafa;
-      line-height: 1.6;
-    }
-    header {
-      position: fixed; top: 0; left: 0; right: 0;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 1.2rem 2rem;
-      background: rgba(250,250,250,0.9);
-      backdrop-filter: blur(8px);
-      z-index: 10;
-    }
-    .logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: #1a1a1a; }
-    nav a {
-      margin-left: 1.5rem; text-decoration: none; color: #1a1a1a;
-      font-size: 0.9rem; letter-spacing: 0.05em;
-    }
-    nav a:hover { text-decoration: underline; }
-
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column; justify-content: center;
-      padding: 0 2rem;
-      max-width: 1100px; margin: 0 auto;
-    }
-    .hero h1 { font-size: clamp(3rem, 10vw, 7rem); line-height: 1; letter-spacing: -0.03em; }
-    .hero p { margin-top: 1.5rem; font-size: clamp(1.1rem, 2.5vw, 1.4rem); max-width: 620px; color: #444; }
-
-    section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
-    h2 {
-      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em;
-      color: #888; margin-bottom: 2rem;
-    }
-
-    .sobre p { font-size: 1.3rem; max-width: 760px; color: #333; }
-
-    .servicios ul {
-      list-style: none;
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem;
-    }
-    .servicios li {
-      border-top: 1px solid #ddd; padding-top: 1rem;
-      font-size: 1.1rem;
-    }
-
-    .galeria {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
-    }
-    .galeria figure { position: relative; overflow: hidden; background: #e8e8e8; aspect-ratio: 4/5; }
-    .galeria img {
-      width: 100%; height: 100%; object-fit: cover;
-      display: block; transition: transform 0.4s ease;
-    }
-    .galeria figure:hover img { transform: scale(1.04); }
-    .galeria figcaption {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 0.8rem 1rem;
-      background: linear-gradient(transparent, rgba(0,0,0,0.6));
-      color: #fff; font-size: 0.9rem;
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .galeria figure:hover figcaption { opacity: 1; }
-
-    .contacto { text-align: left; }
-    .contacto p { font-size: 1.3rem; margin-bottom: 1rem; }
-    .contacto a {
-      color: #1a1a1a; font-size: 1.3rem; font-weight: 600;
-      text-decoration: none; border-bottom: 2px solid #1a1a1a;
-    }
-    .contacto a:hover { opacity: 0.6; }
-
-    footer {
-      text-align: center; padding: 3rem 2rem; font-size: 0.85rem; color: #888;
-    }
-
-    @media (max-width: 600px) {
-      header { padding: 1rem; }
-      nav a { margin-left: 0.9rem; font-size: 0.8rem; }
-      section { padding: 4rem 1.2rem; }
-    }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Aya Arbaoui — art direction, fashion, editorial and visual communication.">
+<title>Aya Arbaoui® — Creative Portfolio</title>
+<style>
+:root{--pink:#f12b9d;--black:#111;--cream:#f5f3ed}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--black);font-family:Arial,Helvetica,sans-serif}a{color:inherit;text-decoration:none}img{display:block;width:100%;height:100%;object-fit:cover}::selection{background:var(--pink);color:white}
+nav{position:absolute;z-index:5;left:0;top:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:25px 4vw;color:white;font-size:12px;font-weight:800;letter-spacing:.05em}nav .brand{font-size:18px;letter-spacing:-.05em}nav .links{display:flex;gap:22px}
+.cover{height:100svh;min-height:560px;background:#111;color:white;display:flex;flex-direction:column;justify-content:center;padding:100px 4vw 70px;position:relative;overflow:hidden}.cover:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 80% 35%,#551436 0%,transparent 45%);opacity:.6}.cover>*{position:relative}.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase}.cover h1{font-size:clamp(6rem,19vw,19rem);letter-spacing:-.11em;line-height:.72;margin:35px 0 40px;font-weight:900}.cover h1 span{display:block}.cover h1 span:last-child{color:var(--pink)}.cover .intro-line{font-size:clamp(17px,2.7vw,37px);line-height:1.14;max-width:650px}.cover .bottom{position:absolute;bottom:32px;left:4vw;right:4vw;display:flex;justify-content:space-between;font-size:11px;text-transform:uppercase}
+.ticker{background:var(--pink);padding:15px 0;white-space:nowrap;overflow:hidden;font-size:clamp(23px,3vw,45px);font-weight:900;letter-spacing:-.05em}.ticker span{display:inline-block;animation:marquee 24s linear infinite}@keyframes marquee{to{transform:translateX(-50%)}}
+.work-title{padding:90px 4vw 40px;display:flex;align-items:end;justify-content:space-between}.work-title h2{font-size:clamp(65px,11vw,180px);line-height:.83;letter-spacing:-.1em;margin:0}.work-title small{font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+.feature{display:grid;grid-template-columns:1.25fr 1fr;min-height:72vh}.feature .photo{height:72vh;min-height:460px;overflow:hidden}.feature img{transition:transform .9s cubic-bezier(.2,.7,.2,1)}.feature:hover img{transform:scale(1.05)}.feature .text{background:#e6e2d9;padding:4vw;display:flex;flex-direction:column;justify-content:space-between}.feature h3{font-size:clamp(75px,11vw,180px);line-height:.75;letter-spacing:-.1em;margin:40px 0}.feature p{font-size:clamp(18px,2.3vw,31px);line-height:1.2;max-width:480px}.feature small{text-transform:uppercase;letter-spacing:.1em}.feature .view{border:1px solid #111;border-radius:50%;width:95px;height:95px;display:grid;place-items:center;font-size:12px}
+.index{background:#111;color:white;padding:100px 4vw}.index .section-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:40px}.index .item{border-top:1px solid #555;padding:22px 0;display:flex;align-items:baseline;gap:20px}.index .item:last-child{border-bottom:1px solid #555}.index .item b{font-size:clamp(28px,5.7vw,90px);letter-spacing:-.075em;flex:1}.index .item small{font-size:11px;color:#bbb;text-transform:uppercase}.index .item .number{color:var(--pink)}
+.project-head{padding:105px 4vw 33px}.meta{display:flex;justify-content:space-between;gap:16px;font-size:11px;letter-spacing:.1em;text-transform:uppercase}.project-head h2{font-size:clamp(72px,19vw,310px);line-height:.85;letter-spacing:-.11em;margin:50px 0 30px}.tagline{display:flex;justify-content:space-between;align-items:end;gap:25px}.tagline p{font:italic clamp(21px,3vw,50px) Georgia,serif;margin:0}.tagline span{font-size:12px;line-height:1.5;text-transform:uppercase}
+.hero-photo{height:clamp(400px,72vw,950px)}.hero-photo img{object-position:50% 50%}
+.statement{background:#111;color:white;display:grid;grid-template-columns:1fr 1fr;gap:6vw;padding:10vw 4vw}.statement h3{font-size:clamp(60px,9vw,160px);letter-spacing:-.09em;line-height:.83;margin:20px 0}.statement h3 em{font-family:Georgia,serif;font-weight:400}.statement .copy{align-self:end;font-size:clamp(19px,2vw,29px);line-height:1.35}.statement .copy p:last-child{font-size:clamp(15px,1.4vw,20px);color:#bbb}
+.editorial{padding:7vw 4vw;background:#efede6}.editorial .label{font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:30px}.gallery{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1.5vw}.gallery figure{margin:0;overflow:hidden}.gallery img{transition:transform .8s ease}.gallery figure:hover img{transform:scale(1.035)}.gallery .a{grid-column:1/6;aspect-ratio:3/4}.gallery .b{grid-column:7/13;aspect-ratio:3/4;margin-top:12vw}.gallery .c{grid-column:2/9;aspect-ratio:3/2;margin-top:5vw}.gallery .d{grid-column:9/13;aspect-ratio:3/4;margin-top:12vw}.gallery .e{grid-column:1/13;aspect-ratio:16/9;margin-top:7vw}.gallery .f{grid-column:1/6;aspect-ratio:3/4;margin-top:7vw}.gallery .g{grid-column:7/13;aspect-ratio:3/4;margin-top:14vw}
+.quote{padding:13vw 4vw;text-align:center;background:#efede6;font:italic clamp(35px,7vw,115px)/1.03 Georgia,serif;letter-spacing:-.04em}.quote em{color:#7b896c}
+.outro{background:#111;color:white;padding:9vw 4vw}.outro h3{font-size:clamp(54px,10vw,165px);line-height:.9;letter-spacing:-.09em;margin:15px 0 45px}.outro p{max-width:700px;font-size:clamp(18px,2vw,28px);line-height:1.4}.outro .credits{margin-top:60px;padding-top:24px;border-top:1px solid #666;text-transform:uppercase;font-size:11px;letter-spacing:.08em}
+.about{background:var(--pink);padding:9vw 4vw}.about h2{font-size:clamp(70px,13vw,190px);letter-spacing:-.1em;line-height:.8;margin:0 0 50px}.about p{font-size:clamp(20px,3vw,42px);line-height:1.17;max-width:900px}.about .socials{display:flex;gap:25px;flex-wrap:wrap;margin-top:50px;text-decoration:underline;font-weight:bold;text-transform:uppercase;font-size:13px}
+footer{background:#111;color:white;display:flex;justify-content:space-between;padding:32px 4vw;font-size:11px;text-transform:uppercase}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .85s,transform .85s}.reveal.visible{opacity:1;transform:none}
+@media(max-width:700px){nav{padding:18px 5vw}.cover{padding-left:5vw}.cover h1{font-size:22vw}.cover .bottom{left:5vw;right:5vw}.work-title{padding:70px 5vw 25px}.feature{grid-template-columns:1fr}.feature .photo{height:60vh;min-height:380px}.feature .text{padding:30px 5vw;min-height:340px}.feature h3{font-size:18vw}.index{padding:70px 5vw}.index .item{flex-wrap:wrap}.index .item small{width:100%;padding-left:32px}.project-head{padding:100px 5vw 25px}.project-head h2{font-size:18.5vw}.tagline{align-items:start;flex-direction:column}.statement{grid-template-columns:1fr;padding:85px 5vw}.gallery{gap:8px}.editorial{padding:50px 5vw}.gallery .a{grid-column:1/7}.gallery .b{grid-column:7/13}.gallery .c{grid-column:1/11}.gallery .d{grid-column:6/13}.gallery .f{grid-column:1/7}.gallery .g{grid-column:7/13}.about,.outro{padding:85px 5vw}footer{flex-direction:column;gap:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ticker span{animation:none}.reveal{opacity:1;transform:none}*{transition:none!important}}
+</style>
 </head>
 <body>
-
-  <header>
-    <a href="#inicio" class="logo">360grados</a>
-    <nav>
-      <a href="#sobre">Sobre mí</a>
-      <a href="#servicios">Servicios</a>
-      <a href="#trabajos">Trabajos</a>
-      <a href="#contacto">Contacto</a>
-    </nav>
-  </header>
-
-  <div class="hero" id="inicio">
-    <h1>360grados</h1>
-    <p>Aya Arbaoui · Dirección artística, fotografía y contenido visual para marcas.</p>
-  </div>
-
-  <section class="sobre" id="sobre">
-    <h2>Sobre mí</h2>
-    <p>
-      Soy Aya Arbaoui y creo imagen de marca de principio a fin: desde la idea y la dirección artística
-      hasta la fotografía, el diseño y el contenido para redes. Me interesa que cada proyecto
-      tenga coherencia en todo lo que la gente ve, tanto en lo digital como en lo físico.
-    </p>
-  </section>
-
-  <section class="servicios" id="servicios">
-    <h2>Servicios</h2>
-    <ul>
-      <li>Dirección artística</li>
-      <li>Fotografía</li>
-      <li>Contenido para redes sociales</li>
-      <li>Flyers y material impreso</li>
-      <li>Branding e identidad visual</li>
-      <li>Contenido digital y físico</li>
-    </ul>
-  </section>
-
-  <section id="trabajos">
-    <h2>Trabajos</h2>
-    <div class="galeria">
-      <figure>
-        <img src="imagenes/proyecto-1.jpg" alt="Proyecto 1">
-        <figcaption>Nombre del proyecto · Fotografía</figcaption>
-      </figure>
-      <figure>
-        <img src="imagenes/proyecto-2.jpg" alt="Proyecto 2">
-        <figcaption>Nombre del proyecto · Branding</figcaption>
-      </figure>
-      <figure>
-        <img src="imagenes/proyecto-3.jpg" alt="Proyecto 3">
-        <figcaption>Nombre del proyecto · Redes sociales</figcaption>
-      </figure>
-      <figure>
-        <img src="imagenes/proyecto-4.jpg" alt="Proyecto 4">
-        <figcaption>Nombre del proyecto · Flyer</figcaption>
-      </figure>
-      <figure>
-        <img src="imagenes/proyecto-5.jpg" alt="Proyecto 5">
-        <figcaption>Nombre del proyecto · Dirección artística</figcaption>
-      </figure>
-      <figure>
-        <img src="imagenes/proyecto-6.jpg" alt="Proyecto 6">
-        <figcaption>Nombre del proyecto · Contenido físico</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <section class="contacto" id="contacto">
-    <h2>Contacto</h2>
-    <p>¿Tienes un proyecto en mente? Escríbeme.</p>
-    <a href="mailto:TU_EMAIL@ejemplo.com">ayaarbaoui10@gmail.com</a>
-    <p style="margin-top:2rem;">
-      <a href="https://instagram.com/tu_usuario" target="_blank">@ayaarbaoui en Instagram</a>
-    </p>
-  </section>
-
-  <footer>
-    © 2026 360grados · Aya Arbaoui
-  </footer>
-
+<nav><a href="#top" class="brand">AYA ARBAOUI®</a><div class="links"><a href="#work">WORK</a><a href="#nuptias">NUPTIAS</a><a href="#about">ABOUT</a></div></nav>
+<main id="top">
+<section class="cover"><small class="eyebrow">Independent creative portfolio · Madrid</small><h1><span>AYA</span><span>ARBA</span><span>OUI.</span></h1><p class="intro-line">Art direction, fashion, design and visual stories with a point of view.</p><div class="bottom"><span>Selected works / 2026</span><a href="#work">Scroll to explore ↓</a></div></section>
+<div class="ticker" aria-hidden="true"><span>ART DIRECTION ✳ VISUAL CULTURE ✳ EDITORIAL ✳ CREATIVE CONTENT ✳ ART DIRECTION ✳ VISUAL CULTURE ✳ EDITORIAL ✳ CREATIVE CONTENT ✳ </span></div>
+<section id="work"><div class="work-title"><h2>SELECTED<br>WORK.</h2><small>Index / 01—06</small></div>
+<a class="feature" href="#nuptias"><div class="photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt="NUPTIAS — couple under a white pergola" loading="lazy"></div><div class="text"><small>001 / Impuribus · Fashion editorial</small><div><h3>NUP<br>TIAS.</h3><p>Where structure meets emotion. An intimate celebration of love.</p></div><span class="view">VIEW ↗</span></div></a>
+<div class="index"><div class="section-label">More selected work — case studies in preparation</div><div class="item"><span class="number">02</span><b>MAISON CARNAGE</b><small>Creative project</small></div><div class="item"><span class="number">03</span><b>AYAM STUDIO</b><small>Creative identity</small></div><div class="item"><span class="number">04</span><b>IRE MAGAZINE</b><small>Editorial design</small></div><div class="item"><span class="number">05</span><b>YVES ROCHER ESPAÑA</b><small>Digital content</small></div><div class="item"><span class="number">06</span><b>VILLA TIGER MARRAKECH</b><small>Content & strategy</small></div></div></section>
+<article id="nuptias"><header class="project-head"><div class="meta"><span>001 / Selected work</span><span>Impuribus — Bridal editorial</span></div><h2>NUPTIAS.</h2><div class="tagline"><p>Where structure meets emotion.</p><span>Art direction / Styling<br>Fashion editorial</span></div></header>
+<div class="hero-photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt="Bridal fashion couple framed by geometric white garden architecture"></div>
+<section class="statement"><div><small class="eyebrow">01 / The story</small><h3>FORM<br><em>&</em><br>FEELING.</h3></div><div class="copy"><p>NUPTIAS is a visual exploration of love, intimacy and connection. Created for Impuribus, the editorial brings the brand's structured aesthetic into a softer, more emotional world.</p><p>Architectural silhouettes meet natural surroundings. Beyond familiar bridal imagery, the story celebrates quiet gestures, complicity and freedom.</p></div></section>
+<section class="editorial"><div class="label">02 / The editorial — selected photography</div><div class="gallery">
+<figure class="a reveal"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.21.42.jpg" alt="Bridal portrait in natural light" loading="lazy"></figure>
+<figure class="b reveal"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.53.53.jpg" alt="Bride and groom sharing a joyful moment" loading="lazy"></figure>
+<figure class="c reveal"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.47.46.jpg" alt="Bridal bouquet detail" loading="lazy"></figure>
+<figure class="d reveal"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2019.01.13.jpg" alt="Details of white bridal fabric" loading="lazy"></figure>
+<figure class="e reveal"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.02.04.jpg" alt="Bride moving through a white garden pavilion" loading="lazy"></figure>
+<figure class="f reveal"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.56.04.jpg" alt="Bride walking through nature" loading="lazy"></figure>
+<figure class="g reveal"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.54.28.jpg" alt="Intimate bridal portrait" loading="lazy"></figure>
+</div></section><div class="quote">Love, in its <em>quietest</em> form.</div>
+<section class="outro"><small class="eyebrow">03 / In conclusion</small><h3>A QUIET KIND<br>OF FOREVER.</h3><p>Through art direction and styling, NUPTIAS explores the tension between precision and spontaneity, structure and tenderness. A celebration of love in its purest form.</p><div class="credits">Project: NUPTIAS / For: Impuribus / Aya Arbaoui: Art direction & styling</div></section></article>
+<section id="about" class="about"><small class="eyebrow">Behind the work</small><h2>LET'S<br>CREATE.</h2><p>I'm Aya, a multidisciplinary creative working across art direction, fashion, design and content. Interested in ideas that feel as distinctive as they look.</p><div class="socials"><a href="https://www.behance.net/ayaarbaoui" target="_blank" rel="noopener">Behance ↗</a><a href="https://www.instagram.com/ayaarbaoui/" target="_blank" rel="noopener">Instagram ↗</a></div></section>
+</main><footer><span>© 2026 Aya Arbaoui®</span><a href="#top">Back to top ↑</a></footer>
+<script>
+if('IntersectionObserver' in window){const obs=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');obs.unobserve(entry.target)}})},{threshold:.08});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))}else{document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'))}
+</script>
 </body>
 </html>

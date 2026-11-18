@@ -1,58 +1,49 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="NUPTIAS — Impuribus bridal fashion editorial. Art Direction and Styling by Aya Arbaoui.">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="NUPTIAS — Bridal editorial for Impuribus. Fashion Editorial, Art Direction and Styling by Aya Arbaoui.">
 <title>NUPTIAS — Aya Arbaoui</title>
 <style>
-:root{--ink:#151515;--muted:#666;--paper:#fff;--line:#d9d9d9}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}img{display:block;width:100%;height:100%;object-fit:cover}button{font:inherit}
-.topbar{padding:27px 4vw;display:flex;justify-content:space-between;align-items:center;gap:25px;font-size:12px;letter-spacing:.04em;font-weight:700}.topbar .links{display:flex;gap:30px}.topbar a:hover{text-decoration:underline}
-.hero{padding:7vh 0 8vh;overflow:hidden}
-.hero-head{padding:0 4vw 3.5vh;display:flex;justify-content:space-between;align-items:end;gap:20px}
-.hero-head h1{margin:0;font-size:clamp(84px,15.5vw,265px);line-height:.74;letter-spacing:-.11em;font-weight:700}
-.hero-index{font-size:11px;letter-spacing:.08em;text-align:right;white-space:nowrap}
-.marquee{overflow:hidden;touch-action:pan-y;cursor:grab}.marquee:active{cursor:grabbing}
-.marquee-track{display:flex;gap:12px;width:max-content;animation:parade 62s linear infinite;will-change:transform}
+:root{--ink:#161616;--gray:#777;--white:#fff;--gutter:clamp(20px,4.3vw,75px)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#fff;color:var(--ink)}
+body{font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}
+.page{min-height:100svh;display:flex;flex-direction:column;background:var(--white)}
+header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:26px var(--gutter) 22px;flex:0 0 auto}
+.brand{font-size:15px;font-weight:700;letter-spacing:-.04em}
+.links{display:flex;gap:28px;align-items:center;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.links a:hover,.brand:hover{text-decoration:underline}
+.category{display:flex;justify-content:space-between;align-items:center;padding:0 var(--gutter) 16px;gap:20px;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:#686868}
+.category span:last-child{text-align:right}
+.marquee{overflow:hidden;flex:0 0 auto;position:relative;user-select:none}
+.marquee-track{display:flex;width:max-content;animation:travel 68s linear infinite;will-change:transform}
+.photo-group{display:flex;gap:12px;padding-right:12px;flex:none}
+.photo{margin:0;width:clamp(150px,13.6vw,270px);height:clamp(165px,21.5vh,280px);flex:0 0 auto;overflow:hidden;background:#e8e6e2}
+.photo img{display:block;width:100%;height:100%;object-fit:cover}
+@keyframes travel{to{transform:translateX(-50%)}}
 .marquee:hover .marquee-track,.marquee:focus-within .marquee-track{animation-play-state:paused}
-@keyframes parade{to{transform:translateX(-50%)}}
-.slide{margin:0;width:clamp(240px,27vw,475px);height:clamp(300px,34vw,520px);flex:none;overflow:hidden;background:#eeece7}
-.slide img{object-fit:cover}
-.hero-bottom{padding:42px 4vw 0;display:flex;justify-content:space-between;align-items:start;gap:32px}
-.project-credit h2{margin:0 0 10px;font-size:clamp(23px,3vw,46px);font-weight:700;letter-spacing:-.04em}
-.project-credit p{margin:0;font-size:clamp(13px,1.5vw,18px);line-height:1.45}
-.scroll-note{font-size:11px;letter-spacing:.1em;white-space:nowrap}
-.section-line{height:1px;background:var(--line);margin:0 4vw}
-.story{padding:10vw 4vw 11vw;display:grid;grid-template-columns:.9fr 1.1fr;gap:8vw}
-.story .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 30px}
-.story h2{font-size:clamp(54px,8vw,135px);line-height:.88;letter-spacing:-.085em;font-weight:700;margin:0}
-.story h2 em{font-weight:400;font-family:Georgia,serif}
-.story-copy{padding-top:45px;max-width:670px}
-.story-copy .lead{font:normal clamp(23px,3.1vw,48px)/1.22 Georgia,serif;margin:0 0 35px}
-.story-copy p{font-size:clamp(16px,1.35vw,20px);line-height:1.55;margin:0 0 20px}
-.gallery-section{padding:0 4vw 10vw}.gallery-label{display:flex;justify-content:space-between;gap:15px;padding:18px 0 36px;border-top:1px solid var(--line);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.gallery figure{margin:0;aspect-ratio:3/4;overflow:hidden;background:#eeeae5}
-.gallery img{transition:transform .6s ease}.gallery img:hover{transform:scale(1.035)}
-.final-line{padding:8vw 4vw 10vw;border-top:1px solid var(--line)}.final-line p{font:italic clamp(35px,6vw,95px)/1.1 Georgia,serif;letter-spacing:-.05em;margin:0}
-footer{border-top:1px solid var(--line);padding:30px 4vw;display:flex;justify-content:space-between;gap:20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-@media(max-width:750px){.topbar{padding:20px 5vw;font-size:11px}.topbar .links{gap:12px}.hero{padding-top:10vh}.hero-head{padding:0 5vw 28px;display:block}.hero-head h1{font-size:19vw}.hero-index{text-align:left;margin-top:20px}.slide{width:75vw;height:92vw;max-height:480px}.hero-bottom{padding:35px 5vw 0;display:block}.scroll-note{margin-top:33px;display:block}.section-line{margin:0 5vw}.story{padding:85px 5vw 95px;grid-template-columns:1fr;gap:15px}.story h2{font-size:16vw}.story-copy{padding-top:25px}.gallery-section{padding:0 5vw 85px}.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.gallery-label{padding-bottom:25px}.final-line{padding:80px 5vw}.final-line p{font-size:9vw}footer{padding:24px 5vw;flex-wrap:wrap}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.marquee-track{animation:none}.marquee{overflow-x:auto;scroll-snap-type:x proximity}.slide{scroll-snap-align:start}.gallery img{transition:none}}
-</style>
-</head>
-<body>
-<header class="topbar"><a href="./index.html">AYA ARBAOUI</a><div class="links"><a href="./index.html">← BACK HOME</a><a href="./index.html#work">WORK</a></div></header>
-<main>
-<section class="hero" aria-label="NUPTIAS fashion editorial">
-<div class="hero-head"><h1>NUPTIAS.</h1><div class="hero-index">01 / SELECTED PROJECTS<br>IMPURIBUS · BRIDAL EDITORIAL</div></div>
-<div class="marquee" aria-label="NUPTIAS photography carousel"><div class="marquee-track"><figure class="slide"><img src="Captura%20de%20pantalla%202026-11-18%20a%20las%2019.58.13.png" alt="The couple beside a vintage car"  draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt="Bride and groom in the garden pergola"  draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.21.42.jpg" alt="Bridal portrait in natural light"  draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.53.53.jpg" alt="Joyful moment between the couple" loading="lazy" draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.47.46.jpg" alt="Detail of the bridal bouquet" loading="lazy" draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2019.01.13.jpg" alt="Wedding dress details" loading="lazy" draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.02.04.jpg" alt="Bride moving beneath the white pergola" loading="lazy" draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.56.04.jpg" alt="Bride walking through nature" loading="lazy" draggable="false"></figure><figure class="slide"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.54.28.jpg" alt="Intimate bridal portrait" loading="lazy" draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202026-11-18%20a%20las%2019.58.13.png" alt=""  draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt=""  draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.21.42.jpg" alt=""  draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.53.53.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.47.46.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2019.01.13.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.02.04.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.56.04.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="slide" aria-hidden="true"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.54.28.jpg" alt="" loading="lazy" draggable="false"></figure></div></div>
-<div class="hero-bottom"><div class="project-credit"><h2>IMPURIBUS</h2><p>Fashion Editorial · Art Direction · Styling</p></div><span class="scroll-note">SCROLL TO EXPLORE ↓</span></div>
+.editorial-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;text-align:center;padding:20px var(--gutter) 28px}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.18em;margin:0 0 15px}
+h1{font:400 clamp(90px,15vw,265px)/.85 "Times New Roman",Times,Georgia,serif;letter-spacing:-.075em;white-space:nowrap;margin:0 0 19px}
+.credit{font-size:clamp(13px,1.25vw,17px);font-weight:700;letter-spacing:.07em;margin:0}
+.roles{font-size:clamp(12px,1.13vw,15px);letter-spacing:.025em;margin:10px 0 0}
+.concept{margin:24px 0 0;max-width:650px;font-size:clamp(13px,1.15vw,16px);line-height:1.5;color:#555}
+.concept strong{font-weight:600;color:#161616}
+footer{display:flex;justify-content:space-between;align-items:center;padding:12px var(--gutter) 20px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#666}
+@media (max-width:700px){header{padding-top:20px;padding-bottom:25px}.brand{font-size:13px}.links{gap:13px;font-size:10px}.category{font-size:9px;padding-bottom:12px}.photo{width:42vw;height:29vh;min-height:185px;max-height:260px}.editorial-bottom{padding-top:30px;padding-bottom:24px}h1{font-size:clamp(72px,19vw,140px);margin-bottom:24px}.concept{margin-top:23px;font-size:13px}.eyebrow{margin-bottom:14px}footer{padding-bottom:18px;gap:15px}}
+@media (max-height:610px) and (min-width:701px){.photo{height:26vh}.editorial-bottom{padding:12px var(--gutter)}h1{font-size:clamp(70px,12vh,125px)}.concept{margin-top:10px}header{padding-top:16px;padding-bottom:15px}}
+@media (prefers-reduced-motion:reduce){.marquee-track{animation:none}.marquee{overflow-x:auto}}
+</style></head>
+<body><div class="page">
+<header><a class="brand" href="./index.html">AYA ARBAOUI</a><nav class="links" aria-label="Main navigation"><a href="./index.html">← BACK HOME</a><a href="./index.html#work">WORK</a></nav></header>
+<main style="flex:1;display:flex;flex-direction:column;min-height:0">
+<div class="category"><span>001 / FASHION EDITORIAL</span><span>SELECTED PHOTOGRAPHY — IMPURIBUS</span></div>
+<section class="marquee" aria-label="NUPTIAS photography in motion"><div class="marquee-track"><div class="photo-group" ><figure class="photo"><img src="Captura%20de%20pantalla%202026-11-18%20a%20las%2019.58.13.png" alt="Pareja junto al coche vintage"  draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt="Pareja en la pérgola"  draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.21.42.jpg" alt="Retrato de novia"  draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.53.53.jpg" alt="Pareja riendo" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.47.46.jpg" alt="Detalle del ramo" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2019.01.13.jpg" alt="Detalle del vestido" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.02.04.jpg" alt="Novia en el jardín" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.56.04.jpg" alt="Novia en la naturaleza" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.54.28.jpg" alt="Retrato editorial" loading="lazy" draggable="false"></figure></div><div class="photo-group" aria-hidden="true"><figure class="photo"><img src="Captura%20de%20pantalla%202026-11-18%20a%20las%2019.58.13.png" alt=""  draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt=""  draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.21.42.jpg" alt=""  draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.53.53.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.47.46.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2019.01.13.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.02.04.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.56.04.jpg" alt="" loading="lazy" draggable="false"></figure><figure class="photo"><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.54.28.jpg" alt="" loading="lazy" draggable="false"></figure></div></div></section>
+<section class="editorial-bottom" aria-labelledby="title">
+<p class="eyebrow">A BRIDAL STORY</p>
+<h1 id="title">NUPTIAS</h1>
+<p class="credit">IMPURIBUS</p>
+<p class="roles">Fashion Editorial · Art Direction · Styling</p>
+<p class="concept"><strong>FORM &amp; FEELING.</strong> Where structure meets emotion. A bridal story of love and connection, balancing the architectural purity of Impuribus with natural surroundings, intimacy and spontaneous gestures.</p>
 </section>
-<div class="section-line"></div>
-<section class="story"><div><p class="eyebrow">01 / THE CONCEPT</p><h2>FORM <em>&</em><br>FEELING.</h2></div><div class="story-copy"><p class="lead">Where structure meets emotion.</p><p>Impuribus is a contemporary bridal brand defined by architectural lines, clean silhouettes and conscious minimalism. White becomes a visual language of light, structure and clarity.</p><p>For NUPTIAS, art direction and styling take that structured universe into an intimate, natural setting. The story celebrates love through spontaneous gestures, tenderness and connection, balancing precision with emotion.</p></div></section>
-<section class="gallery-section" aria-label="Selected bridal photographs"><div class="gallery-label"><span>02 / BRIDAL EDITORIAL</span><span>THE VISUAL STORY</span></div><div class="gallery"><figure><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt="Bride and groom in the garden pergola" loading="lazy"></figure><figure><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.21.42.jpg" alt="Bridal portrait in natural light" loading="lazy"></figure><figure><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.53.53.jpg" alt="Joyful moment between the couple" loading="lazy"></figure><figure><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.47.46.jpg" alt="Detail of the bridal bouquet" loading="lazy"></figure><figure><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2019.01.13.jpg" alt="Wedding dress details" loading="lazy"></figure><figure><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.02.04.jpg" alt="Bride moving beneath the white pergola" loading="lazy"></figure><figure><img src="Captura%20de%20pantalla%202025-05-29%20a%20las%2019.56.04.jpg" alt="Bride walking through nature" loading="lazy"></figure><figure><img src="Captura%20de%20pantalla%202025-03-10%20a%20las%2018.54.28.jpg" alt="Intimate bridal portrait" loading="lazy"></figure></div></section>
-<section class="final-line"><p>Love, in its quietest form.</p></section>
 </main>
-<footer><span>© 2026 Aya Arbaoui</span><a href="./index.html">← BACK TO PROJECTS</a></footer>
-</body></html>
+<footer><span>AYA ARBAOUI © 2026</span><span>IMAGES IN MOTION ←</span></footer>
+</div></body></html>

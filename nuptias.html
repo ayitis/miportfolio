@@ -21,7 +21,23 @@ footer{background:#111;color:white;display:flex;justify-content:space-between;pa
 nav{position:fixed;background:rgba(245,243,237,.96);color:#111;backdrop-filter:blur(12px)}
 #nuptias{padding-top:35px}
 nav a:hover{opacity:.55}
-</style></head><body><nav><a class="brand" href="./index.html">AYA ARBAOUI®</a><div class="links"><a href="./index.html">← BACK TO HOME</a><a href="./index.html#work">WORK</a></div></nav><main><article id="nuptias"><header class="project-head"><div class="meta"><span>001 / Selected work</span><span>Impuribus — Bridal editorial</span></div><h2>NUPTIAS.</h2><div class="tagline"><p>Where structure meets emotion.</p><span>Art direction / Styling<br>Fashion editorial</span></div></header>
+
+/* NUPTIAS: cinematic full-viewport opening image */
+.nuptias-opening{position:relative;min-height:100svh;overflow:hidden;isolation:isolate;background:#293c30;
+background-image:linear-gradient(180deg,rgba(0,0,0,.30),transparent 26%,transparent 72%,rgba(0,0,0,.26)),
+url('nuptias-cover.png'),url('Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg');
+background-position:center,center,center;
+background-size:cover,cover,cover;background-repeat:no-repeat}
+.nuptias-opening:after{content:"";position:absolute;inset:0;background:rgba(15,20,17,.06);pointer-events:none}
+.nuptias-opening .opening-caption{position:absolute;z-index:2;bottom:4.5vw;left:4vw;right:4vw;color:white;display:flex;justify-content:space-between;align-items:end;gap:20px;text-shadow:0 1px 10px #0005}
+.opening-caption h1{font-size:clamp(64px,12vw,190px);letter-spacing:-.095em;line-height:.84;margin:0;font-weight:700}
+.opening-caption p{font-size:clamp(11px,1.1vw,15px);text-transform:uppercase;letter-spacing:.08em;margin:0}
+nav{position:absolute;z-index:9;background:transparent;color:white;backdrop-filter:none;text-shadow:0 1px 12px #0008}
+nav a:hover{text-decoration:underline}
+#nuptias{padding-top:0}
+#nuptias .project-head{padding-top:90px}
+@media(max-width:700px){.nuptias-opening{min-height:100svh;background-position:center,center,center}.nuptias-opening .opening-caption{left:5vw;right:5vw;bottom:8vh;display:block}.opening-caption h1{font-size:17vw}.opening-caption p{margin-top:20px}nav{gap:14px;flex-wrap:wrap;padding:18px 5vw}nav .links{gap:15px}}
+</style></head><body><nav><a class="brand" href="./index.html">AYA ARBAOUI</a><div class="links"><a href="./index.html">← BACK TO HOME</a><a href="./index.html#work">WORK</a></div></nav><main><section class="nuptias-opening" aria-label="NUPTIAS editorial cover photograph"><div class="opening-caption"><h1>NUPTIAS.</h1><p>Impuribus / Fashion editorial / Scroll to explore ↓</p></div></section><article id="nuptias"><header class="project-head"><div class="meta"><span>001 / Selected work</span><span>Impuribus — Bridal editorial</span></div><h2>NUPTIAS.</h2><div class="tagline"><p>Where structure meets emotion.</p><span>Art direction / Styling<br>Fashion editorial</span></div></header>
 <div class="hero-photo"><img src="Captura%20de%20pantalla%202025-03-31%20a%20las%2021.05.01.jpg" alt="Bridal fashion couple framed by geometric white garden architecture"></div>
 <section class="statement"><div><small class="eyebrow">01 / The story</small><h3>FORM<br><em>&</em><br>FEELING.</h3></div><div class="copy"><p>NUPTIAS is a visual exploration of love, intimacy and connection. Created for Impuribus, the editorial brings the brand's structured aesthetic into a softer, more emotional world.</p><p>Architectural silhouettes meet natural surroundings. Beyond familiar bridal imagery, the story celebrates quiet gestures, complicity and freedom.</p></div></section>
 <section class="editorial"><div class="label">02 / The editorial — selected photography</div><div class="gallery">

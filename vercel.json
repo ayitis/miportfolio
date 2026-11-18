@@ -1,0 +1,10 @@
+{
+  "rewrites": [{ "source": "/editor", "destination": "/editor/index.html" }],
+  "headers": [{
+    "source": "/editor/:path*",
+    "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+  }, {
+    "source": "/editor",
+    "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+  }]
+}

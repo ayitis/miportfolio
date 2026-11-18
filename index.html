@@ -27,4 +27,4 @@ box.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)
 box.addEventListener('pointermove',e=>{if(!down)return;if(Math.abs(e.clientX-start)>8)moved=true});
 window.addEventListener('pointerup',()=>{down=false;setTimeout(()=>box.classList.remove('paused'),550)});
 box.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();moved=false}},true);
-</script></body></html>
+</script><script type="module" src="/portfolio/published.js"></script></body></html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Editor de portada · Aya Arbaoui</title>
+  <link rel="stylesheet" href="/editor/editor.css">
+  <script type="module" src="/editor/editor.js"></script>
+</head>
+<body>
+  <section id="access" class="access" aria-labelledby="access-title">
+    <h1 id="access-title">Editor de portada</h1>
+    <p id="access-status" role="status">Comprobando el acceso…</p>
+    <form id="login" method="post" hidden>
+      <label>Correo <input type="email" name="email" autocomplete="username" required></label>
+      <label>Contraseña <input type="password" name="password" autocomplete="current-password" required></label>
+      <button type="submit" class="primary">Entrar</button>
+    </form>
+  </section>
+  <div id="workspace" hidden>
+    <header class="toolbar">
+      <h1>Editor de portada</h1>
+      <div class="views" aria-label="Vista del portfolio">
+        <button type="button" data-view="desktop" aria-pressed="true">Escritorio</button>
+        <button type="button" data-view="mobile" aria-pressed="false">Móvil</button>
+      </div>
+      <button type="button" id="save" disabled>Guardar borrador</button>
+      <button type="button" id="publish" class="primary" disabled>Publicar cambios</button>
+      <button type="button" id="logout">Cerrar sesión</button>
+    </header>
+    <main>
+      <aside>
+        <label for="element">Texto de la portada</label>
+        <select id="element" disabled><option value="">Selecciona un texto</option></select>
+        <p id="instructions">Haz clic sobre un texto de la portada. Arrástralo o ajusta su posición aquí.</p>
+        <fieldset id="properties" disabled>
+          <legend>Ajustes del texto</legend>
+          <label>Contenido <textarea rows="3" maxlength="2000" data-field="text" placeholder="Texto original"></textarea></label>
+          <div class="pair">
+            <label>Horizontal (px) <input type="number" min="-4000" max="4000" placeholder="0" data-field="x"></label>
+            <label>Vertical (px) <input type="number" min="-4000" max="4000" placeholder="0" data-field="y"></label>
+            <label>Tamaño (px) <input type="number" min="4" max="400" placeholder="Original" data-field="size"></label>
+            <label>Ancho (px) <input type="number" min="10" max="4000" placeholder="Original" data-field="width"></label>
+          </div>
+          <label>Tipografía
+            <select data-field="font">
+              <option value="">Original</option>
+              <option value="system">Sistema</option>
+              <option value="helvetica">Helvetica</option>
+              <option value="georgia">Georgia</option>
+              <option value="times">Times New Roman</option>
+              <option value="courier">Courier New</option>
+            </select>
+          </label>
+          <label>Alineación
+            <select data-field="align">
+              <option value="">Original</option>
+              <option value="left">Izquierda</option>
+              <option value="center">Centro</option>
+              <option value="right">Derecha</option>
+              <option value="justify">Justificada</option>
+            </select>
+          </label>
+          <button type="button" id="reset">Restaurar ajustes de este texto</button>
+        </fieldset>
+        <div class="backup">
+          <button type="button" id="export" disabled>Descargar copia</button>
+          <label class="import" for="import">Importar copia</label>
+          <input type="file" id="import" accept=".json,application/json" disabled>
+        </div>
+        <details class="history">
+          <summary>Historial de versiones</summary>
+          <label for="history">Versión</label>
+          <select id="history"><option value="">Selecciona una versión</option></select>
+          <div class="backup">
+            <button type="button" id="restore" disabled>Restaurar como borrador</button>
+            <button type="button" id="older" hidden>Ver versiones anteriores</button>
+          </div>
+        </details>
+        <p id="status" role="status" aria-live="polite">Cargando la portada…</p>
+      </aside>
+      <section class="canvas" aria-label="Vista previa editable">
+        <iframe id="preview" title="Portada editable del portfolio"></iframe>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,4 +1,6 @@
 import { emptyDraft, validateDraft } from '../portfolio/design-document.js';
+import { signGalleryPhotos } from '../portfolio/gallery-storage.js';
+import { galleryBucket, uploadPath } from '../portfolio/gallery-document.js';
 import { connect } from '../portfolio/supabase.js';
 
 const sessionKey = 'miportfolio.editor.session.v1';
@@ -18,7 +20,7 @@ export async function openEditor() {
     setSession({ access_token, refresh_token, expires_at: Date.now() + expires_in * 1000 });
   }
 
-  async function authorized(path, body) {
+  async function authorized(path, body, file) {
     if (!session) throw new Error('Inicia sesión para continuar.');
     if (session.expires_at - Date.now() < 60000) {
       refresh ??= request('/auth/v1/token?grant_type=refresh_token', {
@@ -32,7 +34,10 @@ export async function openEditor() {
       }).finally(() => { refresh = undefined; });
       await refresh;
     }
-    return request(path, { token: session.access_token, body });
+    return request(path, {
+      token: session.access_token, body, file,
+      ...(file && { signal: AbortSignal.timeout(120000) }),
+    });
   }
 
   return {
@@ -62,6 +67,12 @@ export async function openEditor() {
       const [saved] = await authorized(`/rest/v1/portfolio_drafts?page=eq.${page}&select=document,revision`);
       return saved ? { draft: validateDraft(saved.document, page), revision: saved.revision }
         : { draft: emptyDraft(page), revision: null };
+    },
+    async uploadPhoto(id, file) {
+      await authorized(`/storage/v1/object/${galleryBucket}/${uploadPath(id)}`, undefined, file);
+    },
+    async photoUrls(ids) {
+      return signGalleryPhotos(authorized, request.storageUrl, ids);
     },
     async save(draft, revision, publish) {
       const home = draft.page === 'home';

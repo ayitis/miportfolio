@@ -1,6 +1,9 @@
 import { validateDraft } from './design-document.js';
 import { applyElement, collectElements } from './render-design.js';
 import { pages } from './pages.js';
+import { visiblePhoto } from './gallery-document.js';
+import { signGalleryPhotos, photoLinkLifetime } from './gallery-storage.js';
+import { collectGallery, renderGallery } from './render-gallery.js';
 import { connect } from './supabase.js';
 
 async function showPublishedDesign() {
@@ -16,12 +19,29 @@ async function showPublishedDesign() {
   const design = validateDraft(published.document, page);
   const mobile = matchMedia('(max-width: 700px)');
   const elements = collectElements(document, pages[page].targets);
+  const gallery = page === 'nuptias' && collectGallery(document);
+  const uploads = Object.keys(design.gallery?.uploads ?? {}).filter(id => visiblePhoto(design.gallery, id));
+  let urls = new Map();
   const render = () => {
     const view = mobile.matches ? 'mobile' : 'desktop';
     for (const id of elements.keys()) applyElement(elements, id, design, view);
+    if (gallery) renderGallery(gallery, design.gallery, view, urls);
   };
   mobile.addEventListener('change', render);
   render();
+
+  if (gallery && uploads.length) {
+    async function updatePhotos() {
+      try {
+        urls = await signGalleryPhotos((path, body) => request(path, { body }), request.storageUrl, uploads);
+        renderGallery(gallery, design.gallery, mobile.matches ? 'mobile' : 'desktop', urls);
+      } catch {
+        // Preserve the gallery's repository photos if Storage is unavailable.
+      }
+    }
+    await updatePhotos();
+    setInterval(updatePhotos, (photoLinkLifetime - 60) * 1000);
+  }
 }
 
 showPublishedDesign().catch(() => {

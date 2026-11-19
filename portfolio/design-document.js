@@ -1,4 +1,5 @@
 import { pages } from './pages.js';
+import { emptyGallery, validateGallery } from './gallery-document.js';
 
 // Shared document format for the editor, backups and published designs.
 export const bounds = {
@@ -20,7 +21,10 @@ const alignments = ['left', 'center', 'right', 'justify'];
 const isRecord = (object) => object && typeof object === 'object' && !Array.isArray(object);
 
 export function emptyDraft(page = 'home') {
-  return { version: 1, page, desktop: {}, mobile: {}, content: {} };
+  return {
+    version: 1, page, desktop: {}, mobile: {}, content: {},
+    ...(page === 'nuptias' && { gallery: emptyGallery() }),
+  };
 }
 
 export function validateDraft(value, page = value?.page) {
@@ -50,5 +54,6 @@ export function validateDraft(value, page = value?.page) {
       if (Object.keys(clean).length) draft[view][id] = clean;
     }
   }
+  if (page === 'nuptias' && value.gallery !== undefined) draft.gallery = validateGallery(value.gallery);
   return draft;
 }

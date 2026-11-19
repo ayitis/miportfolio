@@ -6,16 +6,17 @@ export async function connect() {
   if (!config.ok) throw new Error('Supabase todavía no está configurado.');
   const { url, key } = await config.json();
 
-  return async function request(path, { token, body, signal } = {}) {
+  async function request(path, { token, body, file, signal } = {}) {
     const response = await fetch(url + path, {
-      method: body === undefined ? 'GET' : 'POST',
+      method: file === undefined && body === undefined ? 'GET' : 'POST',
       cache: 'no-store',
       headers: {
         apikey: key,
         ...(token && { Authorization: `Bearer ${token}` }),
+        ...(file !== undefined && { 'Content-Type': file.type, 'x-upsert': 'false' }),
         ...(body !== undefined && { 'Content-Type': 'application/json' }),
       },
-      ...(body !== undefined && { body: JSON.stringify(body) }),
+      ...(file !== undefined ? { body: file } : (body !== undefined && { body: JSON.stringify(body) })),
       signal: signal ?? AbortSignal.timeout(10000),
     });
     const result = response.status === 204 ? null : await response.json();
@@ -26,5 +27,7 @@ export async function connect() {
       throw error;
     }
     return result;
-  };
+  }
+  request.storageUrl = url + '/storage/v1';
+  return request;
 }

@@ -41,3 +41,12 @@ Los identificadores permanentes de la portada están en `portfolio/home-design.j
 2. En Vercel conserva las dos variables de **Preview** que ya tienes. La rama actualizada usa el mismo proyecto, usuario y enlace de Preview.
 3. Abre `/editor` en Preview y elige **NUPTIAS** en **Página**. Guarda un borrador y comprueba que la página pública del Preview sigue mostrando su versión anterior. Pulsa **Publicar cambios** y abre `/nuptias.html` en el Preview para comprobar la publicación.
 4. Si quieres ajustar el título **FORM & FEELING.**, selecciona el título completo para moverlo o elige sus partes por separado para editar su contenido. Las copias de seguridad y el historial corresponden a la página seleccionada.
+
+## Gestionar las fotos de NUPTIAS en Preview
+
+1. En el Supabase de **Preview**, abre **SQL Editor → New query**. Después de las dos migraciones anteriores, copia [la migración de Storage](../supabase/migrations/20261119010000_nuptias_photo_storage.sql), pégala y pulsa **Run** una vez. Crea el bucket privado `portfolio-nuptias` y sus permisos. Conserva el borrador, la publicación y el historial existentes. En Vercel se siguen usando las mismas variables de Preview.
+2. Abre **/editor → NUPTIAS → Fotografías de NUPTIAS**. Haz clic en una foto de la galería o elígela en la lista. Puedes pausar el carrusel, arrastrar la foto sobre otra o usar **Adelantar** y **Atrasar**.
+3. Usa **Ocultar** o **Quitar de la galería** para retirarla de la vista. Sigue disponible en la lista, donde puedes elegir **Restaurar fotografía**. El ancho, el alto y el recorte se ajustan por separado en **Escritorio** y **Móvil**.
+4. Usa **Subir fotografía** para elegir un JPG, PNG, WebP o AVIF de hasta 10 MB. La foto se sube de forma privada. Pulsa **Guardar borrador** para conservar las ediciones de textos y fotos, o **Publicar cambios** para mostrarlas en la página de Preview.
+
+Los originales del repositorio se identifican por su nombre de archivo. Mantén sus nombres al editar el HTML para conservar sus ajustes. La copia JSON y el historial contienen el orden, los ajustes y las referencias a las subidas. Las imágenes subidas siguen en el Storage del proyecto, incluido cuando se ocultan o se retiran, para que las versiones anteriores puedan restaurarlas. Mantén una copia de los archivos si vas a usar otro proyecto de Supabase.

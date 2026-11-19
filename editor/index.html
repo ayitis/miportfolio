@@ -43,6 +43,33 @@
             <option>Villa Tiger Marrakech</option>
           </optgroup>
         </select>
+        <details id="gallery-tools" hidden>
+          <summary>Fotografías de NUPTIAS</summary>
+          <p>Haz clic en una foto de la galería para seleccionarla. Arrástrala sobre otra para cambiar el orden.</p>
+          <label for="photo-picker">Fotografía</label>
+          <select id="photo-picker"><option value="">Selecciona una fotografía</option></select>
+          <fieldset id="photo-settings" disabled>
+            <legend>Ajustes de la fotografía</legend>
+            <div class="photo-actions">
+              <button type="button" id="photo-up">Adelantar</button>
+              <button type="button" id="photo-down">Atrasar</button>
+              <button type="button" id="photo-hide">Ocultar</button>
+              <button type="button" id="photo-remove">Quitar de la galería</button>
+              <button type="button" id="photo-restore" hidden>Restaurar fotografía</button>
+            </div>
+            <div class="pair">
+              <label>Ancho (px) <input type="number" min="80" max="900" placeholder="Original" data-photo-field="width"></label>
+              <label>Alto (px) <input type="number" min="80" max="600" placeholder="Original" data-photo-field="height"></label>
+              <label>Recorte horizontal (%) <input type="number" min="0" max="100" placeholder="50" data-photo-field="x"></label>
+              <label>Recorte vertical (%) <input type="number" min="0" max="100" placeholder="50" data-photo-field="y"></label>
+            </div>
+          </fieldset>
+          <div class="photo-actions">
+            <button type="button" id="photo-pause" aria-pressed="false">Pausar galería</button>
+          </div>
+          <label for="photo-file">Subir fotografía</label>
+          <input type="file" id="photo-file" accept="image/jpeg,image/png,image/webp,image/avif">
+        </details>
         <label for="element">Texto de la página</label>
         <select id="element" disabled><option value="">Selecciona un texto</option></select>
         <p id="instructions">Haz clic sobre un texto de la página. Arrástralo o ajusta su posición aquí.</p>

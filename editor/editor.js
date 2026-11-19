@@ -1,6 +1,8 @@
 import { bounds, emptyDraft, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
 import { applyElement, collectElements } from '../portfolio/render-design.js';
+import { visiblePhoto } from '../portfolio/gallery-document.js';
+import { setupGallery } from './gallery.js';
 import { openEditor } from './storage.js';
 
 const find = (id) => document.getElementById(id);
@@ -57,6 +59,7 @@ function updateFields() {
 }
 
 function select(id, reveal = false) {
+  if (id) gallery.select('');
   for (const { node } of editable.get(selected) ?? []) node.removeAttribute('data-editor-selected');
   selected = id;
   for (const { node } of editable.get(selected) ?? []) node.setAttribute('data-editor-selected', '');
@@ -87,6 +90,7 @@ function applyView(next) {
   for (const button of viewButtons) button.setAttribute('aria-pressed', String(button.dataset.view === view));
   for (const id of editable.keys()) apply(id);
   updateFields();
+  gallery.render();
 }
 
 function attach() {
@@ -209,6 +213,13 @@ function runAction(action) {
 
 async function save(publish) {
   if (publish && !window.confirm(`¿Quieres mostrar los cambios de ${pages[draft.page].label} en el sitio conectado?`)) return;
+  if (publish && draft.gallery) {
+    const ids = Object.keys(draft.gallery.uploads).filter(id => visiblePhoto(draft.gallery, id));
+    const urls = await store.photoUrls(ids);
+    if (urls.size !== ids.length) {
+      throw new Error('Algunas fotos visibles no están disponibles en Storage. Ocúltalas o vuelve a subirlas antes de publicar.');
+    }
+  }
   revision = await store.save(draft, revision, publish);
   dirty = false;
   status.textContent = publish ? 'Cambios publicados.' : 'Borrador guardado de forma privada.';
@@ -243,6 +254,7 @@ restore.addEventListener('click', runAction(async () => {
   if (!history.value || (dirty && !window.confirm('¿Quieres sustituir los cambios pendientes por esta versión?'))) return;
   draft = await store.restore(draft.page, history.value);
   applyView(view);
+  gallery.reloadUploads();
   markDirty();
   status.textContent = 'Versión cargada. Puedes guardarla como borrador o publicarla.';
 }));
@@ -273,6 +285,7 @@ find('import').addEventListener('change', runAction(async () => {
     if (dirty && !window.confirm('¿Quieres sustituir los cambios pendientes por esta copia?')) return;
     draft = imported;
     applyView(view);
+    gallery.reloadUploads();
     markDirty();
     status.textContent = 'Copia importada. Pulsa Guardar borrador para conservarla.';
   } catch (error) {
@@ -288,6 +301,7 @@ function initializePreview() {
   const url = new URL(preview.contentDocument.URL);
   if (url.pathname !== pages[draft.page].path || !url.searchParams.has('editor-preview')) return;
   attach();
+  if (draft.page === 'nuptias') gallery.attach(preview.contentDocument);
   applyView(view);
   status.textContent = `Editando ${pages[draft.page].label}.`;
   for (const id of pageControls) find(id).disabled = false;
@@ -295,6 +309,7 @@ function initializePreview() {
 
 async function showPage(page) {
   ({ draft, revision } = await store.load(page));
+  gallery.detach();
   pagePicker.value = page;
   dirty = false;
   drag = null;
@@ -354,5 +369,16 @@ async function initialize() {
     if (store && workspace.hidden) login.hidden = false;
   }
 }
+
+const gallery = setupGallery({
+  getDraft: () => draft,
+  getView: () => view,
+  getStore: () => store,
+  runAction,
+  markDirty,
+  deselectText: () => select(''),
+  status,
+  isBusy: () => workspace.inert,
+});
 
 initialize();

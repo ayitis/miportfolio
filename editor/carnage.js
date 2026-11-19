@@ -1,3 +1,4 @@
+import { frameUpdate } from './frame-update.js';
 import { carnageBounds, carnageOrder } from '../portfolio/carnage-document.js';
 
 export function setupCarnage({ getDraft, getView, markDirty, closeGroup, deselectText, isBusy }) {
@@ -179,8 +180,11 @@ export function setupCarnage({ getDraft, getView, markDirty, closeGroup, deselec
       y: bounded('y', y + (top ? height - size.height : 0)) }, gesture);
   }
 
+  const pointerUpdates = frameUpdate(movePointer);
+
   function endPointer(event) {
     if (gesture?.pointer !== event.pointerId) return;
+    pointerUpdates.flush();
     gesture = undefined;
     closeGroup();
   }
@@ -231,7 +235,9 @@ export function setupCarnage({ getDraft, getView, markDirty, closeGroup, deselec
         slider.value = Math.round(detail * 100);
       });
       page.addEventListener('pointerdown', startPointer);
-      page.addEventListener('pointermove', movePointer);
+      page.addEventListener('pointermove', event => {
+        if (gesture?.pointer === event.pointerId) pointerUpdates.schedule(event);
+      });
       page.addEventListener('lostpointercapture', endPointer);
       page.addEventListener('keydown', keydown);
       render();

@@ -1,3 +1,4 @@
+import { frameUpdate } from './frame-update.js';
 import { ayamFilm, ayamGeometry, ayamOrder, mediaPath } from '../portfolio/ayam-document.js';
 import { renderAyam } from '../portfolio/ayam-layout.js';
 
@@ -225,8 +226,11 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
     change({ ...next, x: bound('x', x + (west ? width - next.width : 0)), y: bound('y', y + (north ? height - next.height : 0)) }, drag);
   }
 
+  const pointerUpdates = frameUpdate(move);
+
   function finish(event) {
     if (drag?.id !== event.pointerId) return;
+    pointerUpdates.flush();
     drag = undefined;
     closeGroup();
   }
@@ -257,7 +261,9 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
       `;
       page.head.append(style);
       page.addEventListener('pointerdown', start);
-      page.addEventListener('pointermove', move);
+      page.addEventListener('pointermove', event => {
+        if (drag?.id === event.pointerId) pointerUpdates.schedule(event);
+      });
       page.addEventListener('lostpointercapture', finish);
       render();
     },

@@ -66,11 +66,13 @@ iframe {
   height: 100%;
   min-height: 480px;
   margin: auto;
-  border: 1px solid #c1b5d2;
+  border: 0;
+  outline: 1px solid #c1b5d2;
   background: white;
   border-radius: .6rem;
 }
 iframe.mobile { width: 390px; min-width: 0; max-width: 100%; height: min(844px, 100%); }
+iframe[data-exact-width] { max-width: none; }
 @media (max-width: 650px) {
   .toolbar { flex-wrap: wrap; }
   h1 { flex-basis: 100%; }

@@ -62,6 +62,24 @@ export function syncCustomElements(page, editable, draft) {
   }
 }
 
+function applyText(original, content) {
+  if (!original.allowText || original.appliedText === content) return;
+  const { node } = original;
+  if (content === undefined) node.replaceChildren(...original.children);
+  else node.textContent = content;
+  if (original.title !== null) node.dataset.title = content ?? original.title;
+  const multiline = Boolean(content?.includes('\n'));
+  if (multiline !== Boolean(original.appliedText?.includes('\n'))) {
+    if (multiline) node.style.setProperty('white-space', 'pre-line');
+    else node.style.setProperty('white-space', ...original.styles['white-space']);
+  }
+  original.appliedText = content;
+}
+
+export function applyElementText(editable, id, draft) {
+  for (const original of editable.get(id) ?? []) applyText(original, draft.content[id]?.text);
+}
+
 export function applyElement(editable, id, draft, view) {
   if (id === horizontalGallery || id === verticalGallery) return;
   const overrides = draft[view][id] ?? {};
@@ -82,7 +100,6 @@ export function applyElement(editable, id, draft, view) {
     'margin-inline': null,
     'max-width': null,
     width: overrides.width === undefined ? null : `${overrides.width}px`,
-    'white-space': content?.includes('\n') ? 'pre-line' : null,
   };
 
   for (const original of editable.get(id) ?? []) {
@@ -109,12 +126,7 @@ export function applyElement(editable, id, draft, view) {
       if (value === null) node.style.setProperty(property, ...original.styles[property]);
       else node.style.setProperty(property, value);
     }
-    if (original.allowText && original.appliedText !== content) {
-      if (content === undefined) node.replaceChildren(...original.children);
-      else node.textContent = content;
-      if (original.title !== null) node.dataset.title = content ?? original.title;
-      original.appliedText = content;
-    }
+    applyText(original, content);
     if (nuptias || (draft.page === 'nuptias' && nuptiasLeftCaptions.includes(id))) {
       node.dataset.nuptiasX = x;
       node.dataset.nuptiasY = y;

@@ -1,3 +1,6 @@
+import { frameUpdate } from './frame-update.js';
+import { mobileMaxWidth } from '../portfolio/viewport.js';
+import { renderPortfolio } from '../portfolio/render-portfolio.js';
 import { ayamPage } from '../portfolio/ayam-document.js';
 import { syncAyamNodes } from '../portfolio/ayam-layout.js';
 import { setupAyam } from './ayam.js';
@@ -7,7 +10,7 @@ import { applyNuptiasLayout, followsNuptiasHeading, hasNuptiasDesktopLimit, isNu
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
-import { applyElement, collectElements, constrainNuptiasPositions, syncCustomElements } from '../portfolio/render-design.js';
+import { applyElement, applyElementText, collectElements, constrainNuptiasPositions, syncCustomElements } from '../portfolio/render-design.js';
 import { visibleUploads } from '../portfolio/gallery-document.js';
 import { alignRect, shiftRect } from './alignment.js';
 import { createGuideLayer } from './guide-layer.js';
@@ -17,6 +20,12 @@ import { openEditor } from './storage.js';
 
 const find = (id) => document.getElementById(id);
 const preview = find('preview');
+const viewportWidth = find('viewport-width');
+const viewportHeight = find('viewport-height');
+const viewportSize = find('viewport-size');
+const canvasSizes = new Map();
+const canvasKey = () => `${draft.page}:${view}`;
+
 const element = find('element');
 const pagePicker = find('page');
 const status = find('status');
@@ -61,7 +70,8 @@ function markDirty(group) {
   actions.record(draft, group);
   dirty = actions.dirty;
   updateActionButtons();
-  status.textContent = dirty ? 'Cambios pendientes de guardar.' : 'Sin cambios pendientes.';
+  const message = dirty ? 'Cambios pendientes de guardar.' : 'Sin cambios pendientes.';
+  if (status.textContent !== message) status.textContent = message;
 }
 
 function refreshElements() {
@@ -147,6 +157,7 @@ function updateFields() {
 }
 
 function select(id, reveal = false) {
+  textUpdates.flush();
   if (id) {
     gallery.select('');
     carnage.clear();
@@ -188,6 +199,8 @@ function updateSetting(section, key, value) {
 }
 
 function finishDrag() {
+  textUpdates.flush();
+  pointerUpdates.flush();
   const previous = drag;
   drag = null;
   if (previous) {
@@ -433,22 +446,90 @@ for (const button of columnButtons) button.addEventListener('click', () => {
 });
 columnStage.addEventListener('input', () => changeColumnStage(Number(columnStage.value)));
 
+function showCanvasSize() {
+  const { clientWidth, clientHeight } = preview;
+  const dimensions = `${clientWidth} × ${clientHeight} px`;
+  if (viewportSize.value !== dimensions) viewportSize.value = dimensions;
+}
+
+function sizeCanvas() {
+  const { width, height } = canvasSizes.get(canvasKey()) ?? {};
+  const mobile = view === 'mobile';
+  const limit = mobileMaxWidth(draft.page);
+  viewportWidth.min = mobile ? 240 : limit + 1;
+  viewportWidth.max = mobile ? limit : 3840;
+  viewportWidth.value = width ?? '';
+  viewportHeight.value = height ?? '';
+  preview.classList.toggle('mobile', mobile);
+  preview.toggleAttribute('data-exact-width', width !== undefined);
+  preview.style.width = width === undefined ? '' : `${width}px`;
+  preview.style.minWidth = mobile ? '' : `${limit + 1}px`;
+  preview.style.height = height === undefined ? '' : `${height}px`;
+  preview.style.minHeight = height === undefined ? '' : '0';
+  showCanvasSize();
+}
+
+for (const [field, name] of [[viewportWidth, 'width'], [viewportHeight, 'height']]) {
+  field.addEventListener('change', () => {
+    if (!field.validity.valid) {
+      sizeCanvas();
+      return;
+    }
+    const size = canvasSizes.get(canvasKey()) ?? {};
+    if (field.value === '') delete size[name];
+    else size[name] = field.valueAsNumber;
+    canvasSizes.set(canvasKey(), size);
+    applyView(view);
+  });
+}
+new ResizeObserver(showCanvasSize).observe(preview);
+
 function applyView(next) {
   finishDrag();
   view = next;
-  preview.classList.toggle('mobile', next === 'mobile');
+  sizeCanvas();
   for (const button of viewButtons) button.setAttribute('aria-pressed', String(button.dataset.view === view));
   find('nuptias-position-tools').hidden = draft.page !== 'nuptias' || view !== 'desktop';
-  if (draft.page === 'nuptias') applyNuptiasLayout(preview.contentDocument, draft, view);
-  for (const id of editable.keys()) applyElement(editable, id, draft, view);
-  gallery.render();
-  carnage.render();
-  ayam.render();
-  constrainNuptiasPositions(preview.contentDocument, editable, draft, view);
+  renderPortfolio(preview.contentDocument, editable, draft, view, {
+    renderGallery: () => {
+      gallery.render();
+      carnage.render();
+      ayam.render();
+    },
+    renderHome: syncColumn,
+  });
   updateFields();
   syncRulers();
-  syncColumn();
 }
+
+const pointerUpdates = frameUpdate((page, event) => {
+  if (drag?.pointer !== event.pointerId || workspace.inert) return;
+  const dx = event.clientX - drag.startX;
+  const dy = event.clientY - drag.startY;
+  if (!drag.moved && Math.hypot(dx, dy) < 3) return;
+  drag.moved = true;
+  const win = page.defaultView;
+  const scrollX = win.scrollX - drag.scrollX;
+  const scrollY = win.scrollY - drag.scrollY;
+  const requestedX = clampOffset('x', drag.x + dx + scrollX);
+  const requestedY = clampOffset('y', drag.y + dy + scrollY);
+  const raw = shiftRect(drag.rect, requestedX - drag.x - scrollX, requestedY - drag.y - scrollY);
+  const targets = guideLayer.references(drag.node, selected);
+  const fixed = guideLayer.fixedLines(selected);
+  const snapping = { x: snapText.checked && Math.abs(dx) >= 3, y: snapText.checked && Math.abs(dy) >= 3 };
+  const alignment = alignRect(raw, targets, fixed, drag.locks, snapping);
+  drag.locks = alignment.locks;
+  const followTitle = isDesktopHeadingFollower() && !draft.desktop[selected]?.independentX;
+  const x = followTitle && !dx && !scrollX ? drag.x : setPosition('x', requestedX + alignment.x);
+  const y = setPosition('y', requestedY + alignment.y);
+  apply(selected);
+  const placed = shiftRect(drag.rect, x - drag.x - scrollX, y - drag.y - scrollY);
+  const exact = alignRect(placed, targets, fixed, {}, { x: false, y: false });
+  guideLayer.draw(placed, exact.lines, targets);
+  showNuptiasLimit(drag.node);
+  updateFields();
+  markDirty(drag);
+});
 
 function attach() {
   const page = preview.contentDocument;
@@ -468,10 +549,12 @@ function attach() {
   });
   page.addEventListener('keydown', shortcuts);
   page.defaultView.addEventListener('resize', () => {
-    if (preview.contentDocument === page && draft.page === 'nuptias') {
+    if (preview.contentDocument !== page || pagePicker.disabled) return;
+    if (draft.page === 'nuptias') {
       apply(groupTarget);
       apply(nuptiasEditorial);
     }
+    if (draft.page === ayamPage) ayam.render(false);
   });
 
   const hero = page.querySelector('.hero');
@@ -544,33 +627,8 @@ function attach() {
     node.setPointerCapture(event.pointerId);
   }, true);
 
-  page.addEventListener('pointermove', (event) => {
-    if (drag?.pointer !== event.pointerId || workspace.inert) return;
-    const dx = event.clientX - drag.startX;
-    const dy = event.clientY - drag.startY;
-    if (!drag.moved && Math.hypot(dx, dy) < 3) return;
-    drag.moved = true;
-    const win = page.defaultView;
-    const scrollX = win.scrollX - drag.scrollX;
-    const scrollY = win.scrollY - drag.scrollY;
-    const requestedX = clampOffset('x', drag.x + dx + scrollX);
-    const requestedY = clampOffset('y', drag.y + dy + scrollY);
-    const raw = shiftRect(drag.rect, requestedX - drag.x - scrollX, requestedY - drag.y - scrollY);
-    const targets = guideLayer.references(drag.node, selected);
-    const fixed = guideLayer.fixedLines(selected);
-    const snapping = { x: snapText.checked && Math.abs(dx) >= 3, y: snapText.checked && Math.abs(dy) >= 3 };
-    const alignment = alignRect(raw, targets, fixed, drag.locks, snapping);
-    drag.locks = alignment.locks;
-    const followTitle = isDesktopHeadingFollower() && !draft.desktop[selected]?.independentX;
-    const x = followTitle && !dx && !scrollX ? drag.x : setPosition('x', requestedX + alignment.x);
-    const y = setPosition('y', requestedY + alignment.y);
-    apply(selected);
-    const placed = shiftRect(drag.rect, x - drag.x - scrollX, y - drag.y - scrollY);
-    const exact = alignRect(placed, targets, fixed, {}, { x: false, y: false });
-    guideLayer.draw(placed, exact.lines, targets);
-    showNuptiasLimit(drag.node);
-    updateFields();
-    markDirty(drag);
+  page.addEventListener('pointermove', event => {
+    if (drag?.pointer === event.pointerId) pointerUpdates.schedule(page, event);
   });
 
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
@@ -600,10 +658,40 @@ for (const [button, layer] of [['layer-back', 1], ['layer-front', 50]]) {
 showRulers.addEventListener('change', syncRulers);
 find('clear-guides').addEventListener('click', () => guideLayer?.clearRulers());
 for (const button of viewButtons) button.addEventListener('click', () => applyView(button.dataset.view));
+function syncNuptiasField(key) {
+  if (draft.page !== 'nuptias' || !isNuptiasPosition(selected)) return;
+  const applied = Number(editable.get(selected)?.[0]?.node.dataset.nuptiasX);
+  const requested = draft[view][selected]?.x ?? 0;
+  const followTitle = isDesktopHeadingFollower() && !draft.desktop[selected]?.independentX;
+  if (!followTitle && ['x', 'size', 'width', 'font', 'spacing', 'text'].includes(key) &&
+      Number.isFinite(applied) && applied !== requested) {
+    updateSetting(view, 'x', applied || undefined);
+  }
+  showNuptiasLimit();
+}
+
+const textUpdates = frameUpdate(input => {
+  constrainNuptiasPositions(preview.contentDocument, editable, draft, view);
+  syncNuptiasField('text');
+  markDirty(input);
+});
+
+function editText(input) {
+  const original = editable.get(selected)[0].text;
+  const text = input.value === original ? undefined : input.value;
+  if (text === draft.content[selected]?.text) return;
+  updateSetting('content', 'text', text);
+  applyElementText(editable, selected, draft);
+  if (selected.startsWith('custom.')) element.selectedOptions[0].textContent = input.value.slice(0, 65) || 'Texto nuevo';
+  textUpdates.schedule(input);
+}
+
 for (const input of fields) {
   input.addEventListener('input', () => {
     if (!selected || !input.validity.valid) return;
     const key = input.dataset.field;
+    if (key === 'text') { editText(input); return; }
+    textUpdates.flush();
     if ((homeGallery(selected) || (draft.page === 'nuptias' && isNuptiasPosition(selected)) || isDesktopHeadingFollower()) && (key === 'x' || key === 'y')) {
       if (input.value === '') {
         updateSetting(view, key, undefined);
@@ -611,28 +699,16 @@ for (const input of fields) {
           updateSetting(view, 'independentX', undefined);
         }
       } else setPosition(key, input.valueAsNumber);
-    } else if (key === 'text') {
-      const original = editable.get(selected)[0].text;
-      updateSetting('content', key, input.value === original ? undefined : input.value);
     }
     else if (input.type === 'number') updateSetting(view, key, input.value === '' ? undefined : input.valueAsNumber);
     else updateSetting(view, key, input.value || undefined);
     apply(selected);
-    if (draft.page === 'nuptias' && isNuptiasPosition(selected)) {
-      const applied = Number(editable.get(selected)?.[0]?.node.dataset.nuptiasX);
-      const requested = draft[view][selected]?.x ?? 0;
-      const followTitle = isDesktopHeadingFollower() && !draft.desktop[selected]?.independentX;
-      if (!followTitle && ['x', 'size', 'width', 'font', 'spacing', 'text'].includes(key) &&
-          Number.isFinite(applied) && applied !== requested) {
-        updateSetting(view, 'x', applied || undefined);
-      }
-      showNuptiasLimit();
-    }
+    syncNuptiasField(key);
     if (key === 'color') updateFields();
-    if (key === 'text' && selected.startsWith('custom.')) element.selectedOptions[0].textContent = input.value.slice(0, 65) || 'Texto nuevo';
     markDirty(input);
   });
   input.addEventListener('blur', () => {
+    textUpdates.flush();
     actions.closeGroup();
     if (!input.validity.valid || homeGallery(selected) || (draft.page === 'nuptias' && isNuptiasPosition(selected))) updateFields();
   });
@@ -801,7 +877,7 @@ find('import').addEventListener('change', runAction(async () => {
   }
 }));
 
-const pageControls = ['page', 'element', 'save', 'publish', 'export', 'import', 'add-text'];
+const pageControls = ['page', 'element', 'save', 'publish', 'export', 'import', 'add-text', 'viewport-width', 'viewport-height'];
 
 function initializePreview() {
   const url = new URL(preview.contentDocument.URL);

@@ -1,3 +1,4 @@
+import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
 import { fonts } from './design-document.js';
 
 const properties = ['translate', 'font-size', 'font-family', 'text-align', 'width', 'white-space', 'color', 'display', 'letter-spacing', 'z-index', 'height', 'margin-inline', 'max-width'];
@@ -60,6 +61,7 @@ export function syncCustomElements(page, editable, draft) {
 }
 
 export function applyElement(editable, id, draft, view) {
+  if (id === horizontalGallery || id === verticalGallery) return;
   const overrides = draft[view][id] ?? {};
   const content = draft.content[id]?.text;
   const styles = {

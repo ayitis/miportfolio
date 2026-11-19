@@ -1,3 +1,4 @@
+import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
 import { applyElement, collectElements, syncCustomElements } from '../portfolio/render-design.js';
@@ -29,6 +30,8 @@ let revision = null;
 const actions = actionHistory();
 let clipboard;
 const groupTarget = 'gallery.container';
+const homeGallery = id => id === horizontalGallery || id === verticalGallery;
+const layoutElement = id => id === groupTarget || homeGallery(id);
 
 const workspace = find('workspace');
 const access = find('access');
@@ -45,7 +48,7 @@ function updateActionButtons() {
   find('undo').disabled = !actions.canUndo;
   find('redo').disabled = !actions.canRedo;
   find('paste-element').disabled = !clipboard || pagePicker.disabled || (clipboard.type === 'photo' && draft.page !== 'nuptias');
-  for (const id of ['copy-element', 'duplicate-element']) find(id).disabled = (!selected && !gallery.hasSelection) || selected === groupTarget;
+  for (const id of ['copy-element', 'duplicate-element']) find(id).disabled = (!selected && !gallery.hasSelection) || layoutElement(selected);
 }
 
 function markDirty(group) {
@@ -62,7 +65,7 @@ function refreshElements() {
   const labels = new Map(pages[draft.page].targets);
   for (const [id, originals] of editable) {
     if (draft.elements[id]?.hidden) continue;
-    for (const { node } of originals) if (id !== groupTarget) node.dataset.editorText = id;
+    for (const { node } of originals) if (!layoutElement(id)) node.dataset.editorText = id;
     const name = labels.get(id) ?? (draft.content[id]?.text?.slice(0, 65) || 'Texto nuevo');
     element.add(new Option(name, id));
   }
@@ -84,23 +87,27 @@ function restoreActions(back) {
 }
 
 function apply(id) {
+  if (homeGallery(id)) { syncColumn(); return; }
   applyElement(editable, id, draft, view);
 }
 
 function updateFields() {
   const overrides = draft[view][selected] ?? {};
   const original = editable.get(selected)?.[0];
-  const group = selected === groupTarget;
+  const group = layoutElement(selected);
+  const groupSizing = selected === groupTarget;
   find('element-layers').hidden = !selected.startsWith('custom.');
-  find('gallery-layout-help').hidden = !group;
+  find('gallery-layout-help').hidden = !groupSizing;
   find('delete-element').hidden = group;
   find('reset').textContent = group ? 'Restablecer cinta' : 'Restaurar ajustes de este texto';
   find('reset-color').closest('.color-setting').hidden = group;
   for (const input of fields) {
     if (['text', 'size', 'font', 'align', 'spacing', 'height'].includes(input.dataset.field)) {
-      input.parentElement.hidden = input.dataset.field === 'height' ? !group : group;
+      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing : group;
     }
   }
+  fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected);
+  find('properties').querySelector('legend').textContent = group ? 'Posición de la galería' : 'Ajustes del texto';
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
@@ -122,6 +129,8 @@ function select(id, reveal = false) {
   if (id) gallery.select('');
   for (const { node } of editable.get(selected) ?? []) node.removeAttribute('data-editor-selected');
   selected = id;
+  if (id === verticalGallery && (Number(columnStage.value) < verticalStage || Number(columnStage.value) >= 76)) setColumnStage(verticalStage);
+  else if (id === horizontalGallery && Number(columnStage.value) !== 0) setColumnStage(0);
   for (const { node } of editable.get(selected) ?? []) node.setAttribute('data-editor-selected', '');
   element.value = id;
   updateFields();
@@ -163,7 +172,14 @@ function syncRulers() {
 }
 
 function clampOffset(axis, value) {
-  const [min, max] = bounds[axis];
+  let [min, max] = bounds[axis];
+  if (selected === verticalGallery) {
+    const hero = preview.contentDocument.querySelector('.hero');
+    const suffix = axis.toUpperCase();
+    min = Number(hero.dataset['columnMin' + suffix] ?? min);
+    max = Number(hero.dataset['columnMax' + suffix] ?? max);
+    return Math.max(min, Math.min(max, Math.round(value)));
+  }
   const viewportWidth = preview.contentDocument?.documentElement.clientWidth ?? 0;
   const limit = selected === groupTarget && axis === 'x'
     ? Math.min(max, Math.max(0, Math.floor((viewportWidth - (draft[view][selected]?.width ?? viewportWidth)) / 2)))
@@ -187,7 +203,7 @@ function captureElement() {
     return true;
   }
   const item = editable.get(selected)?.[0];
-  if (!item || selected === groupTarget) return false;
+  if (!item || layoutElement(selected)) return false;
   const win = preview.contentWindow;
   const rect = item.node.getBoundingClientRect();
   const css = win.getComputedStyle(item.node);
@@ -255,7 +271,7 @@ function pasteElement() {
 function deleteSelection() {
   if (workspace.inert || pagePicker.disabled) return false;
   if (!selected) return gallery.removeSelected();
-  if (selected === groupTarget) return false;
+  if (layoutElement(selected)) return false;
   if (selected.startsWith('custom.')) {
     for (const section of ['elements', 'desktop', 'mobile', 'content']) delete draft[section][selected];
   } else {
@@ -310,41 +326,50 @@ function nudge(event) {
   if (!node || !guideLayer) return;
   const rect = node.getBoundingClientRect();
   const targets = guideLayer.references(node, selected);
-  const alignment = alignRect(rect, targets, guideLayer.fixedLines(), {}, { x: false, y: false });
+  const alignment = alignRect(rect, targets, guideLayer.fixedLines(selected), {}, { x: false, y: false });
   guideLayer.draw(rect, alignment.lines, targets);
   clearTimeout(nudgeTimer);
   nudgeTimer = setTimeout(() => guideLayer?.clear(), 650);
 }
 
-const columnOffset = find('column-offset');
-const showColumn = find('show-column');
+const columnStage = find('column-stage');
+const columnButtons = [...document.querySelectorAll('[data-column-stage]')];
 
 function syncColumn() {
   const home = draft.page === 'home';
   find('column-tools').hidden = !home;
   if (!home) return;
-  const offset = draft[view]['gallery.column']?.x;
-  columnOffset.value = offset ?? '';
   const frame = preview.contentDocument;
-  const hero = frame?.querySelector('.hero');
-  if (!hero) return;
-  hero.dataset.columnOffset = offset ?? 0;
-  frame.dispatchEvent(new CustomEvent('portfolio:column-preview', { detail: showColumn.checked }));
+  if (!frame?.querySelector('.hero')) return;
+  const progress = Number(columnStage.value);
+  applyHomeGalleryLayout(frame, draft[view]);
+  find('column-progress').textContent = `${progress} %`;
+  for (const button of columnButtons) {
+    const target = button.dataset.columnStage === 'vertical' ? verticalStage : Number(button.dataset.columnStage);
+    button.setAttribute('aria-pressed', String(target === progress));
+  }
+  const railHandle = frame.querySelector('[data-editor-gallery-handle="gallery.rail"]');
+  if (railHandle) railHandle.hidden = progress !== 0;
+  frame.dispatchEvent(new CustomEvent('portfolio:column-preview', { detail: progress / 100 }));
 }
 
-showColumn.addEventListener('change', syncColumn);
-columnOffset.addEventListener('input', () => {
-  if (draft.page !== 'home' || !columnOffset.validity.valid) return;
-  if (columnOffset.value === '') delete draft[view]['gallery.column'];
-  else draft[view]['gallery.column'] = { x: columnOffset.valueAsNumber };
-  showColumn.checked = true;
+function setColumnStage(progress) {
+  columnStage.value = String(progress);
   syncColumn();
-  markDirty(columnOffset);
+}
+
+function changeColumnStage(progress) {
+  if ((selected === horizontalGallery && progress !== 0) ||
+      (selected === verticalGallery && (progress < verticalStage || progress >= 76))) select('');
+  finishDrag();
+  setColumnStage(progress);
+}
+
+for (const button of columnButtons) button.addEventListener('click', () => {
+  const choice = button.dataset.columnStage;
+  changeColumnStage(choice === 'vertical' ? verticalStage : Number(choice));
 });
-columnOffset.addEventListener('blur', () => {
-  actions.closeGroup();
-  if (!columnOffset.validity.valid) syncColumn();
-});
+columnStage.addEventListener('input', () => changeColumnStage(Number(columnStage.value)));
 
 function applyView(next) {
   finishDrag();
@@ -379,22 +404,33 @@ function attach() {
     if (preview.contentDocument === page && draft.page === 'nuptias') apply(groupTarget);
   });
 
+  const hero = page.querySelector('.hero');
+  if (draft.page === 'home' && hero) {
+    const region = page.createElement('div');
+    region.dataset.columnRegion = '';
+    region.hidden = true;
+    Object.assign(region.style, { position: 'absolute', pointerEvents: 'none', zIndex: 21 });
+    hero.append(region);
+  }
+
   const { targets } = pages[draft.page];
   editable = collectElements(page, targets);
   refreshElements();
-  const container = editable.get(groupTarget)?.[0]?.node;
-  if (container) {
+  for (const [id, label] of [[groupTarget, 'Mover cinta'], [horizontalGallery, 'Mover carrusel'], [verticalGallery, 'Mover cinta vertical']]) {
+    const group = editable.get(id)?.[0]?.node;
+    if (!group) continue;
     const handle = page.createElement('button');
     handle.type = 'button';
-    handle.textContent = 'Mover cinta';
-    handle.dataset.editorGalleryHandle = '';
+    handle.textContent = label;
+    handle.dataset.editorGalleryHandle = id;
     Object.assign(handle.style, {
-      position: 'absolute', right: '8px', top: '8px', zIndex: '5', cursor: 'move',
+      position: 'absolute', right: '8px', top: 'var(--editor-handle-top, 8px)', zIndex: '5', cursor: 'move',
       background: '#fff', color: '#43275d', border: '1px solid #a88ec7', borderRadius: '5px',
-      padding: '4px 7px', font: '12px system-ui', touchAction: 'none',
+      padding: '4px 7px', font: '12px system-ui', touchAction: 'none', pointerEvents: 'auto',
     });
-    container.append(handle);
-    handle.addEventListener('click', () => select(groupTarget));
+    if (id === horizontalGallery) group.style.position = 'relative';
+    group.append(handle);
+    handle.addEventListener('click', () => select(id));
   }
 
   page.addEventListener('click', (event) => {
@@ -404,12 +440,18 @@ function attach() {
   page.addEventListener('pointerdown', (event) => {
     if (workspace.inert) return;
     const handle = event.target.closest('[data-editor-gallery-handle]');
-    const node = handle ? container : event.target.closest('[data-editor-text]');
+    const text = event.target.closest('[data-editor-text]');
+    const photo = event.target.closest('.hero .project .thumb');
+    const stage = Number(columnStage.value);
+    const galleryId = handle?.dataset.editorGalleryHandle ?? (!text && photo && draft.page === 'home'
+      ? stage === 0 ? horizontalGallery : stage >= verticalStage && stage < 76 ? verticalGallery : null
+      : null);
+    const node = galleryId ? editable.get(galleryId)?.[0]?.node : text;
     if (!node || event.button !== 0 || !event.isPrimary) return;
     event.preventDefault();
     event.stopPropagation();
     finishDrag();
-    select(handle ? groupTarget : node.dataset.editorText);
+    select(galleryId ?? node.dataset.editorText);
     page.defaultView.focus();
     page.documentElement.classList.add('editor-aligning');
     const offsets = draft[view][selected] ?? {};
@@ -422,8 +464,8 @@ function attach() {
       pointer: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      x: offsets.x ?? 0,
-      y: offsets.y ?? 0,
+      x: clampOffset('x', offsets.x ?? 0),
+      y: clampOffset('y', offsets.y ?? 0),
       moved: false,
     };
     node.setPointerCapture(event.pointerId);
@@ -442,7 +484,7 @@ function attach() {
     const requestedY = clampOffset('y', drag.y + dy + scrollY);
     const raw = shiftRect(drag.rect, requestedX - drag.x - scrollX, requestedY - drag.y - scrollY);
     const targets = guideLayer.references(drag.node, selected);
-    const fixed = guideLayer.fixedLines();
+    const fixed = guideLayer.fixedLines(selected);
     const snapping = { x: snapText.checked && Math.abs(dx) >= 3, y: snapText.checked && Math.abs(dy) >= 3 };
     const alignment = alignRect(raw, targets, fixed, drag.locks, snapping);
     drag.locks = alignment.locks;
@@ -487,7 +529,10 @@ for (const input of fields) {
   input.addEventListener('input', () => {
     if (!selected || !input.validity.valid) return;
     const key = input.dataset.field;
-    if (key === 'text') {
+    if (homeGallery(selected) && (key === 'x' || key === 'y')) {
+      if (input.value === '') updateSetting(view, key, undefined);
+      else setPosition(key, input.valueAsNumber);
+    } else if (key === 'text') {
       const original = editable.get(selected)[0].text;
       updateSetting('content', key, input.value === original ? undefined : input.value);
     }
@@ -500,7 +545,7 @@ for (const input of fields) {
   });
   input.addEventListener('blur', () => {
     actions.closeGroup();
-    if (!input.validity.valid) updateFields();
+    if (!input.validity.valid || homeGallery(selected)) updateFields();
   });
 }
 
@@ -646,7 +691,7 @@ async function showPage(page) {
   guideLayer?.detach();
   guideLayer = undefined;
   pagePicker.value = page;
-  showColumn.checked = false;
+  columnStage.value = '0';
   find('column-tools').hidden = true;
   dirty = false;
   select('');

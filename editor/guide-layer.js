@@ -111,12 +111,20 @@ export function createGuideLayer(page, { settings, manualGuides, isBusy }) {
     return targets;
   }
 
-  function fixedLines() {
+  function fixedLines(id) {
     const { width, height } = viewport();
     const fixed = {
       x: [{ id: 'center-x', target: width / 2, center: true }],
       y: [{ id: 'center-y', target: Math.max(height, page.documentElement.scrollHeight) / 2 - win.scrollY, center: true }],
     };
+    if (id === 'gallery.column') {
+      const hero = page.querySelector('.hero');
+      const point = hero?.getBoundingClientRect();
+      if (point && hero.dataset.editorFingerX !== undefined) {
+        fixed.x.push({ id: 'finger-x', target: point.left + Number(hero.dataset.editorFingerX), center: true });
+        fixed.y.push({ id: 'finger-y', target: point.top + Number(hero.dataset.editorFingerY) });
+      }
+    }
     if (rulersEnabled && scope) {
       for (const axis of ['x', 'y']) {
         fixed[axis].push(...guideSet()[axis].map(pos => ({ id: `manual-${axis}-${pos}`, target: pos - scroll(axis) })));

@@ -75,11 +75,14 @@
           <input type="file" id="photo-file" accept="image/jpeg,image/png,image/webp,image/avif">
         </details>
         <details class="column-tools" id="column-tools" hidden>
-          <summary>Columna de proyectos de Home</summary>
-          <label><input type="checkbox" id="show-column"> Ver la columna</label>
-          <label>Desplazamiento adicional (px)
-            <input type="number" id="column-offset" min="-4000" max="4000" step="1" placeholder="0">
-          </label>
+          <summary>Previsualizar transición de Home</summary>
+          <div class="element-actions" aria-label="Estado de la transición">
+            <button type="button" data-column-stage="0" aria-pressed="true">Inicio</button>
+            <button type="button" data-column-stage="24" aria-pressed="false">Transición</button>
+            <button type="button" data-column-stage="vertical" aria-pressed="false">Vertical</button>
+          </div>
+          <label for="column-stage">Progreso del scroll <output id="column-progress">0 %</output></label>
+          <input type="range" id="column-stage" min="0" max="100" value="0">
         </details>
         <details class="alignment-tools">
           <summary>Guías de alineación</summary>

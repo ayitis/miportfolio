@@ -66,3 +66,11 @@ Los originales del repositorio se identifican por su nombre de archivo. Mantén 
 - En NUPTIAS, elige **Galería · Cinta completa** o arrastra el control **Mover cinta** del lienzo. Reduce el ancho antes de desplazarla en horizontal. El alto cambia el marco de la cinta. **Restablecer cinta** devuelve su geometría original en la vista actual. Haz clic sobre las fotos para seguir editándolas individualmente.
 
 Si duplicas una foto subida a Storage, aplica una vez en el Supabase de Preview la [migración de permisos para copias](../supabase/migrations/20261119020000_nuptias_photo_copies.sql). En **SQL Editor → New query**, pega el archivo completo y pulsa **Run** después de la migración de Storage. Así, cada copia conserva sus propios ajustes y comparte el archivo de origen. Los visitantes pueden abrir ese archivo solo mientras al menos una de sus instancias esté publicada y visible.
+
+## Colocar las galerías de Home
+
+Abre **Home / Portada → Previsualizar transición de Home**. **Inicio**, **Transición** y **Vertical** muestran tres momentos del recorrido. El deslizador recorre de 0 a 100 %. La cinta se queda quieta dentro del editor para poder colocarla.
+
+Selecciona **Galería de proyectos — Cinta vertical** o **Mover cinta vertical** sobre el lienzo. Arrastra el bloque o ajusta **Horizontal (px)** y **Vertical (px)**. Puedes usar las flechas para moverlo 1 px y **Mayús + flecha** para moverlo 10 px. Las guías incluyen la punta del dedo. **Restablecer cinta** devuelve la posición de base de la vista activa.
+
+Para ajustar el inicio, elige **Galería de proyectos — Carrusel horizontal**. Ambos bloques tienen posiciones distintas para **Escritorio** y **Móvil**. Guarda un borrador o publica para conservarlas. El movimiento automático se reproduce al entrar en la fase vertical de la portada publicada.

@@ -1,3 +1,4 @@
+import { applyHomeGalleryLayout } from './home-gallery-layout.js';
 import { validateDraft } from './design-document.js';
 import { applyElement, collectElements, syncCustomElements } from './render-design.js';
 import { pages } from './pages.js';
@@ -27,7 +28,7 @@ async function showPublishedDesign() {
     const view = mobile.matches ? 'mobile' : 'desktop';
     for (const id of elements.keys()) applyElement(elements, id, design, view);
     if (page === 'home') {
-      document.querySelector('.hero').dataset.columnOffset = design[view]['gallery.column']?.x ?? 0;
+      applyHomeGalleryLayout(document, design[view]);
       document.dispatchEvent(new Event('portfolio:home-design'));
     }
     if (gallery) renderGallery(gallery, design.gallery, view, urls);

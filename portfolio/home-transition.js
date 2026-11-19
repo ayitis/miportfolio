@@ -1,3 +1,4 @@
+import { verticalStage } from './home-gallery-layout.js';
 import { measureDisciplines } from './home-disciplines.js';
 
 const root = document.documentElement;
@@ -14,7 +15,7 @@ const about = document.getElementById('about');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const narrow = matchMedia('(max-width: 700px)');
 const canHover = matchMedia('(hover: hover)');
-const formedAt = .48;
+const formedAt = verticalStage / 100;
 const exitAt = .76;
 const pixelsPerSecond = 52;
 const inEditor = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
@@ -39,6 +40,8 @@ function clearCards() {
 function stop() {
   distance = 0;
   lastTick = null;
+  const region = hero.querySelector('[data-column-region]');
+  if (region) region.hidden = true;
   if (!active) return;
   active.disciplines.reset();
   active = null;
@@ -112,8 +115,19 @@ function measure() {
   const offset = Number(hero.dataset.columnOffset ?? 0) || 0;
   // Keep the existing offset plus another 19 CSS px at desktop reference size.
   const rightShift = Math.min(105, rect.width * .073) + Math.min(19, rect.width * .0132);
-  const columnX = clamp(offsetX + size * fingertip.x + rightShift + offset, gutter, rect.width - gutter);
-  let nextY = clamp(offsetY + size * fingertip.y + 25, 28, rect.height * .68);
+  const baseX = offsetX + size * fingertip.x + rightShift;
+  const columnX = clamp(baseX + offset, gutter, rect.width - gutter);
+  const baseY = clamp(offsetY + size * fingertip.y + 25, 28, rect.height * .68);
+  const verticalOffset = Number(hero.dataset.columnOffsetY ?? 0) || 0;
+  let nextY = clamp(baseY + verticalOffset, -entries[0].height / 2, rect.height - 60);
+  if (inEditor) {
+    Object.assign(hero.dataset, {
+      columnMinX: Math.ceil(gutter - baseX),
+      columnMaxX: Math.floor(rect.width - gutter - baseX),
+      columnMinY: Math.ceil(-entries[0].height / 2 - baseY),
+      columnMaxY: Math.floor(rect.height - 60 - baseY),
+    });
+  }
   const firstY = nextY;
   const gap = narrow.matches ? 15 : 20;
   for (const item of entries) {
@@ -124,7 +138,7 @@ function measure() {
   const disciplines = measureDisciplines(hero, rect, columnX - widest / 2);
   return {
     entries, visible: new Set(entries.map(({ card }) => card)), rise: nextY + 35, period: nextY - firstY,
-    photoX, photoY, offsetX, offsetY, disciplines,
+    photoX, photoY, offsetX, offsetY, disciplines, columnX, widest, firstY, size, fingertip,
   };
 }
 
@@ -188,6 +202,20 @@ function draw(progress, timestamp) {
       card.inert = true;
     }
   }
+  if (inEditor) {
+    hero.dataset.editorFingerX = mix(active.photoX, active.offsetX, reform) + active.size * active.fingertip.x;
+    hero.dataset.editorFingerY = mix(active.photoY, active.offsetY, reform) + active.size * active.fingertip.y;
+    const region = hero.querySelector('[data-column-region]');
+    if (region) {
+      region.hidden = progress < formedAt || progress >= exitAt;
+      region.style.setProperty('--editor-handle-top', `${Math.max(8, 8 - active.firstY)}px`);
+      Object.assign(region.style, {
+        left: `${active.columnX - active.widest / 2}px`, top: `${active.firstY}px`,
+        width: `${active.widest}px`, height: `${active.period}px`,
+      });
+    }
+  }
+
   for (const item of active.entries) {
     const x = (item.destLeft - item.left) * reform;
     const y = (flowTop(item, active.period) - item.top) * fan - rise;
@@ -242,17 +270,17 @@ function navigateHash() {
 }
 
 if (inEditor) {
-  let showColumn = false;
+  let previewProgress = 0;
   function previewColumn() {
-    if (!showColumn || motion.matches) {
+    if (!previewProgress) {
       stop();
       return;
     }
     needsMeasure = true;
-    draw(formedAt);
+    draw(previewProgress);
   }
   document.addEventListener('portfolio:column-preview', event => {
-    showColumn = event.detail === true;
+    previewProgress = clamp(Number(event.detail) || 0, 0, 1);
     previewColumn();
   });
   window.addEventListener('resize', previewColumn);

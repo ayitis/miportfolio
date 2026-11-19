@@ -20,7 +20,7 @@ header .brand img{width:100%;height:auto;object-fit:contain}
 .nav-links{display:flex;gap:clamp(12px,2vw,30px);align-items:center;font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700}
 .nav-links a:hover,.nav-links a:focus-visible{text-decoration:underline}
 main{overflow:hidden}
-.intro{min-height:calc(100svh - 99px);padding:clamp(12px,2.5vh,28px) var(--gutter) 32px;display:flex;flex-direction:column}
+.intro{isolation:isolate;min-height:calc(100svh - 99px);padding:clamp(12px,2.5vh,28px) var(--gutter) 32px;display:flex;flex-direction:column}
 .meta{font-size:10px;letter-spacing:.18em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px}
 .masthead{display:flex;align-items:baseline;justify-content:space-between;gap:1vw;margin:clamp(14px,3vh,32px) 0 clamp(18px,2.4vh,30px);line-height:.82}
 .masthead span{font-weight:900;font-size:clamp(54px,10.6vw,190px);letter-spacing:-.098em;white-space:nowrap}
@@ -32,16 +32,22 @@ main{overflow:hidden}
 .details{justify-self:end;max-width:290px}
 .details p{font-size:clamp(13px,1vw,17px);line-height:1.5;margin:0 0 20px}
 .details .label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
-.reel-frame{width:100%;aspect-ratio:9/16;position:relative;background:#1f1f1f;overflow:hidden;color:#fff}
+.reel-frame{width:100%;aspect-ratio:9/16;position:relative;z-index:2;transform:translateY(var(--reel-lift, 0px));background:#1f1f1f;overflow:hidden;color:#fff}
 .reel-frame video,.reel-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .reel-frame video{opacity:0;transition:opacity .25s ease;z-index:2}
 .reel-frame.is-playing video{opacity:1}
+.reel-effects{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;visibility:hidden}
+.reel-frame[data-effect="tracking"] .reel-effects{visibility:visible}
+.reel-frame[data-effect="red"] video{filter:grayscale(1) contrast(1.18) url(#reel-red)}
+.reel-frame[data-effect="contrast"] video{filter:contrast(1.36) saturate(.82)}
+.reel-frame[data-effect="tracking"] video{filter:url(#reel-rgb);transform:translate(-2px, 2px) scale(1.025)}
+.reel-frame[data-effect="tracking"]::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,#0005 0 1px,transparent 1px 4px)}
 .reel-fallback{background:#242424;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start}
 .reel-fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6)}
 .reel-caption{z-index:1;position:relative;padding:20px;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;text-shadow:0 1px 8px #000b}
 .reel-status{display:block;font-size:10px;letter-spacing:.09em;margin-top:8px;color:#ddd;font-weight:400;text-transform:none}
-.reel-toggle{position:absolute;z-index:3;right:12px;bottom:12px;display:none;border:1px solid #fff9;background:#1119;color:#fff;padding:8px 10px;cursor:pointer;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
-.reel-frame.is-playing .reel-toggle{display:block}
+.reel-toggle{position:absolute;z-index:4;right:12px;bottom:12px;display:none;border:1px solid #fff9;background:#1119;color:#fff;padding:8px 10px;cursor:pointer;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.reel-frame.has-media .reel-toggle{display:block}
 .intro-footer{display:flex;justify-content:space-between;gap:20px;margin-top:clamp(20px,4vh,50px);font-size:10px;letter-spacing:.13em;text-transform:uppercase}
 .intro-footer a{border-bottom:1px solid currentColor}
 .archive{background:#0b0b0b;color:#f6f5f1;padding:clamp(60px,8vw,125px) var(--gutter) clamp(70px,10vw,145px)}
@@ -84,7 +90,14 @@ main{overflow:hidden}
   .photo-grid .portrait{aspect-ratio:4/5}
   .photo-grid .stack{grid-template-columns:1fr 1fr}
 }
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reel-frame video{transition:none}}
+@media(max-width:650px){
+  .reel-frame[data-effect="tracking"] video{filter:none;transform:translateX(-1px) scale(1.012)}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reel-frame,.reel-frame[data-effect] video{transform:none;filter:none;transition:none}
+  .reel-frame[data-effect] .reel-effects,.reel-frame[data-effect]::after{visibility:hidden}
+}
 </style>
 </head>
 <body>
@@ -110,10 +123,26 @@ main{overflow:hidden}
         <img src="/CARNAGE%20COCHE.jpg" alt="Maison Carnage campaign photograph">
         <div class="reel-caption">CAMPAIGN FILM <span class="reel-status">Campaign film · Maison Carnage</span></div>
       </div>
-      <video id="carnage-reel" muted loop autoplay playsinline preload="metadata" poster="/CARNAGE%20COCHE.jpg">
+      <video id="carnage-reel" muted loop playsinline preload="metadata" poster="/CARNAGE%20COCHE.jpg">
         <source src="/0930.mp4" type="video/mp4">
       </video>
-      <button class="reel-toggle" type="button" aria-label="Pause campaign film">PAUSE</button>
+      <canvas class="reel-effects" aria-hidden="true"></canvas>
+      <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+        <filter id="reel-red" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values="1.12 0 0 0 .06  .12 0 0 0 0  .15 0 0 0 0  0 0 0 1 0"/>
+        </filter>
+        <filter id="reel-rgb" color-interpolation-filters="sRGB">
+          <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feOffset dx="4" result="red"/>
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feOffset dy="1" result="green"/>
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+          <feOffset dx="-3"/>
+          <feBlend in2="green" mode="screen"/>
+          <feBlend in2="red" mode="screen"/>
+        </filter>
+      </svg>
+      <button class="reel-toggle" type="button" aria-label="Play campaign film">PLAY</button>
     </div>
     <div class="details">
       <p class="label">ABOUT THE PROJECT</p>
@@ -136,21 +165,6 @@ main{overflow:hidden}
   <div class="endnote"><span>MAISON CARNAGE / VISUAL ARCHIVE</span><a href="/">BACK TO SELECTED WORK ↑</a></div>
 </section>
 </main>
-<script>
-(() => {
-  const video = document.getElementById('carnage-reel');
-  const wrap = video.closest('.reel-frame');
-  const toggle = wrap.querySelector('.reel-toggle');
-  video.addEventListener('loadeddata', () => {
-    wrap.classList.add('is-playing');
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) video.pause();
-  });
-  video.addEventListener('error', () => wrap.classList.remove('is-playing'));
-  toggle.addEventListener('click', () => {
-    if (video.paused) { video.play().catch(() => {}); toggle.textContent = 'PAUSE'; toggle.setAttribute('aria-label','Pause campaign film'); }
-    else { video.pause(); toggle.textContent = 'PLAY'; toggle.setAttribute('aria-label','Play campaign film'); }
-  });
-})();
-</script>
+<script type="module" src="/portfolio/carnage-reel.js"></script>
 </body>
 </html>

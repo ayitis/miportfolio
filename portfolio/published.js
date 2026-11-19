@@ -13,9 +13,10 @@ async function showPublishedDesign() {
 
   const page = document.documentElement.dataset.designPage ?? 'home';
   if (!Object.hasOwn(pages, page)) return;
-  const request = await connect();
-  const [published] = await request(`/rest/v1/portfolio_published?page=eq.${page}&select=document`);
-  if (!published) return;
+  const firstPaint = page === 'nuptias' ? window.nuptiasFirstPaint : null;
+  const snapshot = firstPaint ? await firstPaint.snapshot : await loadPublished(page);
+  if (!snapshot?.published) return;
+  const { request, published } = snapshot;
 
   const design = validateDraft(published.document, page);
   const mobile = matchMedia('(max-width: 700px)');
@@ -33,23 +34,42 @@ async function showPublishedDesign() {
     }
     if (gallery) renderGallery(gallery, design.gallery, view, urls);
   };
+  async function loadPhotoUrls(signal) {
+    return signGalleryPhotos((path, body) => request(path, { body, signal }), request.storageUrl, uploads);
+  }
+
+  if (gallery && uploads.length) {
+    // Resolve the first visible gallery order before showing the page. In a
+    // Storage failure, keep the saved layout and show repository images.
+    try {
+      urls = await loadPhotoUrls(firstPaint?.signal);
+    } catch {
+      // The rest of the published design is still available.
+    }
+  }
+
   window.addEventListener('resize', render);
   render();
 
   if (gallery && uploads.length) {
     async function updatePhotos() {
       try {
-        urls = await signGalleryPhotos((path, body) => request(path, { body }), request.storageUrl, uploads);
+        urls = await loadPhotoUrls();
         renderGallery(gallery, design.gallery, mobile.matches ? 'mobile' : 'desktop', urls);
       } catch {
         // Preserve the gallery's repository photos if Storage is unavailable.
       }
     }
-    await updatePhotos();
     setInterval(updatePhotos, (photoLinkLifetime - 60) * 1000);
   }
 }
 
+async function loadPublished(page) {
+  const request = await connect();
+  const [published] = await request(`/rest/v1/portfolio_published?page=eq.${page}&select=document`);
+  return { request, published };
+}
+
 showPublishedDesign().catch(() => {
   // The original page remains usable when data or configuration is unavailable.
-});
+}).finally(() => window.nuptiasFirstPaint?.done());

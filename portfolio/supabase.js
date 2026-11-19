@@ -1,7 +1,7 @@
-export async function connect() {
+export async function connect(signal = AbortSignal.timeout(5000)) {
   const config = await fetch('/api/portfolio-config', {
     cache: 'no-store',
-    signal: AbortSignal.timeout(5000),
+    signal,
   });
   if (!config.ok) throw new Error('Supabase todavía no está configurado.');
   const { url, key } = await config.json();

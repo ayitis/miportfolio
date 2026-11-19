@@ -1,8 +1,8 @@
-import { alignNuptiasEditorial, applyNuptiasLayout, followsNuptiasGuide, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasLayout } from '../portfolio/nuptias-layout.js';
+import { applyNuptiasLayout, followsNuptiasGuide, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasLayout } from '../portfolio/nuptias-layout.js';
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
-import { applyElement, collectElements, syncCustomElements } from '../portfolio/render-design.js';
+import { applyElement, collectElements, constrainNuptiasPositions, syncCustomElements } from '../portfolio/render-design.js';
 import { visibleUploads } from '../portfolio/gallery-document.js';
 import { alignRect, shiftRect } from './alignment.js';
 import { createGuideLayer } from './guide-layer.js';
@@ -90,12 +90,7 @@ function restoreActions(back) {
 function apply(id) {
   if (homeGallery(id)) { syncColumn(); return; }
   applyElement(editable, id, draft, view);
-  if (id === nuptiasEditorial) {
-    for (const target of editable.keys()) {
-      if (target !== id && isNuptiasPosition(target)) applyElement(editable, target, draft, view);
-    }
-  }
-  if (draft.page === 'nuptias') alignNuptiasEditorial(preview.contentDocument, view);
+  constrainNuptiasPositions(preview.contentDocument, editable, draft, view);
 }
 
 function updateFields() {
@@ -407,9 +402,10 @@ function applyView(next) {
   for (const button of viewButtons) button.setAttribute('aria-pressed', String(button.dataset.view === view));
   find('nuptias-position-tools').hidden = draft.page !== 'nuptias' || view !== 'desktop';
   if (draft.page === 'nuptias') applyNuptiasLayout(preview.contentDocument, draft, view);
-  for (const id of editable.keys()) apply(id);
-  updateFields();
+  for (const id of editable.keys()) applyElement(editable, id, draft, view);
   gallery.render();
+  constrainNuptiasPositions(preview.contentDocument, editable, draft, view);
+  updateFields();
   syncRulers();
   syncColumn();
 }

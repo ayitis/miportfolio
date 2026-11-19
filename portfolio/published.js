@@ -1,7 +1,7 @@
-import { alignNuptiasEditorial, applyNuptiasLayout } from './nuptias-layout.js';
+import { applyNuptiasLayout } from './nuptias-layout.js';
 import { applyHomeGalleryLayout } from './home-gallery-layout.js';
 import { validateDraft } from './design-document.js';
-import { applyElement, collectElements, syncCustomElements } from './render-design.js';
+import { applyElement, collectElements, constrainNuptiasPositions, syncCustomElements } from './render-design.js';
 import { pages } from './pages.js';
 import { visibleUploads } from './gallery-document.js';
 import { signGalleryPhotos, photoLinkLifetime } from './gallery-storage.js';
@@ -22,7 +22,6 @@ async function showPublishedDesign() {
       const renderDefault = () => {
         const view = media.matches ? 'mobile' : 'desktop';
         applyNuptiasLayout(document, { desktop: {}, mobile: {} }, view);
-        alignNuptiasEditorial(document, view);
       };
       window.addEventListener('resize', renderDefault);
       renderDefault();
@@ -47,7 +46,7 @@ async function showPublishedDesign() {
       document.dispatchEvent(new Event('portfolio:home-design'));
     }
     if (gallery) renderGallery(gallery, design.gallery, view, urls);
-    if (page === 'nuptias') alignNuptiasEditorial(document, view);
+    constrainNuptiasPositions(document, elements, design, view);
   };
   async function loadPhotoUrls(signal) {
     return signGalleryPhotos((path, body) => request(path, { body, signal }), request.storageUrl, uploads);
@@ -70,7 +69,7 @@ async function showPublishedDesign() {
     async function updatePhotos() {
       try {
         urls = await loadPhotoUrls();
-        renderGallery(gallery, design.gallery, mobile.matches ? 'mobile' : 'desktop', urls);
+        render();
       } catch {
         // Preserve the gallery's repository photos if Storage is unavailable.
       }

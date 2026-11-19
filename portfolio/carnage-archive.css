@@ -1,0 +1,64 @@
+.archive {
+  background: #0b0b0b;
+  color: #f6f5f1;
+  padding: clamp(60px, 8vw, 125px) var(--gutter) clamp(70px, 10vw, 145px);
+}
+.archive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+}
+.archive-header h2 {
+  margin: 0;
+  font-size: clamp(45px, 9vw, 145px);
+  line-height: .8;
+  letter-spacing: -.095em;
+  font-weight: 900;
+}
+.archive-header span, .endnote {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.archive-header span { color: #b6b6b6; }
+.archive-stage {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(10px, 2vw, 30px);
+  padding-block: clamp(50px, 10vh, 125px);
+}
+.archive-stage figure { grid-column: span 4; margin: 0; overflow: hidden; }
+.archive-stage figure:nth-child(4n + 1) { grid-column: span 6; }
+.archive-stage figure:nth-child(4n + 2) { grid-column: span 3; }
+.archive-stage img { display: block; width: 100%; height: auto; }
+.endnote { display: flex; justify-content: space-between; margin-top: 65px; gap: 12px; }
+
+.archive.is-scrubbed { --archive-window: 100svh; }
+.archive.is-scrubbed .archive-runway { height: calc(var(--archive-window) + var(--archive-distance)); }
+.archive.is-scrubbed .archive-stage {
+  position: sticky;
+  top: 0;
+  display: block;
+  padding: 0;
+  height: var(--archive-window);
+  overflow: clip;
+}
+.archive.is-scrubbed.is-unfolded .archive-stage { overflow: visible; }
+.archive.is-scrubbed figure {
+  position: absolute;
+  inset: 0 auto auto 0;
+  contain: layout paint;
+}
+.archive.is-scrubbed figure img { height: 100%; object-fit: cover; }
+.archive.is-scrubbed figure:first-child img { object-position: 50% 58%; }
+.archive.is-scrubbed .endnote { margin-top: calc(65px + var(--archive-tail, 0px)); }
+
+@media (max-width: 650px) {
+  .archive-header { display: block; }
+  .archive-header span { display: block; margin-top: 18px; }
+  .archive-stage figure { grid-column: span 6; }
+  .archive-stage figure:nth-child(4n + 1) { grid-column: span 8; }
+  .archive-stage figure:nth-child(4n + 2) { grid-column: span 4; }
+}

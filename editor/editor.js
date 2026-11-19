@@ -1,4 +1,4 @@
-import { applyNuptiasLayout, followsNuptiasGuide, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasLayout } from '../portfolio/nuptias-layout.js';
+import { applyNuptiasLayout, hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasRightLimit, nuptiasLayout } from '../portfolio/nuptias-layout.js';
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
@@ -101,9 +101,9 @@ function updateFields() {
   find('element-layers').hidden = !selected.startsWith('custom.');
   find('gallery-layout-help').hidden = !groupSizing;
   find('delete-element').hidden = group;
-  const locked = draft.page === 'nuptias' && followsNuptiasGuide(selected, view);
-  find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected) || locked;
-  find('nuptias-guide-help').hidden = !locked;
+  const limited = draft.page === 'nuptias' && hasNuptiasDesktopLimit(selected, view);
+  find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected);
+  find('nuptias-guide-help').hidden = !limited;
   find('reset').textContent = selected === nuptiasEditorial ? 'Restablecer posición del bloque' : group ? 'Restablecer cinta' : 'Restaurar ajustes de este texto';
   find('reset-color').closest('.color-setting').hidden = group;
   for (const input of fields) {
@@ -116,7 +116,6 @@ function updateFields() {
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
-    if (key === 'x' || key === 'align') input.disabled = locked;
     if (key === 'text') {
       input.disabled = original?.allowText === false;
       input.value = input.disabled ? '' : (draft.content[selected]?.text ?? original?.text ?? '');
@@ -126,7 +125,9 @@ function updateFields() {
       input.value = rgb ? '#' + rgb.slice(0, 3).map(value => Number(value).toString(16).padStart(2, '0')).join('') : '#161616';
       find('reset-color').disabled = !overrides.color;
     } else {
-      input.value = locked && key === 'x' ? '' : overrides[key] ?? '';
+      const actual = key === 'x' && draft.page === 'nuptias' && isNuptiasPosition(selected)
+        ? Number(original?.node.dataset.nuptiasX) : NaN;
+      input.value = Number.isFinite(actual) && actual !== (overrides[key] ?? 0) ? actual : (overrides[key] ?? '');
     }
   }
 }
@@ -187,7 +188,6 @@ function syncRulers() {
 }
 
 function clampOffset(axis, value) {
-  if (axis === 'x' && draft.page === 'nuptias' && followsNuptiasGuide(selected, view)) return draft[view][selected]?.x ?? 0;
   let [min, max] = bounds[axis];
   if (selected === verticalGallery) {
     const hero = preview.contentDocument.querySelector('.hero');
@@ -196,10 +196,10 @@ function clampOffset(axis, value) {
     max = Number(hero.dataset['columnMax' + suffix] ?? max);
     return Math.max(min, Math.min(max, Math.round(value)));
   }
-  if (draft.page === 'nuptias' && isNuptiasPosition(selected)) {
+  if (draft.page === 'nuptias' && (isNuptiasPosition(selected) || hasNuptiasDesktopLimit(selected, view))) {
     const node = editable.get(selected)?.[0]?.node;
     if (node) {
-      [min, max] = nuptiasPositionBounds(node, axis);
+      [min, max] = nuptiasPositionBounds(node, axis, view);
       return Math.max(min, Math.min(max, Math.round(value)));
     }
   }
@@ -211,7 +211,6 @@ function clampOffset(axis, value) {
 }
 
 function setPosition(axis, value) {
-  if (axis === 'x' && draft.page === 'nuptias' && followsNuptiasGuide(selected, view)) return draft[view][selected]?.x ?? 0;
   const next = clampOffset(axis, value);
   updateSetting(view, axis, next || undefined);
   return next;
@@ -327,6 +326,13 @@ function shortcuts(event) {
   nudge(event);
 }
 
+function showNuptiasLimit(node = editable.get(selected)?.[0]?.node) {
+  const guide = node && draft.page === 'nuptias' && isNuptiasPosition(selected) && view === 'desktop'
+    ? nuptiasRightLimit(node.ownerDocument, view) : null;
+  const edge = node?.getBoundingClientRect().right;
+  guideLayer?.drawRightLimit(guide !== null && Math.abs(edge - guide) < 1.01 ? guide : null);
+}
+
 function nudge(event) {
   if (!selected || drag || workspace.inert || event.altKey || event.ctrlKey || event.metaKey || event.isComposing ||
       event.target.closest?.('input, textarea, select, button, [contenteditable], summary')) return;
@@ -336,7 +342,7 @@ function nudge(event) {
   if (!candidates?.length) return;
   event.preventDefault();
   const [axis, direction] = directions[event.key];
-  const offset = draft[view][selected]?.[axis] ?? 0;
+  const offset = clampOffset(axis, draft[view][selected]?.[axis] ?? 0);
   if (setPosition(axis, offset + direction * (event.shiftKey ? 10 : 1)) === offset) return;
   apply(selected);
   updateFields();
@@ -352,6 +358,7 @@ function nudge(event) {
   const targets = guideLayer.references(node, selected);
   const alignment = alignRect(rect, targets, guideLayer.fixedLines(selected), {}, { x: false, y: false });
   guideLayer.draw(rect, alignment.lines, targets);
+  showNuptiasLimit(node);
   clearTimeout(nudgeTimer);
   nudgeTimer = setTimeout(() => guideLayer?.clear(), 650);
 }
@@ -471,7 +478,9 @@ function attach() {
   page.addEventListener('pointerdown', (event) => {
     if (workspace.inert) return;
     const handle = event.target.closest('[data-editor-gallery-handle]');
-    const text = event.target.closest('[data-editor-text]');
+    const heading = event.target.closest('.concept h2[data-editor-text="concept.title"]');
+    const partSelected = ['concept.form', 'concept.ampersand', 'concept.feeling'].includes(selected);
+    const text = heading && !partSelected ? heading : event.target.closest('[data-editor-text]');
     const photo = event.target.closest('.hero .project .thumb');
     const stage = Number(columnStage.value);
     const galleryId = handle?.dataset.editorGalleryHandle ?? (!text && photo && draft.page === 'home'
@@ -525,6 +534,7 @@ function attach() {
     const placed = shiftRect(drag.rect, x - drag.x - scrollX, y - drag.y - scrollY);
     const exact = alignRect(placed, targets, fixed, {}, { x: false, y: false });
     guideLayer.draw(placed, exact.lines, targets);
+    showNuptiasLimit(drag.node);
     updateFields();
     markDirty(drag);
   });
@@ -570,6 +580,14 @@ for (const input of fields) {
     else if (input.type === 'number') updateSetting(view, key, input.value === '' ? undefined : input.valueAsNumber);
     else updateSetting(view, key, input.value || undefined);
     apply(selected);
+    if (draft.page === 'nuptias' && isNuptiasPosition(selected)) {
+      const applied = Number(editable.get(selected)?.[0]?.node.dataset.nuptiasX);
+      const requested = draft[view][selected]?.x ?? 0;
+      if (['x', 'size', 'width', 'font', 'spacing', 'text'].includes(key) && Number.isFinite(applied) && applied !== requested) {
+        updateSetting(view, 'x', applied || undefined);
+      }
+      showNuptiasLimit();
+    }
     if (key === 'color') updateFields();
     if (key === 'text' && selected.startsWith('custom.')) element.selectedOptions[0].textContent = input.value.slice(0, 65) || 'Texto nuevo';
     markDirty(input);
@@ -599,9 +617,10 @@ find('nuptias-align-right').addEventListener('click', () => {
   const node = editable.get(selected)?.[0]?.node;
   if (!node || !isNuptiasPosition(selected)) return;
   keepNuptiasLayout();
-  const [, edge] = nuptiasPositionBounds(node, 'x');
+  const [, edge] = nuptiasPositionBounds(node, 'x', view);
   setPosition('x', edge);
   apply(selected);
+  showNuptiasLimit();
   updateFields();
   markDirty();
 });

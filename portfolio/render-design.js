@@ -1,5 +1,5 @@
 import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
-import { followsNuptiasGuide, isNuptiasPosition, nuptiasPositionBounds } from './nuptias-layout.js';
+import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasPositionBounds } from './nuptias-layout.js';
 import { fonts } from './design-document.js';
 
 const properties = ['translate', 'font-size', 'font-family', 'text-align', 'width', 'white-space', 'color', 'display', 'letter-spacing', 'z-index', 'height', 'margin-inline', 'max-width'];
@@ -66,17 +66,15 @@ export function applyElement(editable, id, draft, view) {
   if (id === horizontalGallery || id === verticalGallery) return;
   const overrides = draft[view][id] ?? {};
   const content = draft.content[id]?.text;
-  // Desktop editorial text shares a CSS right edge. Archived X and alignment
-  // values remain in the document for old revisions and the independent mobile view.
-  const anchored = draft.page === 'nuptias' && followsNuptiasGuide(id, view);
-  const x = anchored ? 0 : (overrides.x ?? 0);
+  const nuptias = draft.page === 'nuptias' && (isNuptiasPosition(id) || hasNuptiasDesktopLimit(id, view));
+  const x = overrides.x ?? 0;
   const y = overrides.y ?? 0;
   const styles = {
-    translate: (!anchored && overrides.x !== undefined) || overrides.y !== undefined
+    translate: overrides.x !== undefined || overrides.y !== undefined
       ? `${x}px ${y}px` : null,
     'font-size': overrides.size === undefined ? null : `${overrides.size}px`,
     'font-family': fonts[overrides.font] ?? null,
-    'text-align': anchored ? null : (overrides.align ?? null),
+    'text-align': overrides.align ?? null,
     color: overrides.color ?? null,
     'letter-spacing': overrides.spacing === undefined ? null : `${overrides.spacing}px`,
     'z-index': overrides.layer ?? null,
@@ -117,7 +115,7 @@ export function applyElement(editable, id, draft, view) {
       if (original.title !== null) node.dataset.title = content ?? original.title;
       original.appliedText = content;
     }
-    if (draft.page === 'nuptias' && isNuptiasPosition(id) && !anchored) {
+    if (nuptias) {
       node.dataset.nuptiasX = x;
       node.dataset.nuptiasY = y;
     }
@@ -127,14 +125,14 @@ export function applyElement(editable, id, draft, view) {
 // Width and content changes can move the common block. Measure after all
 // declared styles are in place, in the same order on both surfaces.
 export function constrainNuptiasPositions(page, editable, design, view) {
-  if (design.page !== 'nuptias' || !page.documentElement.hasAttribute('data-nuptias-bounded')) return;
+  if (design.page !== 'nuptias') return;
   for (const [id, items] of editable) {
-    if (!isNuptiasPosition(id) || followsNuptiasGuide(id, view)) continue;
+    if (!isNuptiasPosition(id) && !hasNuptiasDesktopLimit(id, view)) continue;
     const { node } = items[0];
     if (!node.offsetWidth && !node.offsetHeight) continue;
     const offsets = design[view][id] ?? {};
-    const [minX, maxX] = nuptiasPositionBounds(node, 'x');
-    const [minY, maxY] = nuptiasPositionBounds(node, 'y');
+    const [minX, maxX] = nuptiasPositionBounds(node, 'x', view);
+    const [minY, maxY] = nuptiasPositionBounds(node, 'y', view);
     const x = Math.max(minX, Math.min(maxX, offsets.x ?? 0));
     const y = Math.max(minY, Math.min(maxY, offsets.y ?? 0));
     const saved = offsets.x !== undefined || offsets.y !== undefined;

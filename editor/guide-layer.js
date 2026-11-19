@@ -160,6 +160,12 @@ export function createGuideLayer(page, { settings, manualGuides, isBusy }) {
 
   return {
     references, fixedLines, draw,
+    drawRightLimit(at) {
+      smart.querySelector('[data-editor-nuptias-limit]')?.remove();
+      if (at !== null) smart.append(line(at, 0, at, viewport().height, '#e13e49', {
+        'data-editor-nuptias-limit': '', 'stroke-dasharray': '5 4',
+      }));
+    },
     setRulers(next, key) { rulersEnabled = next; scope = key; drawRulers(); },
     clearRulers() { manualGuides.delete(scope); drawRulers(); },
     clear() { smart.replaceChildren(); },

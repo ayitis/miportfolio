@@ -42,3 +42,26 @@ export function nuptiasPositionBounds(node, axis) {
   const fallback = Math.round((low + high) / 2);
   return [fallback, fallback];
 }
+
+const guideElements = new Set([...moving, 'concept.form', 'concept.ampersand', 'concept.feeling']);
+
+export const followsNuptiasGuide = (id, view) => view === 'desktop' && guideElements.has(id);
+
+export function alignNuptiasEditorial(page, view) {
+  const root = page.documentElement;
+  root.toggleAttribute('data-nuptias-right-guide', view === 'desktop');
+  const block = page.querySelector('.editorial-right');
+  if (!block) return;
+  block.style.removeProperty('--editorial-right-shift');
+  if (view !== 'desktop') return;
+
+  const width = root.clientWidth;
+  const gallery = page.querySelector('.marquee');
+  const galleryEdge = gallery?.hidden ? 0 : (gallery?.getBoundingClientRect().right ?? 0);
+  // The red mark in the reference is about 76% across the photographed page.
+  // Prefer the actual gallery edge when it has the matching editorial inset.
+  const edge = galleryEdge >= width * .65 && galleryEdge <= width * .83
+    ? galleryEdge : width * .76;
+  root.style.setProperty('--nuptias-guide', `${edge}px`);
+  block.style.setProperty('--editorial-right-shift', `${edge - block.getBoundingClientRect().right}px`);
+}

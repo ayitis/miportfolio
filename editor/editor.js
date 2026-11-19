@@ -1,4 +1,4 @@
-import { applyNuptiasLayout, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasLayout } from '../portfolio/nuptias-layout.js';
+import { alignNuptiasEditorial, applyNuptiasLayout, followsNuptiasGuide, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasLayout } from '../portfolio/nuptias-layout.js';
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
@@ -95,6 +95,7 @@ function apply(id) {
       if (target !== id && isNuptiasPosition(target)) applyElement(editable, target, draft, view);
     }
   }
+  if (draft.page === 'nuptias') alignNuptiasEditorial(preview.contentDocument, view);
 }
 
 function updateFields() {
@@ -105,7 +106,9 @@ function updateFields() {
   find('element-layers').hidden = !selected.startsWith('custom.');
   find('gallery-layout-help').hidden = !groupSizing;
   find('delete-element').hidden = group;
-  find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected);
+  const locked = draft.page === 'nuptias' && followsNuptiasGuide(selected, view);
+  find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected) || locked;
+  find('nuptias-guide-help').hidden = !locked;
   find('reset').textContent = selected === nuptiasEditorial ? 'Restablecer posición del bloque' : group ? 'Restablecer cinta' : 'Restaurar ajustes de este texto';
   find('reset-color').closest('.color-setting').hidden = group;
   for (const input of fields) {
@@ -118,6 +121,7 @@ function updateFields() {
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
+    if (key === 'x' || key === 'align') input.disabled = locked;
     if (key === 'text') {
       input.disabled = original?.allowText === false;
       input.value = input.disabled ? '' : (draft.content[selected]?.text ?? original?.text ?? '');
@@ -127,7 +131,7 @@ function updateFields() {
       input.value = rgb ? '#' + rgb.slice(0, 3).map(value => Number(value).toString(16).padStart(2, '0')).join('') : '#161616';
       find('reset-color').disabled = !overrides.color;
     } else {
-      input.value = overrides[key] ?? '';
+      input.value = locked && key === 'x' ? '' : overrides[key] ?? '';
     }
   }
 }
@@ -188,6 +192,7 @@ function syncRulers() {
 }
 
 function clampOffset(axis, value) {
+  if (axis === 'x' && draft.page === 'nuptias' && followsNuptiasGuide(selected, view)) return draft[view][selected]?.x ?? 0;
   let [min, max] = bounds[axis];
   if (selected === verticalGallery) {
     const hero = preview.contentDocument.querySelector('.hero');
@@ -211,6 +216,7 @@ function clampOffset(axis, value) {
 }
 
 function setPosition(axis, value) {
+  if (axis === 'x' && draft.page === 'nuptias' && followsNuptiasGuide(selected, view)) return draft[view][selected]?.x ?? 0;
   const next = clampOffset(axis, value);
   updateSetting(view, axis, next || undefined);
   return next;

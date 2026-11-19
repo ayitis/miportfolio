@@ -1,8 +1,10 @@
 const frame = document.querySelector('#fashion-film');
 const video = frame.querySelector('video');
+const audioButton = frame.querySelector('.film-audio-toggle');
 let start = 0;
 let end;
 let currentSource = video.querySelector('source').getAttribute('src');
+let inView = false;
 
 function interval() {
   const duration = video.duration;
@@ -12,16 +14,50 @@ function interval() {
   return [from, Math.min(duration, Math.max(from + .1, end ?? fallback))];
 }
 
+function canPlay() {
+  return inView && !document.hidden;
+}
+
 function play() {
-  video.play().catch(() => {});
+  if (canPlay()) video.play().catch(() => {});
+}
+
+function syncVisibility() {
+  if (canPlay()) play();
+  else video.pause();
 }
 
 function loop() {
   video.currentTime = interval()[0];
-  if (video.paused) play();
+  play();
 }
 
-video.addEventListener('loadedmetadata', loop);
+function syncSoundButton() {
+  audioButton.textContent = video.muted ? 'ACTIVAR SONIDO' : 'SILENCIAR';
+  audioButton.setAttribute('aria-label', video.muted ? 'Activar sonido del fashion film' : 'Silenciar fashion film');
+  audioButton.setAttribute('aria-pressed', String(!video.muted));
+}
+
+audioButton.addEventListener('click', () => {
+  video.muted = !video.muted;
+  syncSoundButton();
+  // Called directly from a click: browsers permit audible playback here.
+  play();
+});
+syncSoundButton();
+
+const visibility = new IntersectionObserver(([entry]) => {
+  inView = entry.intersectionRatio >= .2;
+  syncVisibility();
+}, { threshold: [0, .2] });
+visibility.observe(frame);
+document.addEventListener('visibilitychange', syncVisibility);
+
+video.addEventListener('loadedmetadata', () => {
+  const [from, to] = interval();
+  if (video.currentTime < from || video.currentTime >= to) video.currentTime = from;
+  syncVisibility();
+});
 video.addEventListener('loadeddata', () => frame.classList.add('has-video'));
 video.addEventListener('error', () => frame.classList.remove('has-video'));
 video.addEventListener('timeupdate', () => {
@@ -41,9 +77,8 @@ document.addEventListener('portfolio:ayam-film', ({ detail }) => {
     frame.classList.remove('has-video');
     video.src = source;
     video.load();
-    play();
-  } else if (trimChanged && video.readyState >= 1) loop();
+  } else if (trimChanged && video.readyState >= 1) {
+    const [from, to] = interval();
+    if (video.currentTime < from || video.currentTime >= to) video.currentTime = from;
+  }
 });
-
-if (video.readyState >= 1) loop();
-else play();

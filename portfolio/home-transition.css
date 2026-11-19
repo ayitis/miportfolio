@@ -24,13 +24,14 @@ html[data-about-direct] #about { min-height: 100vh; min-height: 100dvh; }
     z-index: 6;
     pointer-events: none;
   }
-  .scroll-disciplines span, .scroll-hint {
+  .scroll-disciplines span {
     position: absolute;
     display: block;
     inset: 0 auto auto 0;
+    hyphens: auto;
     overflow-wrap: anywhere;
   }
-  .scroll-hint { z-index: 6; pointer-events: none; }
+  .home-scrubbing .gallery-header > :last-child { position: relative; z-index: 1; pointer-events: none; }
   .scroll-disciplines-source { opacity: 0; }
   .home-scrubbing .track { animation-play-state: paused !important; }
   .home-scrubbing .marquee { overflow: visible; cursor: auto; }

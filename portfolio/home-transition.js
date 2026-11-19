@@ -19,7 +19,6 @@ const mix = (a, b, t) => a + (b - a) * t;
 const smooth = t => t * t * (3 - 2 * t);
 
 let active;
-let activeHint;
 let pending = 0;
 let travel = 0;
 let needsMeasure = true;
@@ -41,8 +40,6 @@ function stop() {
   group.inert = false;
   heading.style.removeProperty('opacity');
   instructions.style.removeProperty('opacity');
-  activeHint?.remove();
-  activeHint = null;
   hero.style.removeProperty('--photo-x');
   hero.style.removeProperty('--photo-y');
 }
@@ -81,8 +78,6 @@ function pickCards(width, origin) {
 
 function measure() {
   active?.disciplines.reset();
-  activeHint?.remove();
-  activeHint = null;
   clearCards();
   // Read the unmodified cover position before enabling the photo pan.
   hero.classList.remove('home-photo-panning');
@@ -117,25 +112,10 @@ function measure() {
     item.destTop = nextY;
     nextY += item.height + gap;
   }
-  const disciplines = measureDisciplines(hero, rect, columnX - widest / 2, columnX + widest / 2);
-  const hint = instructions.getBoundingClientRect();
-  if (hint.width && hint.height) {
-    activeHint = document.createElement('span');
-    activeHint.className = 'scroll-hint';
-    activeHint.setAttribute('aria-hidden', 'true');
-    activeHint.textContent = instructions.textContent;
-    const type = getComputedStyle(instructions);
-    Object.assign(activeHint.style, {
-      color: type.color, fontFamily: type.fontFamily, fontSize: type.fontSize,
-      lineHeight: type.lineHeight, fontWeight: type.fontWeight, letterSpacing: type.letterSpacing,
-      textShadow: type.textShadow, textTransform: type.textTransform,
-    });
-    hero.append(activeHint);
-  }
+  const disciplines = measureDisciplines(hero, rect, columnX - widest / 2);
   return {
     entries, visible: new Set(entries.map(({ card }) => card)), rise: nextY + 35,
     photoX, photoY, offsetX, offsetY, disciplines,
-    hintX: hint.left - rect.left, hintY: hint.top - rect.top, hintWidth: hint.width,
   };
 }
 
@@ -161,16 +141,10 @@ function draw(progress) {
   group.inert = ended;
   group.style.pointerEvents = ended ? 'none' : '';
   heading.style.opacity = 1 - reform;
-  const typeProgress = smooth(clamp(progress / .24, 0, 1));
-  const typeRise = smooth(clamp((progress - .12) / .28, 0, 1));
+  const typeProgress = smooth(clamp(progress / .30, 0, 1));
+  const typeRise = smooth(clamp(progress / .24, 0, 1));
   active.disciplines.draw(typeProgress, typeRise);
-  const hint = active.disciplines.instruction;
-  if (activeHint) {
-    instructions.style.opacity = 0;
-    activeHint.style.transform = `translate3d(${mix(active.hintX, hint.left, typeProgress)}px, ${mix(active.hintY, hint.top, typeRise)}px, 0)`;
-    activeHint.style.width = `${mix(active.hintWidth + 2, hint.width, typeProgress)}px`;
-    activeHint.style.opacity = opacity;
-  }
+  instructions.style.opacity = opacity;
 
   for (const card of cards) {
     if (!active.visible.has(card)) {

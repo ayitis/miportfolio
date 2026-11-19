@@ -71,11 +71,12 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
     for (const node of nodes()) {
       node.toggleAttribute('data-ayam-selected', node.dataset.ayamMedia === selected);
       if (node.querySelector('[data-ayam-handle]')) continue;
+      const mediaFrame = node.querySelector('.story-image') ?? node;
       for (const corner of ['nw', 'ne', 'sw', 'se']) {
         const handle = page.createElement('span');
         handle.dataset.ayamHandle = corner;
         handle.setAttribute('aria-hidden', 'true');
-        node.append(handle);
+        mediaFrame.append(handle);
       }
     }
     updateFields();
@@ -240,11 +241,15 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
       const style = page.createElement('style');
       style.textContent = `
         [data-ayam-media] { cursor: move; }
+        [data-ayam-media] .story-image { position: relative; }
         #fashion-film[data-ayam-preview-poster] video { opacity: 0; }
         [data-ayam-media] img, [data-ayam-media] video { user-select: none; -webkit-user-drag: none; }
-        [data-ayam-selected] { outline: 2px solid #9661e8; outline-offset: -2px; touch-action: none; }
+        [data-ayam-selected] { touch-action: none; }
+        #fashion-film[data-ayam-selected], [data-ayam-selected] .story-image {
+          outline: 2px solid #9661e8; outline-offset: -2px;
+        }
         [data-ayam-handle] { display: none; position: absolute; z-index: 8; width: 14px; height: 14px; border: 2px solid #7133c4; background: #fff; }
-        [data-ayam-selected] > [data-ayam-handle] { display: block; }
+        [data-ayam-selected] [data-ayam-handle] { display: block; }
         [data-ayam-handle="nw"] { top: 0; left: 0; cursor: nwse-resize; }
         [data-ayam-handle="ne"] { top: 0; right: 0; cursor: nesw-resize; }
         [data-ayam-handle="sw"] { bottom: 0; left: 0; cursor: nesw-resize; }

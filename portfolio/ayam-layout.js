@@ -66,6 +66,25 @@ function setSource(image, source) {
   if (image.getAttribute('src') !== source) image.setAttribute('src', source);
 }
 
+export function ayamCrop(image, saved) {
+  const manual = saved.cropX !== undefined || saved.cropY !== undefined;
+  return {
+    x: saved.cropX ?? 50,
+    y: saved.cropY ?? (manual ? 50 : (parseFloat(image.style.getPropertyValue('--ayam-crop-y')) || 43)),
+    zoom: saved.zoom ?? 100,
+    fit: saved.fit ?? 'cover',
+  };
+}
+
+export function renderAyamCrop(image, saved) {
+  const { x, y, zoom } = ayamCrop(image, saved);
+  image.style.objectFit = saved.fit ?? '';
+  const position = `${x}% ${y}%`;
+  image.style.objectPosition = saved.cropX === undefined && saved.cropY === undefined ? '' : position;
+  image.style.transformOrigin = zoom === 100 ? '' : position;
+  image.style.transform = zoom === 100 ? '' : `scale(${zoom / 100})`;
+}
+
 export function renderAyam(page, design, view) {
   const { grid, slots, storyClasses, media, originalIds } = collect(page);
   const layout = design.ayam[view];
@@ -100,7 +119,8 @@ export function renderAyam(page, design, view) {
       frame.style.aspectRatio = saved.height === undefined ? '' : 'auto';
       setSource(image, saved.source ?? design.ayam.assets[id] ?? item.source);
     }
-    for (const surface of [image, video].filter(Boolean)) {
+    if (!film) renderAyamCrop(image, saved);
+    for (const surface of film ? [image, video] : []) {
       surface.style.objectFit = saved.fit ?? '';
       surface.style.objectPosition = saved.cropX === undefined && saved.cropY === undefined
         ? '' : `${saved.cropX ?? 50}% ${saved.cropY ?? 50}%`;

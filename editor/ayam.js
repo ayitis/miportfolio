@@ -1,7 +1,7 @@
 import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { ayamFilm, ayamGeometry, ayamOrder, mediaPath } from '../portfolio/ayam-document.js';
-import { renderAyam } from '../portfolio/ayam-layout.js';
+import { ayamCrop, renderAyam, renderAyamCrop } from '../portfolio/ayam-layout.js';
 
 export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectText, syncGallery, isBusy }) {
   const find = id => document.getElementById(`ayam-${id}`);
@@ -11,6 +11,9 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
   let page;
   let selected = '';
   let drag;
+  let cropMode = false;
+  let wheelFrame;
+  const cropFields = new Set(['cropX', 'cropY', 'zoom', 'fit']);
 
   const design = () => getDraft().ayam;
   const layout = () => design()[getView()];
@@ -22,7 +25,7 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
   const message = text => { find('media-status').textContent = text; };
 
   function geometry(node) {
-    const surface = node.querySelector('video, img');
+    const surface = node.querySelector('.story-image') ?? node;
     const scale = designScale(node.ownerDocument);
     return {
       x: Number(node.dataset.ayamX) || 0, y: Number(node.dataset.ayamY) || 0,
@@ -33,12 +36,24 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
 
   function updateFields() {
     const node = target();
+    const activeFrame = cropMode && node ? node.querySelector('.story-image') : undefined;
+    if (activeFrame !== wheelFrame) {
+      wheelFrame?.removeEventListener('wheel', wheel);
+      wheelFrame = activeFrame;
+      wheelFrame?.addEventListener('wheel', wheel, { passive: false });
+    }
     find('properties').disabled = !node;
     if (!node) return;
     const current = item();
     const film = selected === ayamFilm;
     const hidden = Boolean(current.visibility);
     const dimensions = geometry(node);
+    const crop = film ? null : ayamCrop(node.querySelector('img'), current);
+    find('modes').hidden = film || hidden;
+    find('zoom-tools').hidden = !cropMode || film || hidden;
+    find('frame-mode').setAttribute('aria-pressed', String(!cropMode));
+    find('crop-mode').setAttribute('aria-pressed', String(cropMode));
+    find('zoom-value').value = `${crop?.zoom ?? 100} %`;
     find('timing').hidden = !film;
     find('photo-actions').hidden = film;
     find('source').setAttribute('list', film ? 'ayam-videos' : 'ayam-images');
@@ -51,8 +66,9 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
     for (const input of inputs) {
       const key = input.dataset.ayamField;
       if (input.type === 'checkbox') input.checked = Boolean(current[key]);
-      else input.value = (!hidden && dimensions[key] !== undefined ? dimensions[key] : current[key]) ?? '';
-      input.disabled = hidden;
+      else input.value = (!hidden && dimensions[key] !== undefined ? dimensions[key]
+        : current[key] ?? ({ cropX: crop?.x, cropY: crop?.y, zoom: crop?.zoom })[key]) ?? '';
+      input.disabled = hidden || (cropMode && !cropFields.has(key));
     }
   }
 
@@ -73,6 +89,7 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
     }
     for (const node of nodes()) {
       node.toggleAttribute('data-ayam-selected', node.dataset.ayamMedia === selected);
+      node.toggleAttribute('data-ayam-crop-mode', cropMode && node.dataset.ayamMedia === selected);
       if (node.querySelector('[data-ayam-handle]')) continue;
       const mediaFrame = node.querySelector('.story-image') ?? node;
       for (const corner of ['nw', 'ne', 'sw', 'se']) {
@@ -87,6 +104,7 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
 
   function select(id, reveal = false) {
     if (!page) return;
+    if (selected !== id) cropMode = false;
     selected = id;
     if (id) {
       deselectText();
@@ -110,10 +128,14 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
       return;
     }
     const media = layout().media ??= {};
+    if (settings.visibility) cropMode = false;
     if (Object.keys(settings).length) media[selected] = settings;
     else delete media[selected];
     message('');
-    render(!group);
+    if (selected !== ayamFilm && Object.keys(patch).every(key => cropFields.has(key))) {
+      renderAyamCrop(target().querySelector('img'), settings);
+      updateFields();
+    } else render(!group);
     markDirty(group);
   }
 
@@ -133,7 +155,7 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
   }
 
   for (const input of inputs) input.addEventListener('change', () => {
-    if (!target() || !input.validity.valid) return;
+    if (!target() || !input.validity.valid || input.type === 'range') return;
     const key = input.dataset.ayamField;
     const value = input.type === 'checkbox' ? input.checked || undefined
       : input.value === '' ? undefined : input.type === 'number' ? input.valueAsNumber : input.value.trim();
@@ -156,6 +178,29 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
     layout().order = order;
     render();
     markDirty();
+  }
+
+  function setMode(crop) {
+    if (!target() || selected === ayamFilm) return;
+    cropMode = crop;
+    target().toggleAttribute('data-ayam-crop-mode', crop);
+    updateFields();
+  }
+
+  find('frame-mode').onclick = () => setMode(false);
+  find('crop-mode').onclick = () => setMode(true);
+  find('reset-crop').onclick = () => change({ cropX: undefined, cropY: undefined, zoom: undefined, fit: undefined });
+  const zoomInput = panel.querySelector('[data-ayam-field="zoom"]');
+  zoomInput.addEventListener('input', () => change({ zoom: zoomInput.valueAsNumber }, zoomInput));
+  zoomInput.addEventListener('change', closeGroup);
+
+  function wheel(event) {
+    if (!cropMode || isBusy() || event.target.closest('.story-image')?.parentElement !== target()) return;
+    event.preventDefault();
+    if (!event.deltaY) return;
+    const zoom = item().zoom ?? 100;
+    const next = bound('zoom', zoom + Math.sign(-event.deltaY) * Math.max(2, Math.min(12, Math.abs(event.deltaY) * .18)));
+    if (next !== zoom) change({ zoom: next });
   }
 
   picker.addEventListener('change', () => select(picker.value, true));
@@ -200,13 +245,25 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
     const node = event.target.closest('[data-ayam-media]');
     if (!node) return;
     const handle = event.target.dataset.ayamHandle;
-    select(node.dataset.ayamMedia);
+    if (selected !== node.dataset.ayamMedia) select(node.dataset.ayamMedia);
+    if (cropMode && !event.target.closest('.story-image')) return;
     event.preventDefault();
     page.defaultView.focus();
     drag = {
       id: event.pointerId, node, handle, clientX: event.clientX, clientY: event.clientY,
       scroll: page.defaultView.scrollY, ...geometry(node),
     };
+    if (cropMode) {
+      const image = node.querySelector('img');
+      const { x, y, zoom, fit } = ayamCrop(image, item());
+      const { width, height } = drag;
+      const factors = [width / image.naturalWidth, height / image.naturalHeight];
+      const factor = (fit === 'contain' ? Math.min(...factors) : Math.max(...factors)) * zoom / 100;
+      drag.crop = image.naturalWidth ? {
+        x, y, travelX: image.naturalWidth * factor - width,
+        travelY: image.naturalHeight * factor - height,
+      } : { x, y, travelX: 0, travelY: 0 };
+    }
     node.setPointerCapture(event.pointerId);
   }
 
@@ -218,6 +275,14 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
     const dy = (event.clientY - drag.clientY + page.defaultView.scrollY - drag.scroll) / scale;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 2) return;
     drag.moved = true;
+    if (drag.crop) {
+      const { x, y, travelX, travelY } = drag.crop;
+      const patch = {};
+      if (Math.abs(travelX) >= 1) patch.cropX = bound('cropX', x - dx * 100 / travelX);
+      if (Math.abs(travelY) >= 1) patch.cropY = bound('cropY', y - dy * 100 / travelY);
+      if (Object.keys(patch).length) change(patch, drag);
+      return;
+    }
     if (!handle) {
       change({ x: bound('x', x + dx), y: bound('y', y + dy) }, drag);
       return;
@@ -256,7 +321,9 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
           outline: 2px solid #9661e8; outline-offset: -2px;
         }
         [data-ayam-handle] { display: none; position: absolute; z-index: 8; width: 14px; height: 14px; border: 2px solid #7133c4; background: #fff; }
-        [data-ayam-selected] [data-ayam-handle] { display: block; }
+        [data-ayam-selected]:not([data-ayam-crop-mode]) [data-ayam-handle] { display: block; }
+        [data-ayam-crop-mode] .story-image { cursor: grab; }
+        [data-ayam-crop-mode] .story-image:active { cursor: grabbing; }
         [data-ayam-handle="nw"] { top: 0; left: 0; cursor: nwse-resize; }
         [data-ayam-handle="ne"] { top: 0; right: 0; cursor: nesw-resize; }
         [data-ayam-handle="sw"] { bottom: 0; left: 0; cursor: nesw-resize; }
@@ -275,6 +342,9 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
       panel.open = false;
       page = undefined;
       selected = '';
+      cropMode = false;
+      wheelFrame?.removeEventListener('wheel', wheel);
+      wheelFrame = undefined;
       drag = undefined;
     },
   };

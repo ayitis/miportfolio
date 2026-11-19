@@ -124,6 +124,17 @@
           <select id="ayam-media"><option value="">Selecciona el vídeo o una foto</option></select>
           <fieldset id="ayam-properties" disabled>
             <legend>Composición</legend>
+            <div class="photo-actions" id="ayam-modes" hidden>
+              <button type="button" id="ayam-frame-mode" aria-pressed="true">Editar marco</button>
+              <button type="button" id="ayam-crop-mode" aria-pressed="false">Editar encuadre</button>
+            </div>
+            <div id="ayam-zoom-tools" hidden>
+              <label>Zoom <output id="ayam-zoom-value">100 %</output>
+                <input type="range" min="100" max="300" step="1" value="100" data-ayam-field="zoom">
+              </label>
+              <button type="button" id="ayam-reset-crop">Restablecer encuadre</button>
+              <p>Arrastra la foto dentro del marco. Usa la rueda sobre la foto para ampliar o reducir.</p>
+            </div>
             <div class="pair">
               <label>X (px) <input type="number" min="-4000" max="4000" data-ayam-field="x"></label>
               <label>Y (px) <input type="number" min="-4000" max="4000" data-ayam-field="y"></label>

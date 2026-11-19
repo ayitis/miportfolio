@@ -2,7 +2,7 @@ export const ayamPage = 'ayam';
 export const ayamFilm = 'film';
 export const ayamGeometry = {
   x: [-4000, 4000], y: [-4000, 4000], width: [16, 4000], height: [16, 4000],
-  cropX: [0, 100], cropY: [0, 100], layer: [1, 50],
+  cropX: [0, 100], cropY: [0, 100], zoom: [100, 300], layer: [1, 50],
 };
 export const emptyAyam = () => ({ assets: {}, desktop: {}, mobile: {} });
 const record = value => value && typeof value === 'object' && !Array.isArray(value);

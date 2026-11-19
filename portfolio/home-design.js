@@ -27,8 +27,7 @@ export const targets = [
 for (const [project, name, href] of [
   ['nuptias', 'NUPTIAS', 'nuptias.html'],
   ['carnage', 'Maison Carnage', 'project.html?name=carnage'],
-  ['ayam', 'AYAM Studio', 'project.html?name=ayam'],
-  ['ire', 'IRE Magazine', 'project.html?name=ire'],
+  ['ayam', 'AYAM', 'project.html?name=ayam'],
   ['yves', 'Yves Rocher', 'project.html?name=yves'],
   ['villa', 'Villa Tiger', 'project.html?name=villa'],
 ]) {

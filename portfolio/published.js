@@ -1,3 +1,4 @@
+import { carnagePage } from './carnage-document.js';
 import { applyNuptiasLayout } from './nuptias-layout.js';
 import { applyHomeGalleryLayout } from './home-gallery-layout.js';
 import { validateDraft } from './design-document.js';
@@ -31,7 +32,7 @@ async function showPublishedDesign() {
   const { request, published } = snapshot;
 
   const design = validateDraft(published.document, page);
-  const mobile = matchMedia('(max-width: 700px)');
+  const mobile = matchMedia(page === carnagePage ? '(max-width: 650px)' : '(max-width: 700px)');
   const elements = collectElements(document, pages[page].targets);
   const gallery = page === 'nuptias' && collectGallery(document);
   const uploads = visibleUploads(design.gallery);
@@ -44,6 +45,9 @@ async function showPublishedDesign() {
     if (page === 'home') {
       applyHomeGalleryLayout(document, design[view]);
       document.dispatchEvent(new Event('portfolio:home-design'));
+    }
+    if (page === carnagePage) {
+      document.dispatchEvent(new CustomEvent('portfolio:carnage-design', { detail: { view, settings: design.carnage[view] } }));
     }
     if (gallery) renderGallery(gallery, design.gallery, view, urls);
     constrainNuptiasPositions(document, elements, design, view);

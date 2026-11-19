@@ -1,3 +1,5 @@
+import { carnagePage } from '../portfolio/carnage-document.js';
+import { setupCarnage } from './carnage.js';
 import { applyNuptiasLayout, followsNuptiasHeading, hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasRightLimit, nuptiasLayout } from '../portfolio/nuptias-layout.js';
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
@@ -133,7 +135,10 @@ function updateFields() {
 }
 
 function select(id, reveal = false) {
-  if (id) gallery.select('');
+  if (id) {
+    gallery.select('');
+    carnage.clear();
+  }
   for (const { node } of editable.get(selected) ?? []) node.removeAttribute('data-editor-selected');
   selected = id;
   if (id === verticalGallery && (Number(columnStage.value) < verticalStage || Number(columnStage.value) >= 76)) setColumnStage(verticalStage);
@@ -424,6 +429,7 @@ function applyView(next) {
   if (draft.page === 'nuptias') applyNuptiasLayout(preview.contentDocument, draft, view);
   for (const id of editable.keys()) applyElement(editable, id, draft, view);
   gallery.render();
+  carnage.render();
   constrainNuptiasPositions(preview.contentDocument, editable, draft, view);
   updateFields();
   syncRulers();
@@ -668,7 +674,9 @@ function runAction(action) {
         ? 'Hay un borrador más reciente. Descarga una copia de tus cambios y recarga el editor.'
         : error.code === 'PGRST202' && draft.page === 'nuptias'
           ? 'Ejecuta primero la migración de NUPTIAS en el proyecto de Supabase de Preview.'
-          : error.message;
+          : draft.page === carnagePage && ['PGRST202', '22023', '23514'].includes(error.code)
+            ? 'Si aún no lo has hecho, ejecuta la migración de Maison Carnage en Supabase de Preview.'
+            : error.message;
     } finally {
       workspace.inert = false;
     }
@@ -769,6 +777,7 @@ function initializePreview() {
   if (url.pathname !== pages[draft.page].path || !url.searchParams.has('editor-preview')) return;
   attach();
   if (draft.page === 'nuptias') gallery.attach(preview.contentDocument);
+  if (draft.page === carnagePage) carnage.attach(preview.contentDocument);
   applyView(view);
   status.textContent = `Editando ${pages[draft.page].label}.`;
   for (const id of pageControls) find(id).disabled = false;
@@ -779,6 +788,7 @@ async function showPage(page) {
   ({ draft, revision } = await store.load(page));
   actions.reset(draft);
   gallery.detach();
+  carnage.detach();
   finishDrag();
   guideLayer?.detach();
   guideLayer = undefined;
@@ -853,6 +863,15 @@ const gallery = setupGallery({
   selectionChanged: updateActionButtons,
   deselectText: () => select(''),
   status,
+  isBusy: () => workspace.inert,
+});
+
+const carnage = setupCarnage({
+  getDraft: () => draft,
+  getView: () => view,
+  markDirty,
+  closeGroup: () => actions.closeGroup(),
+  deselectText: () => select(''),
   isBusy: () => workspace.inert,
 });
 

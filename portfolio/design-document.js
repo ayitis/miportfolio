@@ -1,3 +1,4 @@
+import { carnagePage, emptyCarnage, validateCarnage } from './carnage-document.js';
 import { followsNuptiasHeading, nuptiasEditorial } from './nuptias-layout.js';
 import { pages } from './pages.js';
 import { emptyGallery, validateGallery } from './gallery-document.js';
@@ -28,6 +29,7 @@ export function emptyDraft(page = 'home') {
   return {
     version: 1, page, desktop: {}, mobile: {}, content: {}, elements: {},
     ...(page === 'nuptias' && { gallery: emptyGallery() }),
+    ...(page === carnagePage && { carnage: emptyCarnage() }),
   };
 }
 
@@ -61,6 +63,7 @@ export function validateDraft(value, page = value?.page) {
     }
   }
   if (page === 'nuptias' && value.gallery !== undefined) draft.gallery = validateGallery(value.gallery);
+  if (page === carnagePage && value.carnage !== undefined) draft.carnage = validateCarnage(value.carnage);
   if (value.elements !== undefined) {
     if (!isRecord(value.elements) || Object.keys(value.elements).length > 1000) {
       throw new Error('La copia contiene elementos inválidos.');

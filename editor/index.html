@@ -39,8 +39,8 @@
         <select id="page" disabled>
           <option value="home">Home / Portada</option>
           <option value="nuptias">NUPTIAS</option>
+          <option value="maison-carnage">MAISON CARNAGE</option>
           <optgroup label="Otros proyectos · próximamente" disabled>
-            <option>Maison Carnage</option>
             <option>AYAM Studio</option>
             <option>IRE Magazine</option>
             <option>Yves Rocher España</option>
@@ -73,6 +73,42 @@
           </div>
           <label for="photo-file">Subir fotografía</label>
           <input type="file" id="photo-file" accept="image/jpeg,image/png,image/webp,image/avif">
+        </details>
+        <details id="carnage-tools" hidden>
+          <summary>Fotografías de Maison Carnage</summary>
+          <div class="element-actions">
+            <button type="button" data-carnage-phase="0">Portada</button>
+            <button type="button" data-carnage-phase="43">Apertura</button>
+            <button type="button" data-carnage-phase="69">Banda</button>
+            <button type="button" data-carnage-phase="100">Collage</button>
+          </div>
+          <label for="carnage-progress">Progreso de la animación</label>
+          <input id="carnage-progress" type="range" min="0" max="100" value="0">
+          <label for="carnage-photo">Fotografía</label>
+          <select id="carnage-photo"><option value="">Selecciona una fotografía</option></select>
+          <fieldset id="carnage-settings" disabled>
+            <legend>Ajustes de la fotografía</legend>
+            <div class="photo-actions">
+              <button type="button" id="carnage-cover">Usar como portada</button>
+              <button type="button" id="carnage-earlier">Antes</button>
+              <button type="button" id="carnage-later">Después</button>
+              <button type="button" id="carnage-hide">Ocultar</button>
+              <button type="button" id="carnage-remove">Quitar del collage</button>
+              <button type="button" id="carnage-restore" hidden>Restaurar</button>
+            </div>
+            <div class="pair">
+              <label>X (px) <input type="number" min="-4000" max="4000" data-carnage-field="x"></label>
+              <label>Y (px) <input type="number" min="-4000" max="4000" data-carnage-field="y"></label>
+              <label>Ancho (px) <input type="number" min="16" max="4000" data-carnage-field="width"></label>
+              <label>Alto (px) <input type="number" min="16" max="4000" data-carnage-field="height"></label>
+              <label>Encuadre X (%) <input type="number" min="0" max="100" data-carnage-field="cropX"></label>
+              <label>Encuadre Y (%) <input type="number" min="0" max="100" data-carnage-field="cropY"></label>
+              <label>Capa <input type="number" min="1" max="50" data-carnage-field="layer"></label>
+            </div>
+            <label><input type="checkbox" id="carnage-ratio"> Bloquear proporciones</label>
+            <button type="button" id="carnage-reset-size">Restaurar tamaño original</button>
+          </fieldset>
+          <p>En Collage, arrastra una foto para moverla o una esquina para cambiar su tamaño. Las flechas mueven 1 px y con Mayús, 10 px.</p>
         </details>
         <details class="column-tools" id="column-tools" hidden>
           <summary>Previsualizar transición de Home</summary>

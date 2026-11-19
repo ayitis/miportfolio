@@ -34,7 +34,7 @@
 .archive-stage img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .endnote { display: flex; justify-content: space-between; margin-top: 65px; gap: 12px; }
 
-.archive.is-scrubbed { --archive-window: 100svh; }
+.archive { --archive-window: 100svh; }
 .archive.is-scrubbed .archive-runway { height: calc(var(--archive-window) + var(--archive-distance)); }
 .archive.is-scrubbed .archive-stage {
   position: sticky;
@@ -44,13 +44,21 @@
   height: var(--archive-window);
   overflow: clip;
 }
+.archive.is-previewing .archive-runway { height: var(--archive-window); }
+.archive.is-previewing .archive-stage { position: relative; }
 .archive.is-scrubbed.is-unfolded .archive-stage { overflow: visible; }
-.archive.is-scrubbed figure {
+.archive:is(.is-scrubbed,.is-static) figure {
   position: absolute;
   inset: 0 auto auto 0;
   contain: layout paint;
 }
-.archive.is-scrubbed figure img { height: 100%; object-fit: cover; }
+.archive.is-static .archive-stage {
+  display: block;
+  position: relative;
+  padding: 0;
+  height: var(--archive-window);
+}
+.archive.is-static .endnote { margin-top: calc(65px + var(--archive-tail, 0px)); }
 .archive.is-scrubbed .endnote { margin-top: calc(65px + var(--archive-tail, 0px)); }
 
 @media (max-width: 650px) {

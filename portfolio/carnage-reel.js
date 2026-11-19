@@ -1,7 +1,5 @@
 const video = document.querySelector('#carnage-reel');
 const reel = video.closest('.reel-frame');
-const toggle = reel.querySelector('.reel-toggle');
-const audioButton = reel.querySelector('.reel-audio-toggle');
 const canvas = reel.querySelector('.reel-effects');
 const context = canvas.getContext('2d');
 const header = document.querySelector('header');
@@ -29,6 +27,7 @@ for (const element of [header, masthead, reel]) layout.observe(element);
 reducedMotion.addEventListener('change', scheduleScroll);
 mobile.addEventListener('change', scheduleScroll);
 renderScroll();
+video.muted = false;
 
 const sequence = [
   { name: 'tracking', gap: 4500, duration: 180 },
@@ -40,29 +39,31 @@ const sequence = [
 let sequenceIndex = 0;
 let timer;
 let inView = false;
-let manuallyPaused = false;
+let userInteracted = false;
 
 function syncPlayback() {
-  if (!inView || document.hidden || reducedMotion.matches || manuallyPaused) {
+  if (!inView || document.hidden || reducedMotion.matches) {
     video.pause();
     return;
   }
-  video.play().catch(() => {});
+  if (userInteracted) video.muted = false;
+  const attempt = video.play();
+  if (attempt?.catch) attempt.catch(() => {
+    // Preserve video playback if the browser blocks audible autoplay.
+    if (!inView || document.hidden || reducedMotion.matches) return;
+    video.muted = true;
+    video.play().catch(() => {});
+  });
 }
 
-function syncAudio() {
-  audioButton.textContent = video.muted ? 'ACTIVAR SONIDO' : 'SILENCIAR';
-  audioButton.setAttribute('aria-pressed', String(!video.muted));
-  audioButton.setAttribute('aria-label', video.muted ? 'Activar sonido de Maison Carnage' : 'Silenciar Maison Carnage');
+function activateAudio() {
+  userInteracted = true;
+  if (!inView || document.hidden || reducedMotion.matches) return;
+  video.muted = false;
+  syncPlayback();
 }
-
-audioButton.addEventListener('click', () => {
-  video.muted = !video.muted;
-  syncAudio();
-  // User gesture explicitly authorizes audible playback.
-  if (inView && !document.hidden && !reducedMotion.matches && !manuallyPaused) video.play().catch(() => {});
-});
-syncAudio();
+document.addEventListener('pointerdown', activateAudio, { capture: true, passive: true });
+document.addEventListener('keydown', activateAudio, { capture: true });
 
 function drawTrackingBands() {
   if (!context || video.readyState < 2) return;
@@ -152,8 +153,6 @@ const visibility = new IntersectionObserver(([entry]) => {
 visibility.observe(reel);
 
 function updatePlayback() {
-  toggle.textContent = video.paused ? 'PLAY' : 'PAUSE';
-  toggle.setAttribute('aria-label', video.paused ? 'Play campaign film' : 'Pause campaign film');
   syncEffects();
 }
 
@@ -180,8 +179,4 @@ document.addEventListener('visibilitychange', () => {
 reducedMotion.addEventListener('change', () => {
   syncPlayback();
   syncEffects();
-});
-toggle.addEventListener('click', () => {
-  manuallyPaused = !video.paused ? true : false;
-  syncPlayback();
 });

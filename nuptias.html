@@ -57,6 +57,19 @@ h1{font:800 clamp(82px,14vw,232px)/.83 Arial,Helvetica,sans-serif;letter-spacing
 .credit{font-size:clamp(13px,1.25vw,17px);font-weight:700;letter-spacing:.07em;margin:0}
 .editorial-left{display:contents}
 .editorial-right{position:relative;display:flex;flex-direction:column;align-items:center;max-width:100%}
+/* Align the entire right-side editorial composition to the same right gutter as the footer. */
+@media (min-width:701px){
+  html:not([data-nuptias-layout="split"]) .editorial-bottom .editorial-right{
+    align-self:flex-end;
+    align-items:flex-end;
+    text-align:right;
+    width:min(100%,900px);
+  }
+  html:not([data-nuptias-layout="split"]) .editorial-bottom .editorial-right .concept{
+    width:100%;
+    max-width:none;
+  }
+}
 .concept > :is(h2,p),.roles{overflow-wrap:anywhere}
 html[data-nuptias-bounded] .editorial-right :is(.roles,h2,p){max-width:calc(100vw - 2 * var(--gutter))}
 @media(min-width:701px){

@@ -96,9 +96,10 @@ a{color:inherit;text-decoration:none}
   .ayam-news :is(.story-g,.story-h,.story-i) .story-image{height:auto;aspect-ratio:4/5}
   .ayam-news .story-i .story-image{aspect-ratio:5/4}
 }
-.chapter-list{padding:clamp(60px,calc(8 * var(--ayam-vw)),110px) var(--space);background:#111;color:#fff}
+.chapter-list{padding:clamp(65px,calc(8 * var(--ayam-vw)),110px) var(--space);min-height:100svh;background:#d81622;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center}
+.chapter-list .label,.chapter-list .chapters{display:none!important}
 .chapter-list .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase}
-.chapter-list h2{font-size:clamp(55px,calc(12 * var(--ayam-vw)),175px);letter-spacing:-.1em;line-height:.85;margin:22px 0 42px}
+.chapter-list h2{font-size:clamp(100px,calc(17 * var(--ayam-vw)),265px);font-weight:900;letter-spacing:-.085em;line-height:.88;margin:0;color:#fff}
 .chapter-list .chapters{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .chapter-list .chapters div{padding-top:12px;border-top:1px solid #aaa;font-size:clamp(13px,calc(1.5 * var(--ayam-vw)),20px);display:flex;flex-direction:column;gap:8px}
 .chapter-list .chapters span{color:#999;font-size:10px;letter-spacing:.13em}
@@ -190,7 +191,7 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
       <div class="closing-line"><span>AYAM / CAMPAIGN IMAGERY</span><span>01 — 09 / VISUAL ARCHIVE</span></div>
     </div>
   </section>
-  <section class="chapter-list" id="project"><span class="label">One project / Four expressions</span><h2>THE<br>UNIVERSE.</h2><div class="chapters">
+  <section class="chapter-list" id="project"><span class="label">One project / Four expressions</span><h2>NOT<br>EGO.</h2><div class="chapters">
     <div><span>01</span><strong style="font-weight:inherit">Fashion collection</strong></div><div><span>02</span><strong style="font-weight:inherit">Fashion film</strong></div><div><span>03</span><strong style="font-weight:inherit">Campaign photography</strong></div><div><span>04</span><strong style="font-weight:inherit">IRE Magazine</strong></div>
   </div></section>
 </main>

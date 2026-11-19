@@ -1,6 +1,7 @@
 const video = document.querySelector('#carnage-reel');
 const reel = video.closest('.reel-frame');
 const toggle = reel.querySelector('.reel-toggle');
+const audioButton = reel.querySelector('.reel-audio-toggle');
 const canvas = reel.querySelector('.reel-effects');
 const context = canvas.getContext('2d');
 const header = document.querySelector('header');
@@ -39,6 +40,29 @@ const sequence = [
 let sequenceIndex = 0;
 let timer;
 let inView = false;
+let manuallyPaused = false;
+
+function syncPlayback() {
+  if (!inView || document.hidden || reducedMotion.matches || manuallyPaused) {
+    video.pause();
+    return;
+  }
+  video.play().catch(() => {});
+}
+
+function syncAudio() {
+  audioButton.textContent = video.muted ? 'ACTIVAR SONIDO' : 'SILENCIAR';
+  audioButton.setAttribute('aria-pressed', String(!video.muted));
+  audioButton.setAttribute('aria-label', video.muted ? 'Activar sonido de Maison Carnage' : 'Silenciar Maison Carnage');
+}
+
+audioButton.addEventListener('click', () => {
+  video.muted = !video.muted;
+  syncAudio();
+  // User gesture explicitly authorizes audible playback.
+  if (inView && !document.hidden && !reducedMotion.matches && !manuallyPaused) video.play().catch(() => {});
+});
+syncAudio();
 
 function drawTrackingBands() {
   if (!context || video.readyState < 2) return;
@@ -122,6 +146,7 @@ function syncEffects() {
 
 const visibility = new IntersectionObserver(([entry]) => {
   inView = entry.intersectionRatio >= .2;
+  syncPlayback();
   syncEffects();
 }, { threshold: .2 });
 visibility.observe(reel);
@@ -148,13 +173,15 @@ video.addEventListener('error', () => reel.classList.remove('is-playing', 'has-m
 video.addEventListener('playing', updatePlayback);
 video.addEventListener('pause', updatePlayback);
 video.addEventListener('waiting', stopEffects);
-document.addEventListener('visibilitychange', syncEffects);
+document.addEventListener('visibilitychange', () => {
+  syncPlayback();
+  syncEffects();
+});
 reducedMotion.addEventListener('change', () => {
-  if (reducedMotion.matches) video.pause();
+  syncPlayback();
   syncEffects();
 });
 toggle.addEventListener('click', () => {
-  if (video.paused) video.play().catch(() => {});
-  else video.pause();
+  manuallyPaused = !video.paused ? true : false;
+  syncPlayback();
 });
-if (!reducedMotion.matches) video.play().catch(() => {});

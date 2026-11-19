@@ -31,63 +31,66 @@ a{color:inherit;text-decoration:none}
 .hero-intro h1{font-size:clamp(85px,18vw,280px);font-weight:900;letter-spacing:-.12em;line-height:.83;margin:22px 0 23px;text-transform:uppercase}
 .hero-intro .subtitle{font-size:clamp(12px,1.3vw,16px);max-width:480px;line-height:1.5;margin:0 auto}
 .hero-intro .index{display:block;margin-top:26px;font-size:10px;letter-spacing:.15em}
-.campaign{padding:0 var(--space) clamp(100px,12vw,180px)}
-.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:22px;margin:0 0 clamp(28px,3.5vw,54px)}
-.section-head h2{font-size:clamp(35px,5vw,74px);line-height:.92;letter-spacing:-.075em;margin:0;text-transform:uppercase;font-weight:900}
-.section-head span{font-size:10px;letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}
-.ayam-news{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(10px,1.6vw,25px);row-gap:clamp(35px,5vw,75px);align-items:start}
-.ayam-news figure{position:relative;margin:0;min-width:0}
-.ayam-news img{width:100%;height:100%;object-fit:cover;background:#e6e4e0}
-.ayam-news .story-image{overflow:hidden;background:#e6e4e0}
-.ayam-news figcaption{font-size:clamp(9px,.85vw,12px);line-height:1.4;padding-top:10px;color:#303030}
-.ayam-news figcaption strong{display:block;font-size:clamp(11px,1vw,15px);line-height:1.16;font-weight:800;letter-spacing:-.025em;margin-bottom:6px}
-.ayam-news .story-a{grid-column:1/span 3}.ayam-news .story-b{grid-column:4/span 3}.ayam-news .story-c{grid-column:9/span 4}
-.ayam-news .story-a .story-image,.ayam-news .story-b .story-image{aspect-ratio:4/5}
-.ayam-news .story-c .story-image{aspect-ratio:5/4}
-.ayam-news .story-a,.ayam-news .story-b,.ayam-news .story-c{grid-row:1}
-.ayam-news .story-d{grid-column:1/span 3;grid-row:2}
-.ayam-news .story-e{grid-column:5/span 4;grid-row:2}
-.ayam-news .story-f{grid-column:10/span 3;grid-row:2}
-.ayam-news .story-d .story-image,.ayam-news .story-f .story-image{aspect-ratio:4/5}
-.ayam-news .story-e .story-image{aspect-ratio:3/4}
-.ayam-news .editorial-note{grid-column:7/span 2;grid-row:1;align-self:center;font-size:clamp(10px,.88vw,13px);line-height:1.45;color:#333;padding-top:14px}
-.ayam-news .editorial-note .eyebrow,.ayam-news .magazine-note .eyebrow{display:block;font-size:10px;letter-spacing:.14em;font-weight:700;margin-bottom:14px;text-transform:uppercase}
-.ayam-news .editorial-note p,.ayam-news .magazine-note p{margin:0}
-.ayam-news .section-break{grid-column:1/-1;grid-row:3;padding:clamp(45px,6vw,85px) 0 0;display:grid;grid-template-columns:1fr 2.1fr;gap:clamp(20px,3vw,45px);align-items:end}
-.ayam-news .section-break h3{margin:0;font-size:clamp(42px,7.4vw,115px);letter-spacing:-.09em;line-height:.85;font-weight:900;text-transform:uppercase;color:#d1d0cd}
-.ayam-news .section-break .section-break-copy{max-width:610px;justify-self:end}
-.ayam-news .section-break .section-break-copy strong{display:block;font-size:clamp(18px,2.2vw,31px);font-weight:800;letter-spacing:-.045em;line-height:1.05}
-.ayam-news .section-break .section-break-copy p{font-size:clamp(12px,1.05vw,15px);line-height:1.5;margin:12px 0 0;max-width:450px}
-.ayam-news .story-g{grid-column:4/span 4;grid-row:4}
-.ayam-news .story-h{grid-column:8/span 3;grid-row:4;padding-top:clamp(25px,4vw,75px)}
-.ayam-news .magazine-note{grid-column:1/span 3;grid-row:4;align-self:end;max-width:260px;font-size:clamp(11px,1vw,15px);line-height:1.45;margin-bottom:35px}
-.ayam-news .story-g .story-image{aspect-ratio:3/4}
-.ayam-news .story-h .story-image{aspect-ratio:4/5}
-.ayam-news .closing-line{grid-column:1/-1;grid-row:5;display:flex;justify-content:space-between;gap:10px;font-size:10px;letter-spacing:.13em;text-transform:uppercase;padding-top:20px;border-top:1px solid #b4b1ab}
+/* The numbered story slots are the default positions used by the editor. */
+.campaign{scroll-margin-top:clamp(20px,4vw,55px);padding:0 var(--space) clamp(90px,11vw,165px)}
+.section-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px clamp(12px,1.6vw,25px);margin-bottom:clamp(32px,5vw,74px)}
+.section-head h2{grid-column:1/span 10;margin:0;font-size:clamp(45px,8vw,132px);line-height:.83;letter-spacing:-.09em;font-weight:900}
+.section-head p{grid-column:1/span 6;max-width:390px;margin:0;font-size:clamp(13px,1.05vw,17px);line-height:1.5}
+.section-head span{grid-column:10/-1;align-self:end;justify-self:end;text-align:right}
+.section-head span,.ayam-news .eyebrow,.closing-line{font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+.ayam-news{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(25px,4vw,60px) clamp(12px,1.6vw,25px);align-items:start}
+.ayam-news figure{position:relative;min-width:0;margin:0}
+.ayam-news .story-image{overflow:hidden;background:#e6e4e0;aspect-ratio:4/5}
+.ayam-news img{width:100%;height:100%;object-fit:cover;object-position:50% 43%}
+.ayam-news figcaption{padding-top:10px;color:#252525;font-size:clamp(11px,.9vw,14px);line-height:1.4}
+.ayam-news figcaption strong{display:block;font-size:clamp(13px,1.1vw,17px);line-height:1.13;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.ayam-news figcaption p{margin:0 0 7px;color:#3f3d3b}
+.ayam-news figcaption span{font-size:10px;letter-spacing:.075em;text-transform:uppercase;color:#605c57}
+.ayam-news .story-a{grid-column:2/span 2;grid-row:1}
+.ayam-news .story-b{grid-column:4/span 2;grid-row:1}
+.ayam-news .story-c{grid-column:8/span 5;grid-row:1;padding-top:clamp(18px,2.7vw,45px)}
+.ayam-news .story-c .story-image{aspect-ratio:1.65}
+.ayam-news .editorial-note{grid-column:1/span 8;grid-row:2;padding-top:clamp(35px,7vw,112px)}
+.ayam-news .editorial-note h3{margin:8px 0 12px;font-size:clamp(33px,5.2vw,80px);line-height:.9;letter-spacing:-.075em}
+.ayam-news .editorial-note p,.ayam-news .section-break p,.ayam-news .magazine-note p{max-width:490px;margin:0;font-size:clamp(13px,1.1vw,17px);line-height:1.5}
+.ayam-news .story-d{grid-column:1/span 2;grid-row:3;padding-top:clamp(35px,5.7vw,90px)}
+.ayam-news .story-e{grid-column:4/span 5;grid-row:3}
+.ayam-news .story-e .story-image{aspect-ratio:4/5}
+.ayam-news .story-f{grid-column:10/span 3;grid-row:3;padding-top:clamp(14px,2.9vw,46px)}
+.ayam-news .section-break{grid-column:1/-1;grid-row:4;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px clamp(12px,1.6vw,25px);align-items:end;padding-top:clamp(50px,8vw,120px)}
+.ayam-news .section-break h3{grid-column:1/span 4;margin:0;color:#cfceca;font-size:clamp(38px,4.9vw,84px);line-height:.83;letter-spacing:-.085em;font-weight:900}
+.ayam-news .section-break-copy{grid-column:5/-1}
+.ayam-news .section-break-copy strong{display:block;margin-bottom:10px;font-size:clamp(29px,4.25vw,67px);font-weight:900;letter-spacing:-.075em;line-height:.9}
+.ayam-news .story-g{grid-column:5/span 2;grid-row:5}
+.ayam-news .story-h{grid-column:7/span 3;grid-row:5}
+.ayam-news .story-i{grid-column:10/span 3;grid-row:5}
+.ayam-news :is(.story-g,.story-h,.story-i) .story-image{height:clamp(200px,29vw,490px);aspect-ratio:auto}
+.ayam-news .magazine-note{grid-column:5/span 7;grid-row:6}
+.ayam-news .magazine-note .eyebrow{display:block;margin-bottom:8px}
+.ayam-news .closing-line{grid-column:1/-1;grid-row:7;display:flex;justify-content:space-between;gap:12px;color:#605c57}
+.ayam-news figure[data-ayam-added]{grid-column:span 4;grid-row:auto}
 @media(max-width:800px){
- .ayam-news{grid-template-columns:repeat(6,minmax(0,1fr));gap:30px 12px}
- .ayam-news .story-a,.ayam-news .story-b,.ayam-news .story-c,.ayam-news .story-d,.ayam-news .story-e,.ayam-news .story-f,.ayam-news .story-g,.ayam-news .story-h,.ayam-news .editorial-note,.ayam-news .magazine-note,.ayam-news .section-break,.ayam-news .closing-line{grid-row:auto;padding-top:0}
- .ayam-news .story-a,.ayam-news .story-d,.ayam-news .story-g{grid-column:1/span 3}
- .ayam-news .story-b,.ayam-news .story-e,.ayam-news .story-h{grid-column:4/span 3}
- .ayam-news .story-c{grid-column:1/span 4}
- .ayam-news .editorial-note{grid-column:5/span 2;align-self:center}
- .ayam-news .story-f{grid-column:4/span 3}
- .ayam-news .section-break{grid-column:1/-1;grid-template-columns:1fr 1.5fr;padding:40px 0 10px}
- .ayam-news .magazine-note{grid-column:1/span 3;align-self:center;margin-bottom:0}
- .ayam-news .closing-line{grid-column:1/-1}
+  .section-head{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .section-head h2{grid-column:1/-1}
+  .section-head p{grid-column:1/span 4}
+  .section-head span{grid-column:5/-1}
+  .ayam-news{grid-template-columns:repeat(6,minmax(0,1fr));gap:28px 14px}
+  .ayam-news > *{grid-row:auto!important}
+  .ayam-news :is(.story-a,.story-d,.story-g){grid-column:1/span 3}
+  .ayam-news :is(.story-b,.story-f,.story-h){grid-column:4/span 3}
+  .ayam-news :is(.story-c,.story-e,.story-i,.editorial-note,.section-break,.magazine-note){grid-column:1/-1}
+  .ayam-news :is(.story-c,.story-d,.story-f){padding-top:0}
+  .ayam-news .section-break{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .ayam-news .section-break h3{grid-column:1/span 3}
+  .ayam-news .section-break-copy{grid-column:4/-1}
+  .ayam-news figure[data-ayam-added]{grid-column:span 3}
 }
 @media(max-width:540px){
- .section-head{align-items:start;gap:10px}
- .section-head h2{font-size:clamp(30px,8vw,53px)}
- .section-head span{font-size:8px;white-space:normal;text-align:right}
- .ayam-news{gap:27px 12px}
- .ayam-news .story-a,.ayam-news .story-b,.ayam-news .story-d,.ayam-news .story-e,.ayam-news .story-f,.ayam-news .story-g,.ayam-news .story-h{grid-column:span 3}
- .ayam-news .story-c{grid-column:1/-1}
- .ayam-news .editorial-note{grid-column:1/-1;max-width:470px}
- .ayam-news .section-break{grid-column:1/-1;grid-template-columns:1fr;gap:16px;padding:30px 0 5px}
- .ayam-news .section-break .section-break-copy{justify-self:start}
- .ayam-news .magazine-note{grid-column:1/-1;max-width:100%;order:0}
- .ayam-news .closing-line{font-size:8px}
+  .section-head p,.section-head span{grid-column:1/-1;justify-self:start;text-align:left}
+  .ayam-news{gap:24px 12px}
+  .ayam-news .section-break h3,.ayam-news .section-break-copy{grid-column:1/-1}
+  .ayam-news :is(.story-g,.story-h,.story-i) .story-image{height:auto;aspect-ratio:4/5}
+  .ayam-news .story-i .story-image{aspect-ratio:5/4}
 }
 .chapter-list{padding:clamp(60px,8vw,110px) var(--space);background:#111;color:#fff}
 .chapter-list .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase}
@@ -96,12 +99,9 @@ a{color:inherit;text-decoration:none}
 .chapter-list .chapters div{padding-top:12px;border-top:1px solid #aaa;font-size:clamp(13px,1.5vw,20px);display:flex;flex-direction:column;gap:8px}
 .chapter-list .chapters span{color:#999;font-size:10px;letter-spacing:.13em}
 footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--space);display:flex;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:.11em}
-@media(max-width:800px){.links{gap:12px;font-size:9px}.hero-film{height:59vw;min-height:270px}.editorial-grid{grid-template-columns:repeat(6,minmax(0,1fr));row-gap:35px}.editorial-grid figure:nth-child(n){grid-row:auto;margin-top:0}.editorial-grid figure:nth-child(odd){grid-column:1/span 3}.editorial-grid figure:nth-child(even){grid-column:4/span 3}.interlude{grid-column:1/span 6}.chapter-list .chapters{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:540px){.site-header{padding-top:12px;padding-bottom:12px}.site-header .site-brand{width:145px}.links a:nth-child(2){display:none}.hero-film{height:62svh;min-height:340px}.film-strap{font-size:9px}.hero-intro h1{font-size:24vw}.hero-intro{padding-bottom:65px}.section-head{align-items:start}.section-head h2{font-size:clamp(35px,8vw,62px)}.section-head span{font-size:9px}.editorial-grid{gap:26px 12px}.editorial-grid figcaption{font-size:9px}.chapter-list .chapters{gap:25px 12px}footer{font-size:9px}}
+@media(max-width:800px){.links{gap:12px;font-size:9px}.hero-film{height:59vw;min-height:270px}.chapter-list .chapters{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.site-header{padding-top:12px;padding-bottom:12px}.site-header .site-brand{width:145px}.links a:nth-child(2){display:none}.hero-film{height:62svh;min-height:340px}.film-strap{font-size:9px}.hero-intro h1{font-size:24vw}.hero-intro{padding-bottom:65px}.chapter-list .chapters{gap:25px 12px}footer{font-size:9px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-film video{transition:none}}
-.ayam-news figure[data-ayam-added]{grid-column:span 4;grid-row:auto}
-.ayam-news figure[data-ayam-added] .story-image{aspect-ratio:4/5}
-@media(max-width:800px){.ayam-news figure[data-ayam-added]{grid-column:span 3}}
 </style>
 </head>
 <body>
@@ -125,58 +125,64 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
   </section>
   <section class="campaign" id="campaign" aria-labelledby="campaign-title">
     <div class="section-head">
-      <h2 id="campaign-title">CAMPAIGN<br>IMAGERY.</h2>
+      <h2 id="campaign-title">THE VISUAL ARCHIVE.</h2>
+      <p>A visual exploration of identity through fashion, movement and image-making.</p>
       <span>AYAM / FASHION ARCHIVE — 01</span>
     </div>
     <div class="ayam-news">
-      <figure class="story-a" data-ayam-media="photo-01">
+      <figure class="story-a" data-ayam-media="photo-04">
+        <div class="story-image"><img src="/DSC01055.jpg" alt="AYAM campaign editorial, image 04" loading="lazy"></div>
+        <figcaption><strong>A study in silhouette</strong><p>An intimate detail, cropped close.</p><span>AYAM / Fashion photography — 04</span></figcaption>
+      </figure>
+      <figure class="story-b" data-ayam-media="photo-01">
         <div class="story-image"><img src="/DSC01108.jpg" alt="AYAM photographic editorial, image 01" loading="lazy"></div>
-        <figcaption><strong>Visual identity through fashion</strong><span>AYAM / Campaign photography — 01</span></figcaption>
+        <figcaption><strong>Visual identity through fashion</strong><p>A portrait framed in deep shadow.</p><span>AYAM / Campaign photography — 01</span></figcaption>
       </figure>
-      <figure class="story-b" data-ayam-media="photo-02">
-        <div class="story-image"><img src="/DSC00997.jpg" alt="AYAM photographic editorial, image 02" loading="lazy"></div>
-        <figcaption><strong>Behind the image</strong><span>AYAM / Creative direction — 02</span></figcaption>
-      </figure>
-      <aside class="editorial-note">
-        <span class="eyebrow">The concept / 03</span>
-        <p>Fashion as an expression of identity. A collection translated into moving images, photography and an editorial publication.</p>
-      </aside>
       <figure class="story-c" data-ayam-media="photo-03">
         <div class="story-image"><img src="/DSC01003.jpg" alt="AYAM campaign editorial, image 03" loading="lazy"></div>
-        <figcaption><strong>One collection, multiple expressions</strong><span>AYAM / Fashion campaign — 03</span></figcaption>
+        <figcaption><strong>One collection, multiple expressions</strong><p>Light and landscape frame the figure.</p><span>AYAM / Fashion campaign — 03</span></figcaption>
       </figure>
-      <figure class="story-d" data-ayam-media="photo-04">
-        <div class="story-image"><img src="/DSC01055.jpg" alt="AYAM campaign editorial, image 04" loading="lazy"></div>
-        <figcaption><strong>A study in silhouette</strong><span>AYAM / Fashion photography — 04</span></figcaption>
+      <div class="editorial-note">
+        <span class="eyebrow">AYAM / 02</span>
+        <h3>CAMPAIGN STUDIES</h3>
+        <p>Fashion becomes a medium for self-expression, where each silhouette contributes to a larger visual narrative.</p>
+      </div>
+      <figure class="story-d" data-ayam-media="photo-07">
+        <div class="story-image"><img src="/DSC01105.jpg" alt="AYAM campaign editorial, image 07" loading="lazy"></div>
+        <figcaption><strong>The collection in motion</strong><p>A study in light and gesture.</p><span>AYAM / Campaign study — 07</span></figcaption>
       </figure>
       <figure class="story-e" data-ayam-media="photo-05">
         <div class="story-image"><img src="/DSC01063.jpg" alt="AYAM campaign editorial, image 05" loading="lazy"></div>
-        <figcaption><strong>Beyond the frame</strong><span>AYAM / Visual exploration — 05</span></figcaption>
+        <figcaption><strong>Beyond the frame</strong><p>A portrait between light and shadow.</p><span>AYAM / Visual exploration — 05</span></figcaption>
       </figure>
-      <figure class="story-f" data-ayam-media="photo-06">
-        <div class="story-image"><img src="/DSC01070%20%281%29.jpg" alt="AYAM campaign editorial, image 06" loading="lazy"></div>
-        <figcaption><strong>Fashion in focus</strong><span>AYAM / Image-making — 06</span></figcaption>
+      <figure class="story-f" data-ayam-media="photo-02">
+        <div class="story-image"><img src="/DSC00997.jpg" alt="AYAM photographic editorial, image 02" loading="lazy"></div>
+        <figcaption><strong>Behind the image</strong><p>A full-length silhouette in an open landscape.</p><span>AYAM / Creative direction — 02</span></figcaption>
       </figure>
       <div class="section-break">
-        <h3>STREET<br>STYLE.</h3>
+        <h3>THE<br>COLLECTION</h3>
         <div class="section-break-copy">
-          <strong>THE COLLECTION, SEEN THROUGH A DIFFERENT LENS.</strong>
-          <p>A visual dialogue between garments, atmosphere and personal expression. Space for the story behind the collection and the campaign.</p>
+          <strong>BEYOND THE GARMENT</strong>
+          <p>An exploration of identity, transformation and personal expression through fashion design.</p>
         </div>
       </div>
-      <aside class="magazine-note">
-        <span class="eyebrow">AYAM / Editorial notes</span>
-        <p>From concept to collection, the project unfolds through a fashion film, a campaign and IRE Magazine. Each medium reveals another side of the same visual universe.</p>
-      </aside>
-      <figure class="story-g" data-ayam-media="photo-07">
-        <div class="story-image"><img src="/DSC01105.jpg" alt="AYAM campaign editorial, image 07" loading="lazy"></div>
-        <figcaption><strong>The collection in motion</strong><span>AYAM / Campaign study — 07</span></figcaption>
+      <figure class="story-g" data-ayam-media="photo-06">
+        <div class="story-image"><img src="/DSC01070%20%281%29.jpg" alt="AYAM campaign editorial, image 06" loading="lazy"></div>
+        <figcaption><strong>Fashion in focus</strong><p>Two figures in an open landscape.</p><span>AYAM / Image-making — 06</span></figcaption>
       </figure>
       <figure class="story-h" data-ayam-media="photo-08">
         <div class="story-image"><img src="/DSC01106.jpg" alt="AYAM campaign editorial, image 08" loading="lazy"></div>
-        <figcaption><strong>An editorial perspective</strong><span>AYAM / Campaign study — 08</span></figcaption>
+        <figcaption><strong>An editorial perspective</strong><p>Red and shadow in close-up.</p><span>AYAM / Campaign study — 08</span></figcaption>
       </figure>
-      <div class="closing-line"><span>AYAM / CAMPAIGN IMAGERY</span><span>01 — 08 / VISUAL ARCHIVE</span></div>
+      <figure class="story-i" data-ayam-media="photo-09">
+        <div class="story-image"><img src="/DSC01143.jpg" alt="Two AYAM models in blue and red against a clear sky" loading="lazy"></div>
+        <figcaption><strong>Two silhouettes</strong><p>Two figures, two silhouettes.</p><span>AYAM / Collection study — 09</span></figcaption>
+      </figure>
+      <div class="magazine-note">
+        <span class="eyebrow">AYAM / Collection editorial</span>
+        <p>A multidisciplinary project bringing together fashion design, moving image, photography and editorial storytelling.</p>
+      </div>
+      <div class="closing-line"><span>AYAM / CAMPAIGN IMAGERY</span><span>01 — 09 / VISUAL ARCHIVE</span></div>
     </div>
   </section>
   <section class="chapter-list" id="project"><span class="label">One project / Four expressions</span><h2>THE<br>UNIVERSE.</h2><div class="chapters">

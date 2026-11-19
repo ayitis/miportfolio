@@ -74,7 +74,7 @@ function refreshElements() {
     const hidden = draft.elements[id]?.hidden;
     if (hidden && draft.page !== ayamPage) continue;
     for (const { node } of originals) if (!layoutElement(id)) node.dataset.editorText = id;
-    const caption = /^caption(?:-title)?\./.test(id) ? 'Pie · ' + (draft.content[id]?.text ?? originals[0].text).slice(0, 60) : null;
+    const caption = /^caption(?:-title|-description)?\./.test(id) ? 'Pie · ' + (draft.content[id]?.text ?? originals[0].text).slice(0, 60) : null;
     const name = labels.get(id) ?? caption ?? (draft.content[id]?.text?.slice(0, 65) || 'Texto nuevo');
     element.add(new Option(name + (hidden ? ' · oculto' : ''), id));
   }

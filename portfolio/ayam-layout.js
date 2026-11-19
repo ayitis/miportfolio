@@ -31,6 +31,7 @@ export function syncAyamNodes(page, design, editable) {
     media.delete(id);
     editable.delete(`caption.${id}`);
     editable.delete(`caption-title.${id}`);
+    editable.delete(`caption-description.${id}`);
   }
   for (const [id, source] of Object.entries(design.ayam.assets)) {
     if (media.has(id)) continue;
@@ -55,6 +56,7 @@ export function syncAyamNodes(page, design, editable) {
     .flatMap(id => [
       [`caption.${id}`, '', `[data-ayam-media="${id}"] figcaption span`, { inline: true }],
       [`caption-title.${id}`, '', `[data-ayam-media="${id}"] figcaption strong`, {}],
+      [`caption-description.${id}`, '', `[data-ayam-media="${id}"] figcaption p`, {}],
     ]);
   for (const [id, entries] of collectElements(page, captions)) editable.set(id, entries);
 }

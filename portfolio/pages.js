@@ -1,3 +1,4 @@
+import { nuptiasEditorial } from './nuptias-layout.js';
 import { targets as homeTargets } from './home-design.js';
 
 export const pages = {
@@ -15,6 +16,7 @@ export const pages = {
       ['editorial.eyebrow', 'Editorial · Antetítulo', '.eyebrow'],
       ['editorial.title', 'Editorial · NUPTIAS', '#title'],
       ['editorial.credit', 'Editorial · Impuribus', '.credit'],
+      [nuptiasEditorial, 'Editorial · Bloque derecho', '.editorial-right', { text: false }],
       ['editorial.roles', 'Editorial · Créditos', '.roles'],
       ['concept.title', 'Concepto · Título completo', '.concept h2', { text: false }],
       ['concept.form', 'Concepto · FORM', '[data-design-part="form"]', { inline: true }],

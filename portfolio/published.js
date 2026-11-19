@@ -1,3 +1,4 @@
+import { applyNuptiasLayout } from './nuptias-layout.js';
 import { applyHomeGalleryLayout } from './home-gallery-layout.js';
 import { validateDraft } from './design-document.js';
 import { applyElement, collectElements, syncCustomElements } from './render-design.js';
@@ -15,7 +16,15 @@ async function showPublishedDesign() {
   if (!Object.hasOwn(pages, page)) return;
   const firstPaint = page === 'nuptias' ? window.nuptiasFirstPaint : null;
   const snapshot = firstPaint ? await firstPaint.snapshot : await loadPublished(page);
-  if (!snapshot?.published) return;
+  if (!snapshot?.published) {
+    if (page === 'nuptias') {
+      const media = matchMedia('(max-width: 700px)');
+      const renderDefault = () => applyNuptiasLayout(document, { desktop: {}, mobile: {} }, media.matches ? 'mobile' : 'desktop');
+      media.addEventListener('change', renderDefault);
+      renderDefault();
+    }
+    return;
+  }
   const { request, published } = snapshot;
 
   const design = validateDraft(published.document, page);
@@ -27,6 +36,7 @@ async function showPublishedDesign() {
   syncCustomElements(document, elements, design);
   const render = () => {
     const view = mobile.matches ? 'mobile' : 'desktop';
+    if (page === 'nuptias') applyNuptiasLayout(document, design, view);
     for (const id of elements.keys()) applyElement(elements, id, design, view);
     if (page === 'home') {
       applyHomeGalleryLayout(document, design[view]);

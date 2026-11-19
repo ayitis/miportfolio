@@ -1,4 +1,5 @@
 import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
+import { isNuptiasPosition, nuptiasPositionBounds } from './nuptias-layout.js';
 import { fonts } from './design-document.js';
 
 const properties = ['translate', 'font-size', 'font-family', 'text-align', 'width', 'white-space', 'color', 'display', 'letter-spacing', 'z-index', 'height', 'margin-inline', 'max-width'];
@@ -34,6 +35,7 @@ export function syncCustomElements(page, editable, draft) {
       body:has([data-custom-text]) .category,
       body:has([data-custom-text]) .marquee,
       body:has([data-custom-text]) .editorial-bottom > *,
+      body:has([data-custom-text]) .editorial-left > *,
       body:has([data-custom-text]) .page > footer {
         position: relative;
         z-index: 5;
@@ -111,6 +113,22 @@ export function applyElement(editable, id, draft, view) {
       else node.textContent = content;
       if (original.title !== null) node.dataset.title = content ?? original.title;
       original.appliedText = content;
+    }
+    if (draft.page === 'nuptias' && isNuptiasPosition(id)) {
+      node.dataset.nuptiasX = x;
+      node.dataset.nuptiasY = y;
+      if (node.ownerDocument.documentElement.hasAttribute('data-nuptias-bounded') &&
+          (original.node.offsetWidth || original.node.offsetHeight)) {
+        const [minX, maxX] = nuptiasPositionBounds(node, 'x');
+        const [minY, maxY] = nuptiasPositionBounds(node, 'y');
+        const boundedX = Math.max(minX, Math.min(maxX, x));
+        const boundedY = Math.max(minY, Math.min(maxY, y));
+        if (boundedX !== x || boundedY !== y) {
+          node.style.translate = `${boundedX}px ${boundedY}px`;
+          node.dataset.nuptiasX = boundedX;
+          node.dataset.nuptiasY = boundedY;
+        }
+      }
     }
   }
 }

@@ -92,6 +92,13 @@
           <button type="button" id="clear-guides" hidden>Borrar guías de esta vista</button>
           <p id="ruler-help" hidden>Haz clic en una regla para colocar una guía.</p>
         </details>
+        <details class="column-tools" id="nuptias-position-tools" hidden>
+          <summary>Composición de NUPTIAS</summary>
+          <div class="element-actions">
+            <button type="button" id="nuptias-split">Colocar bloque a la derecha</button>
+            <button type="button" id="nuptias-center">Centrar composición</button>
+          </div>
+        </details>
         <div class="element-actions">
           <button type="button" id="add-text" disabled>Añadir texto</button>
           <button type="button" id="copy-element" disabled>Copiar</button>
@@ -140,6 +147,7 @@
             <label>Color <input type="color" data-field="color"></label>
             <button type="button" id="reset-color">Color original</button>
           </div>
+          <button type="button" id="nuptias-align-right" hidden>Alinear al margen derecho</button>
           <button type="button" id="delete-element">Eliminar elemento</button>
           <button type="button" id="reset">Restaurar ajustes de este texto</button>
         </fieldset>

@@ -1,3 +1,4 @@
+import { applyNuptiasLayout, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasLayout } from '../portfolio/nuptias-layout.js';
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
@@ -31,7 +32,7 @@ const actions = actionHistory();
 let clipboard;
 const groupTarget = 'gallery.container';
 const homeGallery = id => id === horizontalGallery || id === verticalGallery;
-const layoutElement = id => id === groupTarget || homeGallery(id);
+const layoutElement = id => id === groupTarget || id === nuptiasEditorial || homeGallery(id);
 
 const workspace = find('workspace');
 const access = find('access');
@@ -89,6 +90,11 @@ function restoreActions(back) {
 function apply(id) {
   if (homeGallery(id)) { syncColumn(); return; }
   applyElement(editable, id, draft, view);
+  if (id === nuptiasEditorial) {
+    for (const target of editable.keys()) {
+      if (target !== id && isNuptiasPosition(target)) applyElement(editable, target, draft, view);
+    }
+  }
 }
 
 function updateFields() {
@@ -99,15 +105,16 @@ function updateFields() {
   find('element-layers').hidden = !selected.startsWith('custom.');
   find('gallery-layout-help').hidden = !groupSizing;
   find('delete-element').hidden = group;
-  find('reset').textContent = group ? 'Restablecer cinta' : 'Restaurar ajustes de este texto';
+  find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected);
+  find('reset').textContent = selected === nuptiasEditorial ? 'Restablecer posición del bloque' : group ? 'Restablecer cinta' : 'Restaurar ajustes de este texto';
   find('reset-color').closest('.color-setting').hidden = group;
   for (const input of fields) {
     if (['text', 'size', 'font', 'align', 'spacing', 'height'].includes(input.dataset.field)) {
       input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing : group;
     }
   }
-  fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected);
-  find('properties').querySelector('legend').textContent = group ? 'Posición de la galería' : 'Ajustes del texto';
+  fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected) || selected === nuptiasEditorial;
+  find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : 'Ajustes del texto';
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
@@ -146,7 +153,16 @@ function select(id, reveal = false) {
   }
 }
 
+function keepNuptiasLayout() {
+  const layout = nuptiasLayout(draft, view);
+  const settings = draft[view][nuptiasEditorial] ??= {};
+  settings.layout ??= layout;
+  applyNuptiasLayout(preview.contentDocument, draft, view);
+}
+
 function updateSetting(section, key, value) {
+  if (section === view && draft.page === 'nuptias' && ['x', 'y', 'width'].includes(key) &&
+      (selected.startsWith('editorial.') || selected.startsWith('concept.'))) keepNuptiasLayout();
   const settings = draft[section][selected] ??= {};
   if (value === undefined) delete settings[key];
   else settings[key] = value;
@@ -179,6 +195,13 @@ function clampOffset(axis, value) {
     min = Number(hero.dataset['columnMin' + suffix] ?? min);
     max = Number(hero.dataset['columnMax' + suffix] ?? max);
     return Math.max(min, Math.min(max, Math.round(value)));
+  }
+  if (draft.page === 'nuptias' && isNuptiasPosition(selected)) {
+    const node = editable.get(selected)?.[0]?.node;
+    if (node) {
+      [min, max] = nuptiasPositionBounds(node, axis);
+      return Math.max(min, Math.min(max, Math.round(value)));
+    }
   }
   const viewportWidth = preview.contentDocument?.documentElement.clientWidth ?? 0;
   const limit = selected === groupTarget && axis === 'x'
@@ -376,6 +399,8 @@ function applyView(next) {
   view = next;
   preview.classList.toggle('mobile', next === 'mobile');
   for (const button of viewButtons) button.setAttribute('aria-pressed', String(button.dataset.view === view));
+  find('nuptias-position-tools').hidden = draft.page !== 'nuptias' || view !== 'desktop';
+  if (draft.page === 'nuptias') applyNuptiasLayout(preview.contentDocument, draft, view);
   for (const id of editable.keys()) apply(id);
   updateFields();
   gallery.render();
@@ -401,7 +426,10 @@ function attach() {
   });
   page.addEventListener('keydown', shortcuts);
   page.defaultView.addEventListener('resize', () => {
-    if (preview.contentDocument === page && draft.page === 'nuptias') apply(groupTarget);
+    if (preview.contentDocument === page && draft.page === 'nuptias') {
+      apply(groupTarget);
+      apply(nuptiasEditorial);
+    }
   });
 
   const hero = page.querySelector('.hero');
@@ -416,7 +444,7 @@ function attach() {
   const { targets } = pages[draft.page];
   editable = collectElements(page, targets);
   refreshElements();
-  for (const [id, label] of [[groupTarget, 'Mover cinta'], [horizontalGallery, 'Mover carrusel'], [verticalGallery, 'Mover cinta vertical']]) {
+  for (const [id, label] of [[groupTarget, 'Mover cinta'], [nuptiasEditorial, 'Mover bloque editorial'], [horizontalGallery, 'Mover carrusel'], [verticalGallery, 'Mover cinta vertical']]) {
     const group = editable.get(id)?.[0]?.node;
     if (!group) continue;
     const handle = page.createElement('button');
@@ -428,6 +456,7 @@ function attach() {
       background: '#fff', color: '#43275d', border: '1px solid #a88ec7', borderRadius: '5px',
       padding: '4px 7px', font: '12px system-ui', touchAction: 'none', pointerEvents: 'auto',
     });
+    if (id === nuptiasEditorial) handle.style.top = '-29px';
     if (id === horizontalGallery) group.style.position = 'relative';
     group.append(handle);
     handle.addEventListener('click', () => select(id));
@@ -529,7 +558,7 @@ for (const input of fields) {
   input.addEventListener('input', () => {
     if (!selected || !input.validity.valid) return;
     const key = input.dataset.field;
-    if (homeGallery(selected) && (key === 'x' || key === 'y')) {
+    if ((homeGallery(selected) || (draft.page === 'nuptias' && isNuptiasPosition(selected))) && (key === 'x' || key === 'y')) {
       if (input.value === '') updateSetting(view, key, undefined);
       else setPosition(key, input.valueAsNumber);
     } else if (key === 'text') {
@@ -545,7 +574,7 @@ for (const input of fields) {
   });
   input.addEventListener('blur', () => {
     actions.closeGroup();
-    if (!input.validity.valid || homeGallery(selected)) updateFields();
+    if (!input.validity.valid || homeGallery(selected) || (draft.page === 'nuptias' && isNuptiasPosition(selected))) updateFields();
   });
 }
 
@@ -556,8 +585,30 @@ find('reset-color').addEventListener('click', () => {
   markDirty();
 });
 
+for (const [id, layout] of [['nuptias-split', 'split'], ['nuptias-center', 'center']]) {
+  find(id).addEventListener('click', () => {
+    (draft[view][nuptiasEditorial] ??= {}).layout = layout;
+    applyView(view);
+    select(nuptiasEditorial, true);
+    markDirty();
+  });
+}
+find('nuptias-align-right').addEventListener('click', () => {
+  const node = editable.get(selected)?.[0]?.node;
+  if (!node || !isNuptiasPosition(selected)) return;
+  keepNuptiasLayout();
+  const [, edge] = nuptiasPositionBounds(node, 'x');
+  setPosition('x', edge);
+  apply(selected);
+  updateFields();
+  markDirty();
+});
+
 find('reset').addEventListener('click', () => {
-  delete draft[view][selected];
+  if (selected === nuptiasEditorial) {
+    const layout = nuptiasLayout(draft, view);
+    draft[view][selected] = { layout };
+  } else delete draft[view][selected];
   delete draft.content[selected];
   apply(selected);
   updateFields();

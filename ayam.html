@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="AYAM — final degree project by Aya Arbaoui: fashion collection, fashion film, campaign imagery and IRE magazine.">
+<title>AYAM — Aya Arbaoui</title>
+<link rel="stylesheet" href="/portfolio/brand.css">
+<style>
+:root{--ink:#151515;--paper:#f7f7f3;--space:clamp(18px,3.8vw,66px)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+img{display:block;width:100%}
+a{color:inherit;text-decoration:none}
+.site-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px var(--space);background:var(--paper);position:relative;z-index:10}
+.site-header .site-brand{display:inline-block;width:clamp(120px,17vw,220px);height:auto;flex:0 0 auto}
+.site-header .site-brand img{width:100%;height:auto;object-fit:contain}
+.links{display:flex;align-items:center;gap:clamp(10px,2.4vw,35px);font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:600}
+.links a:hover{text-decoration:underline}
+.hero{position:relative}
+.hero-film{position:relative;background:#141414;width:100%;height:min(76vw,75svh);min-height:380px;overflow:hidden}
+.hero-film img,.hero-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero-film img{filter:brightness(.7)}
+.hero-film video{opacity:0;transition:opacity .5s}
+.hero-film.has-video video{opacity:1}
+.hero-film::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0006,transparent 30%,transparent 54%,#0005);pointer-events:none}
+.film-actions{position:absolute;bottom:20px;right:var(--space);z-index:4;display:flex;gap:8px}
+.film-actions button{border:1px solid #ffffff99;background:#10101099;color:#fff;padding:10px 14px;font-size:11px;letter-spacing:.12em;cursor:pointer}
+.film-actions button:hover{background:#333}
+.film-strap{position:absolute;top:24px;left:var(--space);right:var(--space);display:flex;justify-content:space-between;color:#fff;z-index:3;text-transform:uppercase;font-weight:600;font-size:11px;letter-spacing:.15em}
+.hero-intro{text-align:center;padding:clamp(35px,6vw,94px) var(--space) clamp(55px,8vw,125px)}
+.hero-intro .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.hero-intro h1{font-size:clamp(85px,18vw,280px);font-weight:900;letter-spacing:-.12em;line-height:.83;margin:22px 0 23px;text-transform:uppercase}
+.hero-intro .subtitle{font-size:clamp(12px,1.3vw,16px);max-width:480px;line-height:1.5;margin:0 auto}
+.hero-intro .index{display:block;margin-top:26px;font-size:10px;letter-spacing:.15em}
+.campaign{padding:0 var(--space) clamp(95px,12vw,170px)}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px;border-top:1px solid #171717;padding-top:18px;margin-bottom:30px}
+.section-head h2{font-size:clamp(39px,6.4vw,92px);line-height:.9;letter-spacing:-.09em;margin:0;text-transform:uppercase;font-weight:900}
+.section-head span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.editorial-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(10px,2vw,26px);row-gap:clamp(28px,4.5vw,72px);align-items:start}
+.editorial-grid figure{margin:0;min-width:0}
+.editorial-grid figure:nth-child(1){grid-column:1/span 4;grid-row:1}
+.editorial-grid figure:nth-child(2){grid-column:5/span 3;grid-row:1;margin-top:clamp(28px,5vw,80px)}
+.editorial-grid figure:nth-child(3){grid-column:9/span 4;grid-row:1;margin-top:clamp(10px,2vw,40px)}
+.editorial-grid figure:nth-child(4){grid-column:1/span 3;grid-row:2}
+.editorial-grid figure:nth-child(5){grid-column:4/span 5;grid-row:2;margin-top:clamp(40px,7vw,120px)}
+.editorial-grid figure:nth-child(6){grid-column:10/span 3;grid-row:2;margin-top:clamp(5px,2vw,34px)}
+.editorial-grid figure:nth-child(7){grid-column:2/span 4;grid-row:3}
+.editorial-grid figure:nth-child(8){grid-column:8/span 5;grid-row:3;margin-top:clamp(25px,5vw,75px)}
+.editorial-grid img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;background:#d1d1cc;filter:saturate(.83)}
+.editorial-grid figure:nth-child(3n + 2) img{aspect-ratio:3/4}
+.editorial-grid figure:nth-child(5) img{aspect-ratio:5/4}
+.editorial-grid figcaption{font-size:10px;line-height:1.4;letter-spacing:.09em;text-transform:uppercase;margin-top:10px}
+.editorial-grid figcaption strong{font-weight:700}
+.interlude{grid-column:1/span 12;display:flex;align-items:center;justify-content:space-between;border-top:1px solid currentColor;border-bottom:1px solid currentColor;padding:17px 0;font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.chapter-list{padding:clamp(60px,8vw,110px) var(--space);background:#111;color:#fff}
+.chapter-list .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.chapter-list h2{font-size:clamp(55px,12vw,175px);letter-spacing:-.1em;line-height:.85;margin:22px 0 42px}
+.chapter-list .chapters{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.chapter-list .chapters div{padding-top:12px;border-top:1px solid #aaa;font-size:clamp(13px,1.5vw,20px);display:flex;flex-direction:column;gap:8px}
+.chapter-list .chapters span{color:#999;font-size:10px;letter-spacing:.13em}
+footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--space);display:flex;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:.11em}
+@media(max-width:800px){.links{gap:12px;font-size:9px}.hero-film{height:59vw;min-height:270px}.editorial-grid{grid-template-columns:repeat(6,minmax(0,1fr));row-gap:35px}.editorial-grid figure:nth-child(n){grid-row:auto;margin-top:0}.editorial-grid figure:nth-child(odd){grid-column:1/span 3}.editorial-grid figure:nth-child(even){grid-column:4/span 3}.interlude{grid-column:1/span 6}.chapter-list .chapters{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.site-header{padding-top:12px;padding-bottom:12px}.site-header .site-brand{width:145px}.links a:nth-child(2){display:none}.hero-film{height:62svh;min-height:340px}.film-strap{font-size:9px}.hero-intro h1{font-size:24vw}.hero-intro{padding-bottom:65px}.section-head{align-items:start}.section-head h2{font-size:clamp(35px,8vw,62px)}.section-head span{font-size:9px}.editorial-grid{gap:26px 12px}.editorial-grid figcaption{font-size:9px}.chapter-list .chapters{gap:25px 12px}footer{font-size:9px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-film video{transition:none}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" aria-label="Back to Home" class="site-brand site-wordmark"><span class="wordmark-art"><img src="/portfolio/wordmark-black.png" width="2172" height="724" alt="Aya Arbaoui"></span></a>
+  <nav class="links" aria-label="Main navigation"><a href="/">← HOME</a><a href="#campaign">CAMPAIGN</a><a href="#project">THE PROJECT</a></nav>
+</header>
+<main>
+  <section class="hero" aria-labelledby="ayam-title">
+    <div class="hero-film" id="fashion-film">
+      <img src="/DSC01108.jpg" alt="Fashion editorial photograph from the portfolio">
+      <video autoplay muted loop playsinline preload="metadata" aria-label="AYAM fashion film"><source src="/FASHION%20FILM%20IRE.MP4" type="video/mp4"></video>
+      <div class="film-strap"><span>AYA ARBAOUI / TFG</span><span>FASHION FILM — 01</span></div>
+      <div class="film-actions"><button type="button" id="film-play" aria-label="Pause or play the fashion film">PAUSE</button><button type="button" id="film-sound" aria-label="Enable or mute sound">SOUND OFF</button></div>
+    </div>
+    <div class="hero-intro">
+      <span class="eyebrow">Fashion collection / Creative direction / Editorial</span>
+      <h1 id="ayam-title">AYAM.</h1>
+      <p class="subtitle">One creative universe, expressed through a fashion collection, a fashion film, campaign imagery and IRE Magazine.</p>
+      <span class="index">FINAL DEGREE PROJECT — SELECTED WORK / 03</span>
+    </div>
+  </section>
+  <section class="campaign" id="campaign" aria-labelledby="campaign-title">
+    <div class="section-head"><h2 id="campaign-title">CAMPAIGN<br>IMAGERY.</h2><span>THE VISUAL ARCHIVE / 01</span></div>
+    <div class="editorial-grid">
+      <figure><img src="/DSC01108.jpg" alt="AYAM visual archive — editorial photograph 01" loading="lazy"><figcaption><strong>01 /</strong> Editorial study</figcaption></figure>
+      <figure><img src="/DSC00997.jpg" alt="AYAM visual archive — photograph 02" loading="lazy"><figcaption><strong>02 /</strong> Campaign image</figcaption></figure>
+      <figure><img src="/DSC01003.jpg" alt="AYAM visual archive — photograph 03" loading="lazy"><figcaption><strong>03 /</strong> Campaign image</figcaption></figure>
+      <div class="interlude"><span>AYAM / VISUAL STUDIES</span><span>FASHION — FILM — EDITORIAL</span></div>
+      <figure><img src="/DSC01055.jpg" alt="AYAM visual archive — photograph 04" loading="lazy"><figcaption><strong>04 /</strong> Campaign image</figcaption></figure>
+      <figure><img src="/DSC01063.jpg" alt="AYAM visual archive — photograph 05" loading="lazy"><figcaption><strong>05 /</strong> Campaign image</figcaption></figure>
+      <figure><img src="/DSC01070%20%281%29.jpg" alt="AYAM visual archive — photograph 06" loading="lazy"><figcaption><strong>06 /</strong> Campaign image</figcaption></figure>
+      <figure><img src="/DSC01105.jpg" alt="AYAM visual archive — photograph 07" loading="lazy"><figcaption><strong>07 /</strong> Campaign image</figcaption></figure>
+      <figure><img src="/DSC01106.jpg" alt="AYAM visual archive — photograph 08" loading="lazy"><figcaption><strong>08 /</strong> Campaign image</figcaption></figure>
+    </div>
+  </section>
+  <section class="chapter-list" id="project"><span class="label">One project / Four expressions</span><h2>THE<br>UNIVERSE.</h2><div class="chapters">
+    <div><span>01</span>Fashion collection</div><div><span>02</span>Fashion film</div><div><span>03</span>Campaign photography</div><div><span>04</span>IRE Magazine</div>
+  </div></section>
+</main>
+<footer><span>AYAM / AYA ARBAOUI</span><a href="/">BACK TO HOME ↑</a></footer>
+<script>
+(() => {
+  const frame=document.querySelector('.hero-film');
+  const video=frame.querySelector('video');
+  const play=document.getElementById('film-play');
+  const sound=document.getElementById('film-sound');
+  video.addEventListener('loadeddata',()=>frame.classList.add('has-video'));
+  video.addEventListener('error',()=>{frame.classList.remove('has-video');play.hidden=true;sound.hidden=true});
+  play.addEventListener('click',()=>{if(video.paused)video.play().catch(()=>{});else video.pause();play.textContent=video.paused?'PLAY':'PAUSE'});
+  sound.addEventListener('click',()=>{video.muted=!video.muted;sound.textContent=video.muted?'SOUND OFF':'SOUND ON'});
+  video.play().catch(()=>{play.textContent='PLAY'});
+})();
+</script>
+</body>
+</html>

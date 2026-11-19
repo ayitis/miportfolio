@@ -76,12 +76,14 @@ export function renderAyam(page, design, view) {
   desired.forEach((node, i) => {
     if (grid.children[i] !== node) grid.insertBefore(node, grid.children[i] ?? null);
   });
+  const galleryWidth = grid.clientWidth;
   for (const [id, item] of media) {
     const { node, frame, image, video } = item;
     const saved = layout.media?.[id] ?? {};
     const film = id === ayamFilm;
     node.hidden = Boolean(saved.visibility);
-    node.style.width = saved.width === undefined ? '' : `min(${saved.width}px, 100%)`;
+    const availableWidth = film ? node.parentElement.clientWidth : galleryWidth;
+    node.style.width = saved.width === undefined ? '' : `${Math.min(saved.width, availableWidth)}px`;
     node.style.zIndex = saved.layer ?? '';
     if (film) {
       node.style.height = saved.height === undefined ? '' : `${saved.height}px`;

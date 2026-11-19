@@ -1,11 +1,13 @@
+import { measureDisciplines } from './home-disciplines.js';
+
 const root = document.documentElement;
 const scene = document.querySelector('.home-scroll');
 const hero = scene.querySelector('.hero');
 const photo = hero.querySelector('.hero-bg');
 const group = hero.querySelector('.gallery-wrap');
 const header = group.querySelector('.gallery-header');
-const name = hero.querySelector('.heading h1');
-const captions = [...hero.querySelectorAll('.hero-subtitle, .hero-footer span')];
+const instructions = header.lastElementChild;
+const heading = header.firstElementChild;
 const track = group.querySelector('.track');
 const cards = [...track.querySelectorAll('.project')];
 const about = document.getElementById('about');
@@ -17,30 +19,32 @@ const mix = (a, b, t) => a + (b - a) * t;
 const smooth = t => t * t * (3 - 2 * t);
 
 let active;
+let activeHint;
 let pending = 0;
 let travel = 0;
 let needsMeasure = true;
 
 function clearCards() {
   for (const card of cards) {
-    for (const property of ['--project-x', '--project-y', 'opacity', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat', 'mask-composite']) card.style.removeProperty(property);
+    for (const property of ['--project-x', '--project-y', 'visibility', 'pointer-events']) card.style.removeProperty(property);
     card.inert = false;
   }
 }
 
 function stop() {
   if (!active) return;
+  active.disciplines.reset();
   active = null;
   clearCards();
   hero.classList.remove('home-scrubbing', 'home-photo-panning');
-  group.style.removeProperty('opacity');
   group.style.removeProperty('pointer-events');
   group.inert = false;
-  header.style.removeProperty('opacity');
+  heading.style.removeProperty('opacity');
+  instructions.style.removeProperty('opacity');
+  activeHint?.remove();
+  activeHint = null;
   hero.style.removeProperty('--photo-x');
   hero.style.removeProperty('--photo-y');
-  hero.style.removeProperty('--title-band-top');
-  hero.style.removeProperty('--title-band-bottom');
 }
 
 function configure() {
@@ -76,6 +80,9 @@ function pickCards(width, origin) {
 }
 
 function measure() {
+  active?.disciplines.reset();
+  activeHint?.remove();
+  activeHint = null;
   clearCards();
   // Read the unmodified cover position before enabling the photo pan.
   hero.classList.remove('home-photo-panning');
@@ -103,17 +110,6 @@ function measure() {
   // About 2.8 CSS cm at desktop reference size, scaled down on narrow phones.
   const rightShift = Math.min(105, rect.width * .073);
   const columnX = clamp(offsetX + size * fingertip.x + rightShift + offset, gutter, rect.width - gutter);
-  const title = name.getBoundingClientRect();
-  hero.style.setProperty('--title-band-top', `${Math.max(0, title.top - rect.top - 16)}px`);
-  hero.style.setProperty('--title-band-bottom', `${Math.max(0, rect.bottom - title.bottom - 16)}px`);
-  const range = document.createRange();
-  const protectedAreas = captions.flatMap(caption => {
-    range.selectNodeContents(caption);
-    return [...range.getClientRects()].filter(box => box.width && box.height).map(box => ({
-      left: box.left - rect.left - 7, right: box.right - rect.left + 7,
-      top: box.top - rect.top - 8, bottom: box.bottom - rect.top + 8,
-    }));
-  });
   let nextY = clamp(offsetY + size * fingertip.y + 25, 28, rect.height * .68);
   const gap = narrow.matches ? 15 : 20;
   for (const item of entries) {
@@ -121,23 +117,26 @@ function measure() {
     item.destTop = nextY;
     nextY += item.height + gap;
   }
-  return { entries, visible: new Set(entries.map(({ card }) => card)), rise: nextY + 35, protectedAreas, photoX, photoY, offsetX, offsetY };
-}
-
-function protectCaptions(item, left, top, areas) {
-  const overlapping = areas.filter(area => area.left < left + item.width && area.right > left &&
-    area.top < top + item.height && area.bottom > top);
-  const style = item.card.style;
-  if (!overlapping.length) {
-    style.removeProperty('mask-image');
-    return;
+  const disciplines = measureDisciplines(hero, rect, columnX - widest / 2, columnX + widest / 2);
+  const hint = instructions.getBoundingClientRect();
+  if (hint.width && hint.height) {
+    activeHint = document.createElement('span');
+    activeHint.className = 'scroll-hint';
+    activeHint.setAttribute('aria-hidden', 'true');
+    activeHint.textContent = instructions.textContent;
+    const type = getComputedStyle(instructions);
+    Object.assign(activeHint.style, {
+      color: type.color, fontFamily: type.fontFamily, fontSize: type.fontSize,
+      lineHeight: type.lineHeight, fontWeight: type.fontWeight, letterSpacing: type.letterSpacing,
+      textShadow: type.textShadow, textTransform: type.textTransform,
+    });
+    hero.append(activeHint);
   }
-  style.maskImage = ['linear-gradient(#000, #000)', ...overlapping.map(() =>
-    'linear-gradient(transparent, #000 6px, #000 calc(100% - 6px), transparent)')].join(', ');
-  style.maskPosition = ['0 0', ...overlapping.map(area => `${area.left - left}px ${area.top - top}px`)].join(', ');
-  style.maskSize = ['100% 100%', ...overlapping.map(area => `${area.right - area.left}px ${area.bottom - area.top}px`)].join(', ');
-  style.maskRepeat = 'no-repeat';
-  style.maskComposite = 'exclude';
+  return {
+    entries, visible: new Set(entries.map(({ card }) => card)), rise: nextY + 35,
+    photoX, photoY, offsetX, offsetY, disciplines,
+    hintX: hint.left - rect.left, hintY: hint.top - rect.top, hintWidth: hint.width,
+  };
 }
 
 function draw(progress) {
@@ -154,20 +153,29 @@ function draw(progress) {
   const fan = smooth(clamp(progress / .40, 0, 1));
   const glide = clamp((progress - .48) / .52, 0, 1);
   const rise = active.rise * glide * glide;
-  const opacity = 1 - smooth(clamp((progress - .84) / .15, 0, 1));
+  const opacity = 1 - smooth(clamp((progress - .95) / .05, 0, 1));
   hero.style.setProperty('--photo-x', `${mix(active.photoX, active.offsetX, reform)}px`);
   hero.style.setProperty('--photo-y', `${mix(active.photoY, active.offsetY, reform)}px`);
   hero.classList.add('home-photo-panning');
-  group.style.opacity = opacity;
-  group.inert = opacity <= .02;
-  group.style.pointerEvents = opacity <= .02 ? 'none' : '';
-  header.style.opacity = 1 - reform;
+  const ended = progress >= 1;
+  group.inert = ended;
+  group.style.pointerEvents = ended ? 'none' : '';
+  heading.style.opacity = 1 - reform;
+  const typeProgress = smooth(clamp(progress / .24, 0, 1));
+  const typeRise = smooth(clamp((progress - .12) / .28, 0, 1));
+  active.disciplines.draw(typeProgress, typeRise);
+  const hint = active.disciplines.instruction;
+  if (activeHint) {
+    instructions.style.opacity = 0;
+    activeHint.style.transform = `translate3d(${mix(active.hintX, hint.left, typeProgress)}px, ${mix(active.hintY, hint.top, typeRise)}px, 0)`;
+    activeHint.style.width = `${mix(active.hintWidth + 2, hint.width, typeProgress)}px`;
+    activeHint.style.opacity = opacity;
+  }
 
   for (const card of cards) {
     if (!active.visible.has(card)) {
-      card.style.opacity = 1 - clamp(progress / .08, 0, 1);
-      card.inert = progress >= .08;
-      card.style.pointerEvents = progress >= .08 ? 'none' : '';
+      card.style.visibility = 'hidden';
+      card.inert = true;
     }
   }
   for (const item of active.entries) {
@@ -175,7 +183,6 @@ function draw(progress) {
     const y = (item.destTop - item.top) * fan - rise;
     item.card.style.setProperty('--project-x', `${x}px`);
     item.card.style.setProperty('--project-y', `${y}px`);
-    protectCaptions(item, item.left + x, item.top + y, active.protectedAreas);
   }
 }
 

@@ -16,22 +16,26 @@ html[data-about-direct] #about { min-height: 100vh; min-height: 100dvh; }
     top: var(--hero-travel) !important;
   }
 
-  .home-scrubbing .heading { z-index: 7; }
-  .home-scrubbing .hero-person-depth {
-    z-index: 8;
-    --title-band-mask: linear-gradient(
-      transparent var(--title-band-top, 0px),
-      #000 calc(var(--title-band-top, 0px) + 16px),
-      #000 calc(100% - var(--title-band-bottom, 0px) - 16px),
-      transparent calc(100% - var(--title-band-bottom, 0px))
-    );
-    mask-image: var(--portrait-mask), var(--title-band-mask);
-    mask-composite: intersect;
+  .home-scrubbing .gallery-wrap { z-index: 20; }
+  .home-scrubbing .hero-footer { pointer-events: none; }
+  .scroll-disciplines {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
   }
-  .home-scrubbing :is(.hero-subtitle, .hero-footer) { z-index: 9; pointer-events: none; }
+  .scroll-disciplines span, .scroll-hint {
+    position: absolute;
+    display: block;
+    inset: 0 auto auto 0;
+    overflow-wrap: anywhere;
+  }
+  .scroll-hint { z-index: 6; pointer-events: none; }
+  .scroll-disciplines-source { opacity: 0; }
   .home-scrubbing .track { animation-play-state: paused !important; }
   .home-scrubbing .marquee { overflow: visible; cursor: auto; }
   .home-scrubbing .project { transform: translate3d(var(--project-x, 0px), var(--project-y, 0px), 0); transition: none; }
+  .home-scrubbing .project img { transform: none; transition: none; }
   .home-photo-panning .hero-bg,
   .home-photo-panning .hero-person-depth { background-position: var(--photo-x) var(--photo-y); }
 }

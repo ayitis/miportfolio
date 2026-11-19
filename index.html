@@ -30,9 +30,43 @@ if (document.documentElement.hasAttribute('data-about-arriving')) {
   document.getElementById('about').scrollIntoView({block:'start',behavior:'instant'});
   document.documentElement.removeAttribute('data-about-arriving');
 }
-const box=document.querySelector('.marquee');let down=false,startX=0,startY=0,moved=false,resume;
-box.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;down=true;moved=false;startX=e.clientX;startY=e.clientY;clearTimeout(resume);box.classList.add('paused')});
-window.addEventListener('pointermove',e=>{if(!down)return;if(Math.hypot(e.clientX-startX,e.clientY-startY)>8)moved=true});
-for(const type of ['pointerup','pointercancel'])window.addEventListener(type,()=>{if(!down)return;down=false;resume=setTimeout(()=>box.classList.remove('paused'),550)});
-box.addEventListener('click',e=>{if(moved&&e.detail!==0){e.preventDefault();e.stopPropagation();moved=false}},true);
+const box = document.querySelector('.marquee');
+const rail = box.querySelector('.track');
+let gesture, moved = false, resume;
+box.addEventListener('dragstart', event => event.preventDefault());
+box.addEventListener('pointerdown', event => {
+  if (!event.isPrimary || event.button !== 0) return;
+  clearTimeout(resume);
+  moved = false;
+  box.classList.add('paused');
+  const animation = rail.getAnimations().find(item => item.animationName === 'slide');
+  gesture = {
+    pointer: event.pointerId, x: event.clientX, y: event.clientY,
+    animation, time: Number(animation?.currentTime ?? 0),
+    vertical: box.closest('.home-scrubbing') !== null,
+  };
+});
+window.addEventListener('pointermove', event => {
+  if (gesture?.pointer !== event.pointerId) return;
+  const x = event.clientX - gesture.x;
+  const y = event.clientY - gesture.y;
+  if (Math.hypot(x, y) <= 8 && !moved) return;
+  moved = true;
+  if (gesture.vertical || box.closest('.home-scrubbing') || !gesture.animation || Math.abs(y) > Math.abs(x)) return;
+  const duration = gesture.animation.effect.getTiming().duration;
+  const next = gesture.time - x / (rail.offsetWidth / 2) * duration;
+  gesture.animation.currentTime = ((next % duration) + duration) % duration;
+});
+for (const type of ['pointerup', 'pointercancel']) window.addEventListener(type, event => {
+  if (gesture?.pointer !== event.pointerId) return;
+  gesture = null;
+  resume = setTimeout(() => box.classList.remove('paused'), 550);
+});
+box.addEventListener('click', event => {
+  if (moved && event.detail !== 0) {
+    event.preventDefault();
+    event.stopPropagation();
+    moved = false;
+  }
+}, true);
 </script><script type="module" src="/portfolio/home-transition.js"></script><script type="module" src="/portfolio/published.js"></script></body></html>

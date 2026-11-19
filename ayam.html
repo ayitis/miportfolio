@@ -25,9 +25,6 @@ a{color:inherit;text-decoration:none}
 .hero-film video{opacity:0;transition:opacity .5s}
 .hero-film.has-video video{opacity:1}
 .hero-film::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0006,transparent 30%,transparent 54%,#0005);pointer-events:none}
-.film-actions{position:absolute;bottom:20px;right:var(--space);z-index:4;display:flex;gap:8px}
-.film-actions button{border:1px solid #ffffff99;background:#10101099;color:#fff;padding:10px 14px;font-size:11px;letter-spacing:.12em;cursor:pointer}
-.film-actions button:hover{background:#333}
 .film-strap{position:absolute;top:24px;left:var(--space);right:var(--space);display:flex;justify-content:space-between;color:#fff;z-index:3;text-transform:uppercase;font-weight:600;font-size:11px;letter-spacing:.15em}
 .hero-intro{text-align:center;padding:clamp(35px,6vw,94px) var(--space) clamp(55px,8vw,125px)}
 .hero-intro .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase}
@@ -35,7 +32,7 @@ a{color:inherit;text-decoration:none}
 .hero-intro .subtitle{font-size:clamp(12px,1.3vw,16px);max-width:480px;line-height:1.5;margin:0 auto}
 .hero-intro .index{display:block;margin-top:26px;font-size:10px;letter-spacing:.15em}
 .campaign{padding:0 var(--space) clamp(95px,12vw,170px)}
-.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px;border-top:1px solid #171717;padding-top:18px;margin-bottom:30px}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding-top:0;margin-bottom:30px}
 .section-head h2{font-size:clamp(39px,6.4vw,92px);line-height:.9;letter-spacing:-.09em;margin:0;text-transform:uppercase;font-weight:900}
 .section-head span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
 .editorial-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(10px,2vw,26px);row-gap:clamp(28px,4.5vw,72px);align-items:start}
@@ -75,9 +72,8 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
   <section class="hero" aria-labelledby="ayam-title">
     <div class="hero-film" id="fashion-film">
       <img src="/DSC01108.jpg" alt="Fashion editorial photograph from the portfolio">
-      <video autoplay muted loop playsinline preload="metadata" aria-label="AYAM fashion film"><source src="/FASHION%20FILM%20IRE.MP4" type="video/mp4"></video>
+      <video autoplay muted playsinline preload="metadata" aria-label="AYAM fashion film"><source src="/FASHION%20FILM%20IRE.MP4" type="video/mp4"></video>
       <div class="film-strap"><span>AYA ARBAOUI / TFG</span><span>FASHION FILM — 01</span></div>
-      <div class="film-actions"><button type="button" id="film-play" aria-label="Pause or play the fashion film">PAUSE</button><button type="button" id="film-sound" aria-label="Enable or mute sound">SOUND OFF</button></div>
     </div>
     <div class="hero-intro">
       <span class="eyebrow">Fashion collection / Creative direction / Editorial</span>
@@ -109,13 +105,25 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
 (() => {
   const frame=document.querySelector('.hero-film');
   const video=frame.querySelector('video');
-  const play=document.getElementById('film-play');
-  const sound=document.getElementById('film-sound');
+  // The source file remains unchanged: skip its final seven seconds on every playback.
+  function cutPoint(){
+    return Number.isFinite(video.duration) && video.duration > 7
+      ? video.duration - 7 : video.duration;
+  }
   video.addEventListener('loadeddata',()=>frame.classList.add('has-video'));
-  video.addEventListener('error',()=>{frame.classList.remove('has-video');play.hidden=true;sound.hidden=true});
-  play.addEventListener('click',()=>{if(video.paused)video.play().catch(()=>{});else video.pause();play.textContent=video.paused?'PLAY':'PAUSE'});
-  sound.addEventListener('click',()=>{video.muted=!video.muted;sound.textContent=video.muted?'SOUND OFF':'SOUND ON'});
-  video.play().catch(()=>{play.textContent='PLAY'});
+  video.addEventListener('error',()=>frame.classList.remove('has-video'));
+  video.addEventListener('timeupdate',()=>{
+    const end=cutPoint();
+    if(Number.isFinite(end) && video.currentTime >= end){
+      video.currentTime=0;
+      if(video.paused)video.play().catch(()=>{});
+    }
+  });
+  video.addEventListener('ended',()=>{
+    video.currentTime=0;
+    video.play().catch(()=>{});
+  });
+  video.play().catch(()=>{});
 })();
 </script>
 </body>

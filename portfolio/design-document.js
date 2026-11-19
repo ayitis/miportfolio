@@ -1,3 +1,4 @@
+import { ayamPage, emptyAyam, validateAyam } from './ayam-document.js';
 import { carnagePage, emptyCarnage, validateCarnage } from './carnage-document.js';
 import { followsNuptiasHeading, nuptiasEditorial } from './nuptias-layout.js';
 import { pages } from './pages.js';
@@ -30,6 +31,7 @@ export function emptyDraft(page = 'home') {
     version: 1, page, desktop: {}, mobile: {}, content: {}, elements: {},
     ...(page === 'nuptias' && { gallery: emptyGallery() }),
     ...(page === carnagePage && { carnage: emptyCarnage() }),
+    ...(page === ayamPage && { ayam: emptyAyam() }),
   };
 }
 
@@ -47,7 +49,8 @@ export function validateDraft(value, page = value?.page) {
       }
       const clean = {};
       for (const [field, setting] of Object.entries(settings)) {
-        const range = Object.hasOwn(bounds, field) ? bounds[field] : null;
+        const range = page === ayamPage && field === 'height' ? [16, 4000]
+          : Object.hasOwn(bounds, field) ? bounds[field] : null;
         const valid = view === 'content'
           ? field === 'text' && typeof setting === 'string' && setting.length <= 2000
           : (range && Number.isInteger(setting) && setting >= range[0] && setting <= range[1])
@@ -64,6 +67,7 @@ export function validateDraft(value, page = value?.page) {
   }
   if (page === 'nuptias' && value.gallery !== undefined) draft.gallery = validateGallery(value.gallery);
   if (page === carnagePage && value.carnage !== undefined) draft.carnage = validateCarnage(value.carnage);
+  if (page === ayamPage && value.ayam !== undefined) draft.ayam = validateAyam(value.ayam);
   if (value.elements !== undefined) {
     if (!isRecord(value.elements) || Object.keys(value.elements).length > 1000) {
       throw new Error('La copia contiene elementos inválidos.');
@@ -72,7 +76,9 @@ export function validateDraft(value, page = value?.page) {
       if (!/^[a-z][a-z0-9-]*(\.[a-z0-9-]+)+$/.test(id) || !isRecord(settings)) {
         throw new Error('La copia contiene un elemento inválido.');
       }
-      if (id.startsWith('custom.') && settings.type === 'text') draft.elements[id] = { type: 'text' };
+      if (id.startsWith('custom.') && settings.type === 'text') {
+        draft.elements[id] = { type: 'text', ...(page === ayamPage && settings.hidden === true && { hidden: true }) };
+      }
       else if (settings.hidden === true && !id.startsWith('custom.')) draft.elements[id] = { hidden: true };
       else throw new Error('La copia contiene un elemento inválido.');
     }

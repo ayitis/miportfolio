@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-design-page="ayam">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -10,7 +10,7 @@
 :root{--ink:#151515;--paper:#f7f7f3;--space:clamp(18px,3.8vw,66px)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+body{overflow-x:clip;margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
 img{display:block;width:100%}
 a{color:inherit;text-decoration:none}
 .site-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px var(--space);background:var(--paper);position:relative;z-index:10}
@@ -36,7 +36,7 @@ a{color:inherit;text-decoration:none}
 .section-head h2{font-size:clamp(35px,5vw,74px);line-height:.92;letter-spacing:-.075em;margin:0;text-transform:uppercase;font-weight:900}
 .section-head span{font-size:10px;letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}
 .ayam-news{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(10px,1.6vw,25px);row-gap:clamp(35px,5vw,75px);align-items:start}
-.ayam-news figure{margin:0;min-width:0}
+.ayam-news figure{position:relative;margin:0;min-width:0}
 .ayam-news img{width:100%;height:100%;object-fit:cover;background:#e6e4e0}
 .ayam-news .story-image{overflow:hidden;background:#e6e4e0}
 .ayam-news figcaption{font-size:clamp(9px,.85vw,12px);line-height:1.4;padding-top:10px;color:#303030}
@@ -99,6 +99,9 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
 @media(max-width:800px){.links{gap:12px;font-size:9px}.hero-film{height:59vw;min-height:270px}.editorial-grid{grid-template-columns:repeat(6,minmax(0,1fr));row-gap:35px}.editorial-grid figure:nth-child(n){grid-row:auto;margin-top:0}.editorial-grid figure:nth-child(odd){grid-column:1/span 3}.editorial-grid figure:nth-child(even){grid-column:4/span 3}.interlude{grid-column:1/span 6}.chapter-list .chapters{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:540px){.site-header{padding-top:12px;padding-bottom:12px}.site-header .site-brand{width:145px}.links a:nth-child(2){display:none}.hero-film{height:62svh;min-height:340px}.film-strap{font-size:9px}.hero-intro h1{font-size:24vw}.hero-intro{padding-bottom:65px}.section-head{align-items:start}.section-head h2{font-size:clamp(35px,8vw,62px)}.section-head span{font-size:9px}.editorial-grid{gap:26px 12px}.editorial-grid figcaption{font-size:9px}.chapter-list .chapters{gap:25px 12px}footer{font-size:9px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-film video{transition:none}}
+.ayam-news figure[data-ayam-added]{grid-column:span 4;grid-row:auto}
+.ayam-news figure[data-ayam-added] .story-image{aspect-ratio:4/5}
+@media(max-width:800px){.ayam-news figure[data-ayam-added]{grid-column:span 3}}
 </style>
 </head>
 <body>
@@ -108,7 +111,7 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
 </header>
 <main>
   <section class="hero" aria-labelledby="ayam-title">
-    <div class="hero-film" id="fashion-film">
+    <div class="hero-film" id="fashion-film" data-ayam-media="film">
       <img src="/DSC01108.jpg" alt="Fashion editorial photograph from the portfolio">
       <video autoplay muted playsinline preload="metadata" aria-label="AYAM fashion film"><source src="/FASHION%20FILM%20IRE.MP4" type="video/mp4"></video>
       <div class="film-strap"><span>AYA ARBAOUI / TFG</span><span>FASHION FILM — 01</span></div>
@@ -126,33 +129,33 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
       <span>AYAM / FASHION ARCHIVE — 01</span>
     </div>
     <div class="ayam-news">
-      <figure class="story-a">
+      <figure class="story-a" data-ayam-media="photo-01">
         <div class="story-image"><img src="/DSC01108.jpg" alt="AYAM photographic editorial, image 01" loading="lazy"></div>
-        <figcaption><strong>Visual identity through fashion</strong>AYAM / Campaign photography — 01</figcaption>
+        <figcaption><strong>Visual identity through fashion</strong><span>AYAM / Campaign photography — 01</span></figcaption>
       </figure>
-      <figure class="story-b">
+      <figure class="story-b" data-ayam-media="photo-02">
         <div class="story-image"><img src="/DSC00997.jpg" alt="AYAM photographic editorial, image 02" loading="lazy"></div>
-        <figcaption><strong>Behind the image</strong>AYAM / Creative direction — 02</figcaption>
+        <figcaption><strong>Behind the image</strong><span>AYAM / Creative direction — 02</span></figcaption>
       </figure>
       <aside class="editorial-note">
         <span class="eyebrow">The concept / 03</span>
         <p>Fashion as an expression of identity. A collection translated into moving images, photography and an editorial publication.</p>
       </aside>
-      <figure class="story-c">
+      <figure class="story-c" data-ayam-media="photo-03">
         <div class="story-image"><img src="/DSC01003.jpg" alt="AYAM campaign editorial, image 03" loading="lazy"></div>
-        <figcaption><strong>One collection, multiple expressions</strong>AYAM / Fashion campaign — 03</figcaption>
+        <figcaption><strong>One collection, multiple expressions</strong><span>AYAM / Fashion campaign — 03</span></figcaption>
       </figure>
-      <figure class="story-d">
+      <figure class="story-d" data-ayam-media="photo-04">
         <div class="story-image"><img src="/DSC01055.jpg" alt="AYAM campaign editorial, image 04" loading="lazy"></div>
-        <figcaption><strong>A study in silhouette</strong>AYAM / Fashion photography — 04</figcaption>
+        <figcaption><strong>A study in silhouette</strong><span>AYAM / Fashion photography — 04</span></figcaption>
       </figure>
-      <figure class="story-e">
+      <figure class="story-e" data-ayam-media="photo-05">
         <div class="story-image"><img src="/DSC01063.jpg" alt="AYAM campaign editorial, image 05" loading="lazy"></div>
-        <figcaption><strong>Beyond the frame</strong>AYAM / Visual exploration — 05</figcaption>
+        <figcaption><strong>Beyond the frame</strong><span>AYAM / Visual exploration — 05</span></figcaption>
       </figure>
-      <figure class="story-f">
+      <figure class="story-f" data-ayam-media="photo-06">
         <div class="story-image"><img src="/DSC01070%20%281%29.jpg" alt="AYAM campaign editorial, image 06" loading="lazy"></div>
-        <figcaption><strong>Fashion in focus</strong>AYAM / Image-making — 06</figcaption>
+        <figcaption><strong>Fashion in focus</strong><span>AYAM / Image-making — 06</span></figcaption>
       </figure>
       <div class="section-break">
         <h3>STREET<br>STYLE.</h3>
@@ -165,46 +168,23 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
         <span class="eyebrow">AYAM / Editorial notes</span>
         <p>From concept to collection, the project unfolds through a fashion film, a campaign and IRE Magazine. Each medium reveals another side of the same visual universe.</p>
       </aside>
-      <figure class="story-g">
+      <figure class="story-g" data-ayam-media="photo-07">
         <div class="story-image"><img src="/DSC01105.jpg" alt="AYAM campaign editorial, image 07" loading="lazy"></div>
-        <figcaption><strong>The collection in motion</strong>AYAM / Campaign study — 07</figcaption>
+        <figcaption><strong>The collection in motion</strong><span>AYAM / Campaign study — 07</span></figcaption>
       </figure>
-      <figure class="story-h">
+      <figure class="story-h" data-ayam-media="photo-08">
         <div class="story-image"><img src="/DSC01106.jpg" alt="AYAM campaign editorial, image 08" loading="lazy"></div>
-        <figcaption><strong>An editorial perspective</strong>AYAM / Campaign study — 08</figcaption>
+        <figcaption><strong>An editorial perspective</strong><span>AYAM / Campaign study — 08</span></figcaption>
       </figure>
       <div class="closing-line"><span>AYAM / CAMPAIGN IMAGERY</span><span>01 — 08 / VISUAL ARCHIVE</span></div>
     </div>
   </section>
   <section class="chapter-list" id="project"><span class="label">One project / Four expressions</span><h2>THE<br>UNIVERSE.</h2><div class="chapters">
-    <div><span>01</span>Fashion collection</div><div><span>02</span>Fashion film</div><div><span>03</span>Campaign photography</div><div><span>04</span>IRE Magazine</div>
+    <div><span>01</span><strong style="font-weight:inherit">Fashion collection</strong></div><div><span>02</span><strong style="font-weight:inherit">Fashion film</strong></div><div><span>03</span><strong style="font-weight:inherit">Campaign photography</strong></div><div><span>04</span><strong style="font-weight:inherit">IRE Magazine</strong></div>
   </div></section>
 </main>
 <footer><span>AYAM / AYA ARBAOUI</span><a href="/">BACK TO HOME ↑</a></footer>
-<script>
-(() => {
-  const frame=document.querySelector('.hero-film');
-  const video=frame.querySelector('video');
-  // The source file remains unchanged: skip its final seven seconds on every playback.
-  function cutPoint(){
-    return Number.isFinite(video.duration) && video.duration > 7
-      ? video.duration - 7 : video.duration;
-  }
-  video.addEventListener('loadeddata',()=>frame.classList.add('has-video'));
-  video.addEventListener('error',()=>frame.classList.remove('has-video'));
-  video.addEventListener('timeupdate',()=>{
-    const end=cutPoint();
-    if(Number.isFinite(end) && video.currentTime >= end){
-      video.currentTime=0;
-      if(video.paused)video.play().catch(()=>{});
-    }
-  });
-  video.addEventListener('ended',()=>{
-    video.currentTime=0;
-    video.play().catch(()=>{});
-  });
-  video.play().catch(()=>{});
-})();
-</script>
+<script type="module" src="/portfolio/ayam-film.js"></script>
+<script type="module" src="/portfolio/published.js"></script>
 </body>
 </html>

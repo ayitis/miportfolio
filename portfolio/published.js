@@ -1,3 +1,5 @@
+import { ayamPage } from './ayam-document.js';
+import { renderAyam, syncAyamNodes } from './ayam-layout.js';
 import { carnagePage } from './carnage-document.js';
 import { applyNuptiasLayout } from './nuptias-layout.js';
 import { applyHomeGalleryLayout } from './home-gallery-layout.js';
@@ -32,11 +34,12 @@ async function showPublishedDesign() {
   const { request, published } = snapshot;
 
   const design = validateDraft(published.document, page);
-  const mobile = matchMedia(page === carnagePage ? '(max-width: 650px)' : '(max-width: 700px)');
+  const mobile = matchMedia(page === ayamPage ? '(max-width: 800px)' : page === carnagePage ? '(max-width: 650px)' : '(max-width: 700px)');
   const elements = collectElements(document, pages[page].targets);
   const gallery = page === 'nuptias' && collectGallery(document);
   const uploads = visibleUploads(design.gallery);
   let urls = new Map();
+  if (page === ayamPage) syncAyamNodes(document, design, elements);
   syncCustomElements(document, elements, design);
   const render = () => {
     const view = mobile.matches ? 'mobile' : 'desktop';
@@ -49,6 +52,7 @@ async function showPublishedDesign() {
     if (page === carnagePage) {
       document.dispatchEvent(new CustomEvent('portfolio:carnage-design', { detail: { view, settings: design.carnage[view] } }));
     }
+    if (page === ayamPage) renderAyam(document, design, view);
     if (gallery) renderGallery(gallery, design.gallery, view, urls);
     constrainNuptiasPositions(document, elements, design, view);
   };

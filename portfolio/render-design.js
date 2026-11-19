@@ -78,7 +78,7 @@ export function applyElement(editable, id, draft, view) {
     color: overrides.color ?? null,
     'letter-spacing': overrides.spacing === undefined ? null : `${overrides.spacing}px`,
     'z-index': overrides.layer ?? null,
-    height: null,
+    height: draft.page === 'ayam' && overrides.height !== undefined ? `${overrides.height}px` : null,
     'margin-inline': null,
     'max-width': null,
     width: overrides.width === undefined ? null : `${overrides.width}px`,
@@ -103,7 +103,7 @@ export function applyElement(editable, id, draft, view) {
     if (id.startsWith('custom.') && styles.width !== null) {
       styles.width = `min(${overrides.width}px, max(24px, calc(100% - ${Math.max(0, x)}px)))`;
     }
-    const display = draft.elements[id]?.hidden ? 'none' : original.inline && (styles.translate || styles.width || styles['text-align'])
+    const display = draft.elements[id]?.hidden ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
       ? 'inline-block' : null;
     for (const [property, value] of Object.entries({ ...styles, ...adapted, display })) {
       if (value === null) node.style.setProperty(property, ...original.styles[property]);

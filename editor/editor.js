@@ -1,3 +1,6 @@
+import { ayamPage } from '../portfolio/ayam-document.js';
+import { syncAyamNodes } from '../portfolio/ayam-layout.js';
+import { setupAyam } from './ayam.js';
 import { carnagePage } from '../portfolio/carnage-document.js';
 import { setupCarnage } from './carnage.js';
 import { applyNuptiasLayout, followsNuptiasHeading, hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasRightLimit, nuptiasLayout } from '../portfolio/nuptias-layout.js';
@@ -62,17 +65,20 @@ function markDirty(group) {
 }
 
 function refreshElements() {
+  if (draft.page === ayamPage) syncAyamNodes(preview.contentDocument, draft, editable);
   syncCustomElements(preview.contentDocument, editable, draft);
   const current = selected;
   element.options.length = 1;
   const labels = new Map(pages[draft.page].targets);
   for (const [id, originals] of editable) {
-    if (draft.elements[id]?.hidden) continue;
+    const hidden = draft.elements[id]?.hidden;
+    if (hidden && draft.page !== ayamPage) continue;
     for (const { node } of originals) if (!layoutElement(id)) node.dataset.editorText = id;
-    const name = labels.get(id) ?? (draft.content[id]?.text?.slice(0, 65) || 'Texto nuevo');
-    element.add(new Option(name, id));
+    const caption = /^caption(?:-title)?\./.test(id) ? 'Pie · ' + (draft.content[id]?.text ?? originals[0].text).slice(0, 60) : null;
+    const name = labels.get(id) ?? caption ?? (draft.content[id]?.text?.slice(0, 65) || 'Texto nuevo');
+    element.add(new Option(name + (hidden ? ' · oculto' : ''), id));
   }
-  select(editable.has(current) && !draft.elements[current]?.hidden ? current : '');
+  select(editable.has(current) && (draft.page === ayamPage || !draft.elements[current]?.hidden) ? current : '');
 }
 
 function restoreActions(back) {
@@ -102,7 +108,10 @@ function updateFields() {
   const groupSizing = selected === groupTarget;
   find('element-layers').hidden = !selected.startsWith('custom.');
   find('gallery-layout-help').hidden = !groupSizing;
-  find('delete-element').hidden = group;
+  const hiddenAyamText = draft.page === ayamPage && draft.elements[selected]?.hidden;
+  find('delete-element').hidden = group || Boolean(hiddenAyamText);
+  find('ayam-restore-text').hidden = !hiddenAyamText;
+  find('ayam-hide-text').hidden = draft.page !== ayamPage || Boolean(hiddenAyamText) || !selected;
   const limited = draft.page === 'nuptias' && hasNuptiasDesktopLimit(selected, view);
   find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected);
   find('nuptias-guide-help').hidden = !limited;
@@ -110,11 +119,14 @@ function updateFields() {
   find('reset-color').closest('.color-setting').hidden = group;
   for (const input of fields) {
     if (['text', 'size', 'font', 'align', 'spacing', 'height'].includes(input.dataset.field)) {
-      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing : group;
+      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing && draft.page !== ayamPage : group;
     }
   }
   fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected) || selected === nuptiasEditorial;
   find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : 'Ajustes del texto';
+  const height = fields.find(input => input.dataset.field === 'height');
+  height.min = draft.page === ayamPage ? '16' : String(bounds.height[0]);
+  height.max = draft.page === ayamPage ? '4000' : String(bounds.height[1]);
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
@@ -138,6 +150,7 @@ function select(id, reveal = false) {
   if (id) {
     gallery.select('');
     carnage.clear();
+    ayam.clear();
   }
   for (const { node } of editable.get(selected) ?? []) node.removeAttribute('data-editor-selected');
   selected = id;
@@ -274,7 +287,7 @@ function captureElement() {
     };
   }
   updateActionButtons();
-  status.textContent = 'Texto copiado. Puedes pegarlo en Home o NUPTIAS.';
+  status.textContent = 'Texto copiado. Puedes pegarlo en una página del editor.';
   return true;
 }
 
@@ -430,6 +443,7 @@ function applyView(next) {
   for (const id of editable.keys()) applyElement(editable, id, draft, view);
   gallery.render();
   carnage.render();
+  ayam.render();
   constrainNuptiasPositions(preview.contentDocument, editable, draft, view);
   updateFields();
   syncRulers();
@@ -651,6 +665,21 @@ find('nuptias-align-right').addEventListener('click', () => {
   markDirty();
 });
 
+find('ayam-hide-text').addEventListener('click', () => {
+  if (draft.page !== ayamPage || !selected) return;
+  draft.elements[selected] = { ...draft.elements[selected], hidden: true };
+  apply(selected);
+  refreshElements();
+  markDirty();
+});
+find('ayam-restore-text').addEventListener('click', () => {
+  if (draft.page !== ayamPage || !draft.elements[selected]?.hidden) return;
+  if (draft.elements[selected].type === 'text') delete draft.elements[selected].hidden;
+  else delete draft.elements[selected];
+  apply(selected);
+  refreshElements();
+  markDirty();
+});
 find('reset').addEventListener('click', () => {
   if (selected === nuptiasEditorial) {
     const layout = nuptiasLayout(draft, view);
@@ -674,7 +703,9 @@ function runAction(action) {
         ? 'Hay un borrador más reciente. Descarga una copia de tus cambios y recarga el editor.'
         : error.code === 'PGRST202' && draft.page === 'nuptias'
           ? 'Ejecuta primero la migración de NUPTIAS en el proyecto de Supabase de Preview.'
-          : draft.page === carnagePage && ['PGRST202', '22023', '23514'].includes(error.code)
+          : draft.page === ayamPage && ['PGRST202', '22023', '23514'].includes(error.code)
+            ? 'Si aún no lo has hecho, ejecuta la migración de AYAM en Supabase de Preview.'
+            : draft.page === carnagePage && ['PGRST202', '22023', '23514'].includes(error.code)
             ? 'Si aún no lo has hecho, ejecuta la migración de Maison Carnage en Supabase de Preview.'
             : error.message;
     } finally {
@@ -778,6 +809,7 @@ function initializePreview() {
   attach();
   if (draft.page === 'nuptias') gallery.attach(preview.contentDocument);
   if (draft.page === carnagePage) carnage.attach(preview.contentDocument);
+  if (draft.page === ayamPage) ayam.attach(preview.contentDocument);
   applyView(view);
   status.textContent = `Editando ${pages[draft.page].label}.`;
   for (const id of pageControls) find(id).disabled = false;
@@ -789,6 +821,7 @@ async function showPage(page) {
   actions.reset(draft);
   gallery.detach();
   carnage.detach();
+  ayam.detach();
   finishDrag();
   guideLayer?.detach();
   guideLayer = undefined;
@@ -872,6 +905,16 @@ const carnage = setupCarnage({
   markDirty,
   closeGroup: () => actions.closeGroup(),
   deselectText: () => select(''),
+  isBusy: () => workspace.inert,
+});
+
+const ayam = setupAyam({
+  getDraft: () => draft,
+  getView: () => view,
+  markDirty,
+  closeGroup: () => actions.closeGroup(),
+  deselectText: () => select(''),
+  syncGallery: () => { refreshElements(); applyView(view); },
   isBusy: () => workspace.inert,
 });
 

@@ -1,0 +1,122 @@
+import { ayamFilm, ayamOrder } from './ayam-document.js';
+import { collectElements } from './render-design.js';
+
+const instances = new WeakMap();
+function collect(page) {
+  if (instances.has(page)) return instances.get(page);
+  const grid = page.querySelector('.ayam-news');
+  const film = page.querySelector('#fashion-film');
+  const original = [...grid.querySelectorAll('figure[data-ayam-media]')];
+  const originalIds = original.map(node => node.dataset.ayamMedia);
+  const slots = [...grid.children].map(node => node.matches('figure') ? null : node);
+  const storyClasses = original.map(node => node.className);
+  const media = new Map(original.map(node => [node.dataset.ayamMedia, {
+    node, frame: node.querySelector('.story-image'), image: node.querySelector('img'), source: node.querySelector('img').getAttribute('src'),
+  }]));
+  media.set(ayamFilm, {
+    node: film, image: film.querySelector('img'), video: film.querySelector('video'),
+    poster: film.querySelector('img').getAttribute('src'),
+    source: film.querySelector('source').getAttribute('src'),
+  });
+  const state = { grid, originalIds, slots, storyClasses, media };
+  instances.set(page, state);
+  return state;
+}
+
+export function syncAyamNodes(page, design, editable) {
+  const { grid, media, originalIds } = collect(page);
+  for (const [id, item] of media) {
+    if (id === ayamFilm || originalIds.includes(id) || Object.hasOwn(design.ayam.assets, id)) continue;
+    item.node.remove();
+    media.delete(id);
+    editable.delete(`caption.${id}`);
+    editable.delete(`caption-title.${id}`);
+  }
+  for (const [id, source] of Object.entries(design.ayam.assets)) {
+    if (media.has(id)) continue;
+    const node = page.createElement('figure');
+    node.dataset.ayamMedia = id;
+    node.dataset.ayamAdded = '';
+    const image = page.createElement('img');
+    image.alt = 'AYAM — campaign photograph';
+    image.loading = 'lazy';
+    const frame = page.createElement('div');
+    frame.className = 'story-image';
+    frame.append(image);
+    const caption = page.createElement('figcaption');
+    const line = page.createElement('span');
+    line.textContent = 'Campaign image';
+    caption.append(line);
+    node.append(frame, caption);
+    grid.append(node);
+    media.set(id, { node, frame, image, source });
+  }
+  const captions = [...media.keys()].filter(id => id !== ayamFilm && !editable.has(`caption.${id}`))
+    .flatMap(id => [
+      [`caption.${id}`, '', `[data-ayam-media="${id}"] figcaption span`, { inline: true }],
+      [`caption-title.${id}`, '', `[data-ayam-media="${id}"] figcaption strong`, {}],
+    ]);
+  for (const [id, entries] of collectElements(page, captions)) editable.set(id, entries);
+}
+
+function setSource(image, source) {
+  if (image.getAttribute('src') !== source) image.setAttribute('src', source);
+}
+
+export function renderAyam(page, design, view) {
+  const { grid, slots, storyClasses, media, originalIds } = collect(page);
+  const layout = design.ayam[view];
+  const order = ayamOrder([...originalIds, ...Object.keys(design.ayam.assets).filter(id => !originalIds.includes(id))], layout.order);
+  const nodes = order.map(id => media.get(id)?.node).filter(Boolean);
+  for (const [i, node] of nodes.entries()) {
+    node.className = storyClasses[i] ?? '';
+    node.toggleAttribute('data-ayam-added', i >= storyClasses.length);
+  }
+  const desired = slots.map(slot => slot ?? nodes.shift()).filter(Boolean).concat(nodes);
+  desired.forEach((node, i) => {
+    if (grid.children[i] !== node) grid.insertBefore(node, grid.children[i] ?? null);
+  });
+  for (const [id, item] of media) {
+    const { node, frame, image, video } = item;
+    const saved = layout.media?.[id] ?? {};
+    const film = id === ayamFilm;
+    node.hidden = Boolean(saved.visibility);
+    node.style.width = saved.width === undefined ? '' : `min(${saved.width}px, 100%)`;
+    node.style.zIndex = saved.layer ?? '';
+    if (film) {
+      node.style.height = saved.height === undefined ? '' : `${saved.height}px`;
+      node.style.minHeight = saved.height === undefined ? '' : '0';
+      setSource(image, saved.poster ?? item.poster);
+      page.dispatchEvent(new CustomEvent('portfolio:ayam-film', {
+        detail: { source: saved.source ?? item.source, start: saved.start, end: saved.end },
+      }));
+    } else {
+      frame.style.height = saved.height === undefined ? '' : `${saved.height}px`;
+      frame.style.aspectRatio = saved.height === undefined ? '' : 'auto';
+      setSource(image, saved.source ?? design.ayam.assets[id] ?? item.source);
+    }
+    for (const surface of [image, video].filter(Boolean)) {
+      surface.style.objectFit = saved.fit ?? '';
+      surface.style.objectPosition = saved.cropX === undefined && saved.cropY === undefined
+        ? '' : `${saved.cropX ?? 50}% ${saved.cropY ?? 50}%`;
+    }
+    node.style.translate = '';
+  }
+  const galleryBounds = grid.getBoundingClientRect();
+  let reserve = 0;
+  for (const [id, { node }] of media) {
+    if (node.hidden) continue;
+    const film = id === ayamFilm;
+    const saved = layout.media?.[id] ?? {};
+    const rect = node.getBoundingClientRect();
+    const boundary = film ? node.parentElement.getBoundingClientRect() : galleryBounds;
+    const x = Math.max(Math.ceil(boundary.left - rect.left),
+      Math.min(Math.floor(boundary.right - rect.right), saved.x ?? 0));
+    const y = saved.y ?? 0;
+    node.dataset.ayamX = x;
+    node.dataset.ayamY = y;
+    if (x || y) node.style.translate = `${x}px ${y}px`;
+    if (!film) reserve = Math.max(reserve, y);
+  }
+  grid.style.paddingBottom = reserve ? `${reserve}px` : '';
+}

@@ -40,9 +40,8 @@
           <option value="home">Home / Portada</option>
           <option value="nuptias">NUPTIAS</option>
           <option value="maison-carnage">MAISON CARNAGE</option>
+          <option value="ayam">AYAM</option>
           <optgroup label="Otros proyectos · próximamente" disabled>
-            <option>AYAM Studio</option>
-            <option>IRE Magazine</option>
             <option>Yves Rocher España</option>
             <option>Villa Tiger Marrakech</option>
           </optgroup>
@@ -110,6 +109,66 @@
           </fieldset>
           <p>En Collage, arrastra una foto para moverla o una esquina para cambiar su tamaño. Las flechas mueven 1 px y con Mayús, 10 px.</p>
         </details>
+        <details id="ayam-tools" hidden>
+          <summary>Fashion film y fotografías de AYAM</summary>
+          <label for="ayam-media">Elemento</label>
+          <select id="ayam-media"><option value="">Selecciona el vídeo o una foto</option></select>
+          <fieldset id="ayam-properties" disabled>
+            <legend>Composición</legend>
+            <div class="pair">
+              <label>X (px) <input type="number" min="-4000" max="4000" data-ayam-field="x"></label>
+              <label>Y (px) <input type="number" min="-4000" max="4000" data-ayam-field="y"></label>
+              <label>Ancho (px) <input type="number" min="16" max="4000" data-ayam-field="width"></label>
+              <label>Alto (px) <input type="number" min="16" max="4000" data-ayam-field="height"></label>
+              <label>Encuadre X (%) <input type="number" min="0" max="100" data-ayam-field="cropX"></label>
+              <label>Encuadre Y (%) <input type="number" min="0" max="100" data-ayam-field="cropY"></label>
+              <label>Capa <input type="number" min="1" max="50" data-ayam-field="layer"></label>
+            </div>
+            <label>Ajuste de imagen
+              <select data-ayam-field="fit"><option value="">Original</option><option value="cover">Llenar (cover)</option><option value="contain">Mostrar completa (contain)</option></select>
+            </label>
+            <label><input type="checkbox" data-ayam-field="locked"> Bloquear proporciones</label>
+            <label>Archivo alternativo <input type="text" id="ayam-source" data-ayam-field="source" list="ayam-images" placeholder="Ruta del repositorio o URL directa HTTPS"></label>
+            <div id="ayam-timing" hidden>
+              <label>Imagen de portada <input type="text" data-ayam-field="poster" list="ayam-images" placeholder="Portada original"></label>
+              <div class="pair">
+                <label>Inicio (s) <input type="number" min="0" max="86400" step=".01" data-ayam-field="start" placeholder="0"></label>
+                <label>Fin (s) <input type="number" min="0" max="86400" step=".01" data-ayam-field="end" placeholder="Duración menos 7 s"></label>
+              </div>
+              <button type="button" id="ayam-restart">Previsualizar desde el inicio</button>
+              <button type="button" id="ayam-preview-poster" aria-pressed="false">Ver portada</button>
+            </div>
+            <div id="ayam-photo-actions" class="photo-actions" hidden>
+              <button type="button" id="ayam-earlier">Antes</button>
+              <button type="button" id="ayam-later">Después</button>
+              <button type="button" id="ayam-hide">Ocultar</button>
+              <button type="button" id="ayam-remove">Quitar de la galería</button>
+              <button type="button" id="ayam-restore" hidden>Restaurar foto</button>
+            </div>
+            <button type="button" id="ayam-reset-size">Restaurar tamaño original</button>
+          </fieldset>
+          <label for="ayam-new-photo">Añadir fotografía</label>
+          <input id="ayam-new-photo" type="text" list="ayam-images" placeholder="Ruta del repositorio o URL directa HTTPS">
+          <datalist id="ayam-images">
+            <option value="/DSC00997.jpg"></option>
+            <option value="/DSC01003.jpg"></option>
+            <option value="/DSC01053.jpg"></option>
+            <option value="/DSC01055.jpg"></option>
+            <option value="/DSC01063.jpg"></option>
+            <option value="/DSC01070 (1).jpg"></option>
+            <option value="/DSC01073.jpg"></option>
+            <option value="/DSC01105.jpg"></option>
+            <option value="/DSC01106.jpg"></option>
+            <option value="/DSC01108 (2).jpg"></option>
+            <option value="/DSC01108.jpg"></option>
+            <option value="/DSC01143.jpg"></option>
+            <option value="/DSC01148.jpg"></option>
+          </datalist>
+          <datalist id="ayam-videos"><option value="/FASHION%20FILM%20IRE.MP4"></option></datalist>
+          <button type="button" id="ayam-add">Añadir a la galería</button>
+          <p>Selecciona una foto o el vídeo en el lienzo. Arrastra el marco para moverlo o una esquina para redimensionarlo.</p>
+          <p id="ayam-media-status" role="status"></p>
+        </details>
         <details class="column-tools" id="column-tools" hidden>
           <summary>Previsualizar transición de Home</summary>
           <div class="element-actions" aria-label="Estado de la transición">
@@ -154,7 +213,7 @@
             <label>Ancho (px) <input type="number" min="10" max="4000" placeholder="Original" data-field="width"></label>
           </div>
           <p id="gallery-layout-help" hidden>Reduce el ancho para mover la cinta a izquierda o derecha. El alto recorta el marco y las fotos conservan sus ajustes.</p>
-          <label>Alto de la cinta (px) <input type="number" min="60" max="900" placeholder="Original" data-field="height"></label>
+          <label>Alto (px) <input type="number" min="60" max="900" placeholder="Original" data-field="height"></label>
           <label>Espaciado de letras (px) <input type="number" min="-8" max="40" placeholder="Original" data-field="spacing"></label>
           <div class="element-actions" id="element-layers" hidden>
             <button type="button" id="layer-back">Enviar detrás</button>
@@ -186,6 +245,8 @@
           <p id="nuptias-guide-help" hidden>Puedes mover el bloque o el texto hasta el borde derecho de ABOUT. La guía señala ese límite.</p>
           <button type="button" id="nuptias-align-right" hidden>Alinear al margen derecho</button>
           <button type="button" id="delete-element">Eliminar elemento</button>
+          <button type="button" id="ayam-hide-text" hidden>Ocultar texto</button>
+          <button type="button" id="ayam-restore-text" hidden>Restaurar texto</button>
           <button type="button" id="reset">Restaurar ajustes de este texto</button>
         </fieldset>
         <div class="backup">

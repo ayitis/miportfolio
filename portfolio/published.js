@@ -1,5 +1,5 @@
 import { ayamPage } from './ayam-document.js';
-import { renderAyam, syncAyamNodes } from './ayam-layout.js';
+import { renderAyam, renderIreSettings, syncAyamNodes } from './ayam-layout.js';
 import { carnagePage } from './carnage-document.js';
 import { applyNuptiasLayout } from './nuptias-layout.js';
 import { validateDraft } from './design-document.js';
@@ -49,7 +49,10 @@ async function showPublishedDesign() {
         if (page === carnagePage) {
           document.dispatchEvent(new CustomEvent('portfolio:carnage-design', { detail: { view, settings: design.carnage[view] } }));
         }
-        if (page === ayamPage) renderAyam(document, design, view);
+        if (page === ayamPage) {
+          renderAyam(document, design, view);
+          renderIreSettings(document, design, view);
+        }
         if (gallery) renderGallery(gallery, design.gallery, view, urls);
       },
     });

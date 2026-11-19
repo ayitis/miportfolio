@@ -189,6 +189,24 @@
           <p>Selecciona una foto o el vídeo en el lienzo. Arrastra el marco para moverlo o una esquina para redimensionarlo.</p>
           <p id="ayam-media-status" role="status"></p>
         </details>
+        <details id="ire-tools" hidden>
+          <summary>IRE Magazine</summary>
+          <button type="button" id="ire-show">Ir a la revista</button>
+          <label><input type="checkbox" id="ire-preview"> Previsualizar la animación con scroll</label>
+          <div class="pair">
+            <label>Posición X (px) <input type="number" data-ire-field="x"></label>
+            <label>Posición Y (px) <input type="number" data-ire-field="y"></label>
+            <label>Tamaño (%) <input type="number" data-ire-field="size"></label>
+            <label>Duración (recorrido %) <input type="number" data-ire-field="duration"></label>
+            <label>Intensidad (%) <input type="number" data-ire-field="intensity"></label>
+            <label>Separación (%) <input type="number" data-ire-field="spacing"></label>
+          </div>
+          <div class="pair">
+            <label>Fondo <input type="color" data-ire-field="background"></label>
+            <label>Texto <input type="color" data-ire-field="color"></label>
+          </div>
+          <button type="button" id="ire-reset">Restablecer revista</button>
+        </details>
         <details class="column-tools" id="column-tools" hidden>
           <summary>Previsualizar transición de Home</summary>
           <div class="element-actions" aria-label="Estado de la transición">

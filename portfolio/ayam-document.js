@@ -4,6 +4,11 @@ export const ayamGeometry = {
   x: [-4000, 4000], y: [-4000, 4000], width: [16, 4000], height: [16, 4000],
   cropX: [0, 100], cropY: [0, 100], zoom: [100, 300], layer: [1, 50],
 };
+export const ireFields = {
+  x: [-140, 140, 0], y: [-100, 100, 0], size: [65, 125, 100],
+  duration: [65, 170, 115], intensity: [25, 115, 100], spacing: [65, 115, 100],
+  background: '#f1efe9', color: '#171513',
+};
 export const emptyAyam = () => ({ assets: {}, desktop: {}, mobile: {} });
 const record = value => value && typeof value === 'object' && !Array.isArray(value);
 const photoId = id => /^photo-(?:\d{2}|[a-f0-9-]{36})$/.test(id);
@@ -33,6 +38,18 @@ export function validateAyam(value) {
       if (!Array.isArray(layout.order) || layout.order.length > 200 || !layout.order.every(photoId) ||
           new Set(layout.order).size !== layout.order.length) invalid();
       draft[view].order = [...layout.order];
+    }
+    if (layout.ire !== undefined) {
+      if (!record(layout.ire)) invalid();
+      const clean = {};
+      for (const [key, value] of Object.entries(layout.ire)) {
+        if (!Object.hasOwn(ireFields, key)) invalid();
+        const field = ireFields[key];
+        if (Array.isArray(field) ? !Number.isInteger(value) || value < field[0] || value > field[1]
+          : typeof value !== 'string' || !/^#[0-9a-f]{6}$/i.test(value)) invalid();
+        clean[key] = value;
+      }
+      if (Object.keys(clean).length) draft[view].ire = clean;
     }
     const items = layout.media ?? {};
     if (!record(items) || Object.keys(items).length > 200) invalid();

@@ -88,6 +88,10 @@ export function renderAyamCrop(image, saved) {
   image.style.transform = zoom === 100 ? '' : `scale(${zoom / 100})`;
 }
 
+export function renderIreSettings(page, design, view) {
+  page.dispatchEvent(new CustomEvent('portfolio:ire-settings', { detail: design.ayam[view].ire ?? {} }));
+}
+
 export function renderAyam(page, design, view) {
   const { grid, slots, storyClasses, media, originalIds } = collect(page);
   const layout = design.ayam[view];

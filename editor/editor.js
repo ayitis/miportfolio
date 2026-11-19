@@ -2,8 +2,8 @@ import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { mobileMaxWidth } from '../portfolio/viewport.js';
 import { renderPortfolio } from '../portfolio/render-portfolio.js';
-import { ayamPage } from '../portfolio/ayam-document.js';
-import { syncAyamNodes } from '../portfolio/ayam-layout.js';
+import { ayamPage, ireFields } from '../portfolio/ayam-document.js';
+import { renderIreSettings, syncAyamNodes } from '../portfolio/ayam-layout.js';
 import { setupAyam } from './ayam.js';
 import { carnagePage } from '../portfolio/carnage-document.js';
 import { setupCarnage } from './carnage.js';
@@ -488,6 +488,49 @@ for (const [field, name] of [[viewportWidth, 'width'], [viewportHeight, 'height'
 }
 new ResizeObserver(showCanvasSize).observe(preview);
 
+const ireTools = find('ire-tools');
+const irePreview = find('ire-preview');
+const ireInputs = [...ireTools.querySelectorAll('[data-ire-field]')];
+
+function updateIreTools() {
+  const enabled = draft.page === ayamPage;
+  ireTools.hidden = !enabled;
+  if (!enabled) return;
+  const saved = draft.ayam[view].ire ?? {};
+  for (const input of ireInputs) {
+    const key = input.dataset.ireField;
+    const field = ireFields[key];
+    input.value = saved[key] ?? (Array.isArray(field) ? field[2] : field);
+  }
+  renderIreSettings(preview.contentDocument, draft, view);
+}
+
+for (const input of ireInputs) {
+  const key = input.dataset.ireField;
+  const field = ireFields[key];
+  if (Array.isArray(field)) [input.min, input.max] = field;
+  input.addEventListener('change', () => {
+    if (draft.page !== ayamPage || !input.validity.valid || workspace.inert) return;
+    const value = Array.isArray(field) ? input.valueAsNumber : input.value;
+    if (Number.isNaN(value)) { updateIreTools(); return; }
+    (draft.ayam[view].ire ??= {})[key] = value;
+    updateIreTools();
+    markDirty();
+  });
+}
+find('ire-show').addEventListener('click', () => {
+  preview.contentDocument.getElementById('ire-magazine')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+});
+irePreview.addEventListener('change', () => {
+  preview.contentDocument.dispatchEvent(new CustomEvent('portfolio:ire-preview', { detail: irePreview.checked }));
+});
+find('ire-reset').addEventListener('click', () => {
+  if (draft.page !== ayamPage || workspace.inert) return;
+  delete draft.ayam[view].ire;
+  updateIreTools();
+  markDirty();
+});
+
 function applyView(next) {
   finishDrag();
   view = next;
@@ -502,6 +545,7 @@ function applyView(next) {
     },
     renderHome: syncColumn,
   });
+  updateIreTools();
   updateFields();
   syncRulers();
 }
@@ -909,6 +953,8 @@ async function showPage(page) {
   pagePicker.value = page;
   columnStage.value = '0';
   find('column-tools').hidden = true;
+  ireTools.hidden = true;
+  irePreview.checked = false;
   dirty = false;
   select('');
   editable.clear();

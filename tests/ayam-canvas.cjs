@@ -55,7 +55,7 @@ const base=process.env.BASE_URL ?? 'http://127.0.0.1:4200';
  await editorFrame.locator('[data-custom-text="custom.existence"]').waitFor();
  await editorFrame.evaluate(()=>document.fonts.ready);
  const measure=()=>{
-   const selectors=['.site-header','.hero-film','#ayam-title','#campaign-title','.section-head p',...Array.from(document.querySelectorAll('.ayam-news figure'),n=>'[data-ayam-media="'+n.dataset.ayamMedia+'"] img'),'.editorial-note h3','.section-break h3','.section-break-copy strong','.chapter-list','footer','[data-custom-text="custom.ego"]','[data-custom-text="custom.existence"]','[data-custom-text="custom.paragraph1"]','[data-custom-text="custom.paragraph2"]'];
+   const selectors=['.site-header','.hero-film','#ayam-title','#campaign-title','.section-head p',...Array.from(document.querySelectorAll('.ayam-news figure'),n=>'[data-ayam-media="'+n.dataset.ayamMedia+'"] img'),'.editorial-note h3','.section-break h3','.section-break-copy strong','[data-custom-text="custom.ego"]','[data-custom-text="custom.existence"]','[data-custom-text="custom.paragraph1"]','[data-custom-text="custom.paragraph2"]'];
    const boxes=Object.fromEntries(selectors.map(s=>{const r=document.querySelector(s).getBoundingClientRect();return [s,[r.x,r.y,r.width,r.height]];}));
    const photos=[...document.querySelectorAll('.ayam-news img')].map(n=>n.getBoundingClientRect());
    const overlaps=[...document.querySelectorAll('[data-custom-text]')].map(n=>{

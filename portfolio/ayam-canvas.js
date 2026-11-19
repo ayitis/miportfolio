@@ -39,6 +39,7 @@ export function mountAyamCanvas(page) {
     });
   }
   page.addEventListener('portfolio:ayam-canvas-size', schedule);
+  page.addEventListener('portfolio:ayam-canvas-sync', update);
   win.addEventListener('resize', update);
   // Also account for classic scrollbars appearing as the document loads.
   const sizes = new ResizeObserver(update);

@@ -470,6 +470,7 @@ function sizeCanvas() {
   preview.style.height = height === undefined ? '' : `${height}px`;
   preview.style.minHeight = height === undefined ? '' : '0';
   showCanvasSize();
+  if (draft.page === ayamPage) preview.contentDocument?.dispatchEvent(new Event('portfolio:ayam-canvas-sync'));
 }
 
 for (const [field, name] of [[viewportWidth, 'width'], [viewportHeight, 'height']]) {

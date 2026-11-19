@@ -36,12 +36,15 @@ main{overflow:hidden}
 .reel-frame video,.reel-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .reel-frame video{opacity:0;transition:opacity .25s ease;z-index:2}
 .reel-frame.is-playing video{opacity:1}
-.reel-effects{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;visibility:hidden}
-.reel-frame[data-effect="tracking"] .reel-effects{visibility:visible}
-.reel-frame[data-effect="red"] video{filter:grayscale(1) contrast(1.18) url(#reel-red)}
-.reel-frame[data-effect="contrast"] video{filter:contrast(1.36) saturate(.82)}
-.reel-frame[data-effect="tracking"] video{filter:url(#reel-rgb);transform:translate(-2px, 2px) scale(1.025)}
-.reel-frame[data-effect="tracking"]::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,#0005 0 1px,transparent 1px 4px)}
+.reel-effects,.reel-effect{position:absolute;inset:0;pointer-events:none}
+.reel-effects{z-index:3}
+.reel-effect{opacity:0}
+.reel-red{background:#eb092f}
+.reel-tracking{inset:-16%;background:repeating-linear-gradient(0deg,transparent 0 3px,#14090e 3px 4px),linear-gradient(0deg,transparent 38%,#ed1534 39% 39.7%,#f9bac0 40% 40.4%,transparent 42% 64%,#eb163f 65% 65.5%,transparent 66%)}
+.reel-leak{inset:-20%;background:radial-gradient(ellipse at 15% 62%,#fb3b3f 0%,#b71032 29%,transparent 65%)}
+.reel-dropout{background:linear-gradient(0deg,transparent 16%,#1c0611 16% 17%,transparent 17% 48%,#0a0509 48% 52%,#ec2745 52% 52.5%,transparent 52.5% 83%,#230713 83% 84.5%,transparent 84.5%)}
+.reel-fringe{background:linear-gradient(90deg,#fb1949 0 1%,#09adbf 1% 1.5%,transparent 1.5% 98%,#fb1949 98% 98.5%,#0ca3b3 98.5% 99%,transparent 99%);inset:0 -1%}
+.reel-exposure{background:linear-gradient(115deg,#01020b 10%,#1e0612 48%,#df4b58 100%)}
 .reel-fallback{background:#242424;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start}
 .reel-fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6)}
 .reel-caption{z-index:1;position:relative;padding:20px;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;text-shadow:0 1px 8px #000b}
@@ -90,13 +93,11 @@ main{overflow:hidden}
   .photo-grid .portrait{aspect-ratio:4/5}
   .photo-grid .stack{grid-template-columns:1fr 1fr}
 }
-@media(max-width:650px){
-  .reel-frame[data-effect="tracking"] video{filter:none;transform:translateX(-1px) scale(1.012)}
-}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .reel-frame,.reel-frame[data-effect] video{transform:none;filter:none;transition:none}
-  .reel-frame[data-effect] .reel-effects,.reel-frame[data-effect]::after{visibility:hidden}
+  .reel-frame{transform:none}
+  .reel-frame video{transition:none}
+  .reel-effects{display:none}
 }
 </style>
 </head>
@@ -126,22 +127,14 @@ main{overflow:hidden}
       <video id="carnage-reel" muted loop playsinline preload="metadata" poster="/CARNAGE%20COCHE.jpg">
         <source src="/0930.mp4" type="video/mp4">
       </video>
-      <canvas class="reel-effects" aria-hidden="true"></canvas>
-      <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-        <filter id="reel-red" color-interpolation-filters="sRGB">
-          <feColorMatrix type="matrix" values="1.12 0 0 0 .06  .12 0 0 0 0  .15 0 0 0 0  0 0 0 1 0"/>
-        </filter>
-        <filter id="reel-rgb" color-interpolation-filters="sRGB">
-          <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-          <feOffset dx="4" result="red"/>
-          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-          <feOffset dy="1" result="green"/>
-          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
-          <feOffset dx="-3"/>
-          <feBlend in2="green" mode="screen"/>
-          <feBlend in2="red" mode="screen"/>
-        </filter>
-      </svg>
+      <div class="reel-effects" aria-hidden="true">
+        <span class="reel-effect reel-red"></span>
+        <span class="reel-effect reel-tracking"></span>
+        <span class="reel-effect reel-leak"></span>
+        <span class="reel-effect reel-dropout"></span>
+        <span class="reel-effect reel-fringe"></span>
+        <span class="reel-effect reel-exposure"></span>
+      </div>
       <button class="reel-toggle" type="button" aria-label="Play campaign film">PLAY</button>
     </div>
     <div class="details">

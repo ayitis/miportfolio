@@ -1,8 +1,7 @@
 const video = document.querySelector('#carnage-reel');
 const reel = video.closest('.reel-frame');
 const toggle = reel.querySelector('.reel-toggle');
-const canvas = reel.querySelector('.reel-effects');
-const context = canvas.getContext('2d');
+const layers = reel.querySelector('.reel-effects');
 const header = document.querySelector('header');
 const masthead = document.querySelector('.masthead');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -29,49 +28,45 @@ reducedMotion.addEventListener('change', scheduleScroll);
 mobile.addEventListener('change', scheduleScroll);
 renderScroll();
 
+// Each cue animates only the opacity and transform of prepainted overlays.
 const sequence = [
-  { name: 'tracking', gap: 4500, duration: 180 },
-  { name: 'red', gap: 3400, duration: 150 },
-  { name: 'contrast', gap: 4900, duration: 180 },
-  { name: 'tracking', gap: 3100, duration: 140 },
-  { name: 'red', gap: 5200, duration: 130 },
+  { name: 'tracking', gap: 2600, duration: 520, opacity: .38, from: 9, to: -12 },
+  { name: 'red', gap: 2800, duration: 300, opacity: .62 },
+  { name: 'leak', gap: 1700, duration: 820, opacity: .48, from: -17, to: 12 },
+  { name: 'dropout', gap: 2200, duration: 410, opacity: .55, from: -5, to: 7 },
+  { name: 'fringe', gap: 1800, duration: 540, opacity: .62, from: 6, to: -6 },
+  { name: 'exposure', gap: 2100, duration: 630, opacity: .36 },
 ];
 let sequenceIndex = 0;
 let timer;
+let animation;
 let inView = false;
 
-function drawTrackingBands() {
-  if (!context || video.readyState < 2) return;
-  canvas.width = 240;
-  canvas.height = 426;
-  const { width, height } = canvas;
-  const scale = Math.max(width / video.videoWidth, height / video.videoHeight);
-  const sourceWidth = width / scale;
-  const sourceHeight = height / scale;
-  const sourceX = (video.videoWidth - sourceWidth) / 2;
-  const sourceY = (video.videoHeight - sourceHeight) / 2;
-  const bands = mobile.matches ? [[.58, 7, 5]] : [[.22, 6, -9], [.51, 15, 14], [.78, 5, -11]];
-  for (const [position, bandHeight, shift] of bands) {
-    const y = Math.round(position * height);
-    context.drawImage(video, sourceX, sourceY + y / scale, sourceWidth, bandHeight / scale,
-      shift, y, width, bandHeight);
-    context.fillStyle = '#ed153449';
-    context.fillRect(0, y, width, 1);
-  }
+function stopEffects() {
+  clearTimeout(timer);
+  animation?.cancel();
+  animation = null;
+  delete reel.dataset.effect;
 }
 
 function syncEffects() {
-  clearTimeout(timer);
-  delete reel.dataset.effect;
-  if (!inView || document.hidden || video.paused || video.ended || reducedMotion.matches) return;
+  stopEffects();
+  if (!inView || document.hidden || video.paused || video.ended || video.readyState < 3 || reducedMotion.matches) return;
 
-  const effect = sequence[sequenceIndex];
+  const { name, gap, duration, opacity, from = 0, to = 0 } = sequence[sequenceIndex];
   timer = setTimeout(() => {
     sequenceIndex = (sequenceIndex + 1) % sequence.length;
-    if (effect.name === 'tracking') drawTrackingBands();
-    reel.dataset.effect = effect.name;
-    timer = setTimeout(syncEffects, effect.duration);
-  }, effect.gap);
+    const strength = mobile.matches ? .72 : 1;
+    const translate = name === 'tracking' || name === 'dropout' ? 'translateY' : 'translateX';
+    const shift = distance => `${translate}(${distance * strength}px)`;
+    reel.dataset.effect = name;
+    animation = layers.querySelector(`.reel-${name}`).animate([
+      { opacity: 0, transform: shift(from), easing: 'ease-out' },
+      { opacity: opacity * strength, transform: shift(from * .55), offset: .28, easing: 'ease-in-out' },
+      { opacity: 0, transform: shift(to) },
+    ], duration);
+    animation.onfinish = syncEffects;
+  }, gap);
 }
 
 const visibility = new IntersectionObserver(([entry]) => {
@@ -101,10 +96,7 @@ else video.addEventListener('loadeddata', showFilm, { once: true });
 video.addEventListener('error', () => reel.classList.remove('is-playing', 'has-media'));
 video.addEventListener('playing', updatePlayback);
 video.addEventListener('pause', updatePlayback);
-video.addEventListener('waiting', () => {
-  clearTimeout(timer);
-  delete reel.dataset.effect;
-});
+video.addEventListener('waiting', stopEffects);
 document.addEventListener('visibilitychange', syncEffects);
 reducedMotion.addEventListener('change', () => {
   if (reducedMotion.matches) video.pause();

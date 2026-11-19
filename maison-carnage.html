@@ -40,10 +40,8 @@ main{overflow:hidden}
 .reel-effects{z-index:3}
 .reel-effect{opacity:0}
 .reel-red{background:#eb092f}
-.reel-tracking{inset:-16%;background:repeating-linear-gradient(0deg,transparent 0 3px,#14090e 3px 4px),linear-gradient(0deg,transparent 38%,#ed1534 39% 39.7%,#f9bac0 40% 40.4%,transparent 42% 64%,#eb163f 65% 65.5%,transparent 66%)}
 .reel-leak{inset:-20%;background:radial-gradient(ellipse at 15% 62%,#fb3b3f 0%,#b71032 29%,transparent 65%)}
-.reel-dropout{background:linear-gradient(0deg,transparent 16%,#1c0611 16% 17%,transparent 17% 48%,#0a0509 48% 52%,#ec2745 52% 52.5%,transparent 52.5% 83%,#230713 83% 84.5%,transparent 84.5%)}
-.reel-fringe{background:linear-gradient(90deg,#fb1949 0 1%,#09adbf 1% 1.5%,transparent 1.5% 98%,#fb1949 98% 98.5%,#0ca3b3 98.5% 99%,transparent 99%);inset:0 -1%}
+.reel-fringe{background:linear-gradient(90deg,#fb1949,transparent 9% 91%,#426373);inset:0 -3%}
 .reel-exposure{background:linear-gradient(115deg,#01020b 10%,#1e0612 48%,#df4b58 100%)}
 .reel-fallback{background:#242424;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start}
 .reel-fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6)}
@@ -129,9 +127,7 @@ main{overflow:hidden}
       </video>
       <div class="reel-effects" aria-hidden="true">
         <span class="reel-effect reel-red"></span>
-        <span class="reel-effect reel-tracking"></span>
         <span class="reel-effect reel-leak"></span>
-        <span class="reel-effect reel-dropout"></span>
         <span class="reel-effect reel-fringe"></span>
         <span class="reel-effect reel-exposure"></span>
       </div>

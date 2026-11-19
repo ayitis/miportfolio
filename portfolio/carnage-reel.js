@@ -30,12 +30,10 @@ renderScroll();
 
 // Each cue animates only the opacity and transform of prepainted overlays.
 const sequence = [
-  { name: 'tracking', gap: 2600, duration: 520, opacity: .38, from: 9, to: -12 },
-  { name: 'red', gap: 2800, duration: 300, opacity: .62 },
-  { name: 'leak', gap: 1700, duration: 820, opacity: .48, from: -17, to: 12 },
-  { name: 'dropout', gap: 2200, duration: 410, opacity: .55, from: -5, to: 7 },
-  { name: 'fringe', gap: 1800, duration: 540, opacity: .62, from: 6, to: -6 },
-  { name: 'exposure', gap: 2100, duration: 630, opacity: .36 },
+  { name: 'leak', gap: 2100, duration: 1600, opacity: .38, from: -11, to: 9 },
+  { name: 'red', gap: 3600, duration: 920, opacity: .43 },
+  { name: 'fringe', gap: 2300, duration: 1300, opacity: .32, from: 4, to: -4 },
+  { name: 'exposure', gap: 2500, duration: 1450, opacity: .28 },
 ];
 let sequenceIndex = 0;
 let timer;
@@ -57,12 +55,11 @@ function syncEffects() {
   timer = setTimeout(() => {
     sequenceIndex = (sequenceIndex + 1) % sequence.length;
     const strength = mobile.matches ? .72 : 1;
-    const translate = name === 'tracking' || name === 'dropout' ? 'translateY' : 'translateX';
-    const shift = distance => `${translate}(${distance * strength}px)`;
+    const shift = distance => `translateX(${distance * strength}px)`;
     reel.dataset.effect = name;
     animation = layers.querySelector(`.reel-${name}`).animate([
-      { opacity: 0, transform: shift(from), easing: 'ease-out' },
-      { opacity: opacity * strength, transform: shift(from * .55), offset: .28, easing: 'ease-in-out' },
+      { opacity: 0, transform: shift(from), easing: 'ease-in-out' },
+      { opacity: opacity * strength, transform: shift((from + to) / 2), offset: .46, easing: 'ease-in-out' },
       { opacity: 0, transform: shift(to) },
     ], duration);
     animation.onfinish = syncEffects;

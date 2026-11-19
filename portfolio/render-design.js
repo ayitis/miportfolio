@@ -1,5 +1,5 @@
 import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
-import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasPositionBounds } from './nuptias-layout.js';
+import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasPositionBounds } from './nuptias-layout.js';
 import { fonts } from './design-document.js';
 
 const properties = ['translate', 'font-size', 'font-family', 'text-align', 'width', 'white-space', 'color', 'display', 'letter-spacing', 'z-index', 'height', 'margin-inline', 'max-width'];
@@ -140,4 +140,18 @@ export function constrainNuptiasPositions(page, editable, design, view) {
     node.dataset.nuptiasX = x;
     node.dataset.nuptiasY = y;
   }
+
+  // Saved offsets from the previous desktop layout can leave the paragraph
+  // inset from the title. Keep them in the document and render the shared edge
+  // until the paragraph is explicitly repositioned in the editor.
+  if (view !== 'desktop' || design.desktop[nuptiasDescription]?.independentX) return;
+  const description = editable.get(nuptiasDescription)?.[0].node;
+  const title = editable.get('concept.title')?.[0].node;
+  if (!description?.offsetWidth || !title?.offsetWidth) return;
+  const [minX, maxX] = nuptiasPositionBounds(description, 'x', view);
+  const targetX = Number(description.dataset.nuptiasX) +
+    title.getBoundingClientRect().right - description.getBoundingClientRect().right;
+  const x = Math.max(minX, Math.min(maxX, Math.round(targetX)));
+  description.style.translate = `${x}px ${description.dataset.nuptiasY}px`;
+  description.dataset.nuptiasX = x;
 }

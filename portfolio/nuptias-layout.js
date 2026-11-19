@@ -1,5 +1,6 @@
 export const nuptiasEditorial = 'editorial.right';
-const moving = new Set([nuptiasEditorial, 'editorial.roles', 'concept.title', 'concept.description']);
+export const nuptiasDescription = 'concept.description';
+const moving = new Set([nuptiasEditorial, 'editorial.roles', 'concept.title', nuptiasDescription]);
 const existing = [...moving, 'editorial.eyebrow', 'editorial.title', 'editorial.credit',
   'concept.form', 'concept.ampersand', 'concept.feeling'];
 

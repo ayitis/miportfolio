@@ -1,4 +1,4 @@
-import { applyNuptiasLayout, hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasRightLimit, nuptiasLayout } from '../portfolio/nuptias-layout.js';
+import { applyNuptiasLayout, hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasEditorial, nuptiasPositionBounds, nuptiasRightLimit, nuptiasLayout } from '../portfolio/nuptias-layout.js';
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
@@ -210,8 +210,15 @@ function clampOffset(axis, value) {
   return Math.max(Math.max(min, -limit), Math.min(limit, Math.round(value)));
 }
 
+function isDesktopDescription() {
+  return draft.page === 'nuptias' && view === 'desktop' && selected === nuptiasDescription;
+}
+
 function setPosition(axis, value) {
   const next = clampOffset(axis, value);
+  if (isDesktopDescription() && axis === 'x') {
+    updateSetting(view, 'independentX', true);
+  }
   updateSetting(view, axis, next || undefined);
   return next;
 }
@@ -528,7 +535,8 @@ function attach() {
     const snapping = { x: snapText.checked && Math.abs(dx) >= 3, y: snapText.checked && Math.abs(dy) >= 3 };
     const alignment = alignRect(raw, targets, fixed, drag.locks, snapping);
     drag.locks = alignment.locks;
-    const x = setPosition('x', requestedX + alignment.x);
+    const followTitle = isDesktopDescription() && !draft.desktop[nuptiasDescription]?.independentX;
+    const x = followTitle && !dx && !scrollX ? drag.x : setPosition('x', requestedX + alignment.x);
     const y = setPosition('y', requestedY + alignment.y);
     apply(selected);
     const placed = shiftRect(drag.rect, x - drag.x - scrollX, y - drag.y - scrollY);
@@ -571,8 +579,12 @@ for (const input of fields) {
     if (!selected || !input.validity.valid) return;
     const key = input.dataset.field;
     if ((homeGallery(selected) || (draft.page === 'nuptias' && isNuptiasPosition(selected))) && (key === 'x' || key === 'y')) {
-      if (input.value === '') updateSetting(view, key, undefined);
-      else setPosition(key, input.valueAsNumber);
+      if (input.value === '') {
+        updateSetting(view, key, undefined);
+        if (isDesktopDescription() && key === 'x') {
+          updateSetting(view, 'independentX', undefined);
+        }
+      } else setPosition(key, input.valueAsNumber);
     } else if (key === 'text') {
       const original = editable.get(selected)[0].text;
       updateSetting('content', key, input.value === original ? undefined : input.value);
@@ -583,7 +595,9 @@ for (const input of fields) {
     if (draft.page === 'nuptias' && isNuptiasPosition(selected)) {
       const applied = Number(editable.get(selected)?.[0]?.node.dataset.nuptiasX);
       const requested = draft[view][selected]?.x ?? 0;
-      if (['x', 'size', 'width', 'font', 'spacing', 'text'].includes(key) && Number.isFinite(applied) && applied !== requested) {
+      const followTitle = isDesktopDescription() && !draft.desktop[nuptiasDescription]?.independentX;
+      if (!followTitle && ['x', 'size', 'width', 'font', 'spacing', 'text'].includes(key) &&
+          Number.isFinite(applied) && applied !== requested) {
         updateSetting(view, 'x', applied || undefined);
       }
       showNuptiasLimit();

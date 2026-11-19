@@ -9,6 +9,7 @@ export const pages = {
       ['gallery.container', 'Galería · Cinta completa', '.marquee', { text: false, gallery: true }],
       ['nav.home', 'Menú · Volver a la portada', 'header .links a[href="./index.html"]'],
       ['nav.work', 'Menú · Work', 'header .links a[href="./index.html#work"]'],
+      ['nav.about', 'Menú · About', 'header .links a[href="/#about"]'],
       ['category.number', 'Categoría · Editorial', '.category span:first-child'],
       ['category.photography', 'Categoría · Fotografía', '.category span:last-child'],
       ['editorial.eyebrow', 'Editorial · Antetítulo', '.eyebrow'],

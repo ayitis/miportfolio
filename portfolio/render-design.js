@@ -91,6 +91,10 @@ export function applyElement(editable, id, draft, view) {
       width: overrides.width === undefined ? null : `min(${overrides.width}px, 100%)`,
       height: overrides.height === undefined ? null : `${overrides.height}px`,
     } : {};
+    if (draft.page === 'home' && id.startsWith('custom.')) {
+      const intro = node.ownerDocument.querySelector('.home-scroll > .hero');
+      node.toggleAttribute('data-home-below-scene', Boolean(intro && y >= intro.offsetHeight));
+    }
     if (id.startsWith('custom.') && styles.width !== null) {
       styles.width = `min(${overrides.width}px, max(24px, calc(100% - ${Math.max(0, x)}px)))`;
     }

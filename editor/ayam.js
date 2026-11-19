@@ -1,3 +1,4 @@
+import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { ayamFilm, ayamGeometry, ayamOrder, mediaPath } from '../portfolio/ayam-document.js';
 import { renderAyam } from '../portfolio/ayam-layout.js';
@@ -22,10 +23,11 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
 
   function geometry(node) {
     const surface = node.querySelector('video, img');
+    const scale = designScale(node.ownerDocument);
     return {
       x: Number(node.dataset.ayamX) || 0, y: Number(node.dataset.ayamY) || 0,
-      width: Math.round(surface.getBoundingClientRect().width),
-      height: Math.round(surface.getBoundingClientRect().height),
+      width: Math.round(surface.getBoundingClientRect().width / scale),
+      height: Math.round(surface.getBoundingClientRect().height / scale),
     };
   }
 
@@ -211,8 +213,9 @@ export function setupAyam({ getDraft, getView, markDirty, closeGroup, deselectTe
   function move(event) {
     if (drag?.id !== event.pointerId || isBusy()) return;
     const { handle, x, y, width, height } = drag;
-    const dx = event.clientX - drag.clientX;
-    const dy = event.clientY - drag.clientY + page.defaultView.scrollY - drag.scroll;
+    const scale = designScale(page);
+    const dx = (event.clientX - drag.clientX) / scale;
+    const dy = (event.clientY - drag.clientY + page.defaultView.scrollY - drag.scroll) / scale;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 2) return;
     drag.moved = true;
     if (!handle) {

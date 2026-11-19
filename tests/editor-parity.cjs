@@ -104,8 +104,9 @@ async function main() {
           await editor.mouse.down();
           await editor.mouse.move(box.x + 29, box.y + 25, { steps: 3 });
           await editor.mouse.up();
-          assert.equal(await fields('x').inputValue(), String(59 + index));
-          assert.equal(await fields('y').inputValue(), String(49 + index));
+          const scale = await frame.evaluate(() => Number(document.documentElement.dataset.ayamScale) || 1);
+          assert.equal(await fields('x').inputValue(), String(42 + index + Math.round(17 / scale)));
+          assert.equal(await fields('y').inputValue(), String(34 + index + Math.round(15 / scale)));
         }
         await editor.locator('#save').click();
         await editor.getByText('Borrador guardado de forma privada.').waitFor();
@@ -125,7 +126,10 @@ async function main() {
             await scroll(visitor);
             await scroll(frame);
             const scrolledEditor = await Promise.all(selectors.map(selector => frameLocator.locator(selector).first().evaluate(measure)));
-            if (key === 'ayam') assert.deepEqual(scrolledEditor, expected, 'AYAM position changed on scroll in editor');
+            if (key === 'ayam') {
+              assert.ok(scrolledEditor.flat().every((value, i) => Math.abs(value - expected.flat()[i]) < .01),
+                'AYAM position changed on scroll in editor');
+            }
           }
           await settle(visitor);
           const actual = await Promise.all(selectors.map(selector => visitor.locator(selector).first().evaluate(measure)));

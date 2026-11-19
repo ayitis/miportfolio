@@ -1,3 +1,4 @@
+import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { mobileMaxWidth } from '../portfolio/viewport.js';
 import { renderPortfolio } from '../portfolio/render-portfolio.js';
@@ -286,9 +287,10 @@ function captureElement() {
   if (family) base.font = family[0];
   const custom = selected.startsWith('custom.');
   const current = draft[view][selected] ?? {};
+  const scale = designScale(item.node.ownerDocument);
   const origin = {
-    x: custom ? (current.x ?? 0) : Math.round(rect.left + win.scrollX),
-    y: custom ? (current.y ?? 0) : Math.round(rect.top + win.scrollY),
+    x: custom ? (current.x ?? 0) : Math.round((rect.left + win.scrollX) / scale),
+    y: custom ? (current.y ?? 0) : Math.round((rect.top + win.scrollY) / scale),
   };
   clipboard = { type: 'text', text: draft.content[selected]?.text ?? item.text, settings: {} };
   for (const layout of ['desktop', 'mobile']) {
@@ -314,7 +316,7 @@ function addText(copy = null) {
     const previous = copy?.settings[layout];
     const maxX = layout === 'mobile' ? 335 : Math.max(40, win.innerWidth - 55);
     const x = previous ? previous.x + 16 : (layout === 'mobile' ? 30 : 64);
-    const y = previous ? previous.y + 16 : win.scrollY + Math.round(win.innerHeight * .35);
+    const y = previous ? previous.y + 16 : Math.round((win.scrollY + win.innerHeight * .35) / designScale(win.document));
     draft[layout][id] = { size: 26, width: 245, layer: 10, ...previous,
       x: Math.max(0, Math.min(maxX, x)), y: Math.max(0, Math.min(4000, y)) };
   }
@@ -456,6 +458,7 @@ function sizeCanvas() {
   const { width, height } = canvasSizes.get(canvasKey()) ?? {};
   const mobile = view === 'mobile';
   const limit = mobileMaxWidth(draft.page);
+  find('ayam-canvas-help').hidden = draft.page !== ayamPage || mobile;
   viewportWidth.min = mobile ? 240 : limit + 1;
   viewportWidth.max = mobile ? limit : 3840;
   viewportWidth.value = width ?? '';
@@ -511,19 +514,20 @@ const pointerUpdates = frameUpdate((page, event) => {
   const win = page.defaultView;
   const scrollX = win.scrollX - drag.scrollX;
   const scrollY = win.scrollY - drag.scrollY;
-  const requestedX = clampOffset('x', drag.x + dx + scrollX);
-  const requestedY = clampOffset('y', drag.y + dy + scrollY);
-  const raw = shiftRect(drag.rect, requestedX - drag.x - scrollX, requestedY - drag.y - scrollY);
+  const scale = designScale(page);
+  const requestedX = clampOffset('x', drag.x + (dx + scrollX) / scale);
+  const requestedY = clampOffset('y', drag.y + (dy + scrollY) / scale);
+  const raw = shiftRect(drag.rect, (requestedX - drag.x) * scale - scrollX, (requestedY - drag.y) * scale - scrollY);
   const targets = guideLayer.references(drag.node, selected);
   const fixed = guideLayer.fixedLines(selected);
   const snapping = { x: snapText.checked && Math.abs(dx) >= 3, y: snapText.checked && Math.abs(dy) >= 3 };
   const alignment = alignRect(raw, targets, fixed, drag.locks, snapping);
   drag.locks = alignment.locks;
   const followTitle = isDesktopHeadingFollower() && !draft.desktop[selected]?.independentX;
-  const x = followTitle && !dx && !scrollX ? drag.x : setPosition('x', requestedX + alignment.x);
-  const y = setPosition('y', requestedY + alignment.y);
+  const x = followTitle && !dx && !scrollX ? drag.x : setPosition('x', requestedX + alignment.x / scale);
+  const y = setPosition('y', requestedY + alignment.y / scale);
   apply(selected);
-  const placed = shiftRect(drag.rect, x - drag.x - scrollX, y - drag.y - scrollY);
+  const placed = shiftRect(drag.rect, (x - drag.x) * scale - scrollX, (y - drag.y) * scale - scrollY);
   const exact = alignRect(placed, targets, fixed, {}, { x: false, y: false });
   guideLayer.draw(placed, exact.lines, targets);
   showNuptiasLimit(drag.node);

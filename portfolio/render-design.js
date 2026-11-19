@@ -1,3 +1,4 @@
+import { scheduleCanvasSize } from './ayam-canvas.js';
 import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
 import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasLeftCaptions, nuptiasPositionBounds } from './nuptias-layout.js';
 import { fonts } from './design-document.js';
@@ -47,6 +48,7 @@ export function syncCustomElements(page, editable, draft) {
     if (id.startsWith('custom.') && !Object.hasOwn(draft.elements, id)) {
       items[0].node.remove();
       editable.delete(id);
+      scheduleCanvasSize(page);
     }
   }
   for (const [id, item] of Object.entries(draft.elements)) {
@@ -54,7 +56,8 @@ export function syncCustomElements(page, editable, draft) {
     const node = page.createElement('div');
     node.dataset.customText = id;
     node.style.cssText = 'position:absolute;inset:0 auto auto 0;overflow-wrap:anywhere;white-space:pre-wrap;z-index:10;max-width:100%;';
-    page.body.append(node);
+    const canvas = page.querySelector('[data-design-canvas]') ?? page.body;
+    canvas.append(node);
     editable.set(id, [{
       node, allowText: true, children: [], text: '', title: null,
       styles: Object.fromEntries(properties.map(property => [property, originalStyle(node, property)])),
@@ -77,7 +80,10 @@ function applyText(original, content) {
 }
 
 export function applyElementText(editable, id, draft) {
-  for (const original of editable.get(id) ?? []) applyText(original, draft.content[id]?.text);
+  for (const original of editable.get(id) ?? []) {
+    applyText(original, draft.content[id]?.text);
+    if (id.startsWith('custom.')) scheduleCanvasSize(original.node.ownerDocument);
+  }
 }
 
 export function applyElement(editable, id, draft, view) {
@@ -127,6 +133,7 @@ export function applyElement(editable, id, draft, view) {
       else node.style.setProperty(property, value);
     }
     applyText(original, content);
+    if (id.startsWith('custom.')) scheduleCanvasSize(node.ownerDocument);
     if (nuptias || (draft.page === 'nuptias' && nuptiasLeftCaptions.includes(id))) {
       node.dataset.nuptiasX = x;
       node.dataset.nuptiasY = y;

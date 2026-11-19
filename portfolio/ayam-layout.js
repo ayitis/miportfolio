@@ -1,3 +1,4 @@
+import { designScale } from './ayam-canvas.js';
 import { ayamFilm, ayamOrder } from './ayam-document.js';
 import { collectElements } from './render-design.js';
 
@@ -107,6 +108,7 @@ export function renderAyam(page, design, view) {
     node.style.translate = '';
   }
   const galleryBounds = grid.getBoundingClientRect();
+  const scale = designScale(page);
   let reserve = 0;
   for (const [id, { node }] of media) {
     if (node.hidden) continue;
@@ -114,8 +116,8 @@ export function renderAyam(page, design, view) {
     const saved = layout.media?.[id] ?? {};
     const rect = node.getBoundingClientRect();
     const boundary = film ? node.parentElement.getBoundingClientRect() : galleryBounds;
-    const x = Math.max(Math.ceil(boundary.left - rect.left),
-      Math.min(Math.floor(boundary.right - rect.right), saved.x ?? 0));
+    const x = Math.max(Math.ceil((boundary.left - rect.left) / scale - .01),
+      Math.min(Math.floor((boundary.right - rect.right) / scale + .01), saved.x ?? 0));
     const y = saved.y ?? 0;
     node.dataset.ayamX = x;
     node.dataset.ayamY = y;

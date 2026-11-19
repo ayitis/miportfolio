@@ -130,6 +130,9 @@ export function renderAyam(page, design, view) {
     }
     node.style.translate = '';
   }
+  // Measure the natural gallery height without previously reserved blank space.
+  // Only reserve room if a translated photo actually extends past the gallery.
+  grid.style.paddingBottom = '';
   const galleryBounds = grid.getBoundingClientRect();
   const scale = designScale(page);
   let reserve = 0;
@@ -145,7 +148,7 @@ export function renderAyam(page, design, view) {
     node.dataset.ayamX = x;
     node.dataset.ayamY = y;
     if (x || y) node.style.translate = `${x}px ${y}px`;
-    if (!film) reserve = Math.max(reserve, y);
+    if (!film) reserve = Math.max(reserve, Math.ceil((rect.bottom - galleryBounds.bottom) / scale + y));
   }
   grid.style.paddingBottom = reserve ? `${reserve}px` : '';
 }

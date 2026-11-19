@@ -7,6 +7,9 @@ export const bounds = {
   y: [-4000, 4000],
   size: [4, 400],
   width: [10, 4000],
+  height: [60, 900],
+  spacing: [-8, 40],
+  layer: [1, 50],
 };
 
 export const fonts = {
@@ -22,7 +25,7 @@ const isRecord = (object) => object && typeof object === 'object' && !Array.isAr
 
 export function emptyDraft(page = 'home') {
   return {
-    version: 1, page, desktop: {}, mobile: {}, content: {},
+    version: 1, page, desktop: {}, mobile: {}, content: {}, elements: {},
     ...(page === 'nuptias' && { gallery: emptyGallery() }),
   };
 }
@@ -55,5 +58,18 @@ export function validateDraft(value, page = value?.page) {
     }
   }
   if (page === 'nuptias' && value.gallery !== undefined) draft.gallery = validateGallery(value.gallery);
+  if (value.elements !== undefined) {
+    if (!isRecord(value.elements) || Object.keys(value.elements).length > 1000) {
+      throw new Error('La copia contiene elementos inválidos.');
+    }
+    for (const [id, settings] of Object.entries(value.elements)) {
+      if (!/^[a-z][a-z0-9-]*(\.[a-z0-9-]+)+$/.test(id) || !isRecord(settings)) {
+        throw new Error('La copia contiene un elemento inválido.');
+      }
+      if (id.startsWith('custom.') && settings.type === 'text') draft.elements[id] = { type: 'text' };
+      else if (settings.hidden === true && !id.startsWith('custom.')) draft.elements[id] = { hidden: true };
+      else throw new Error('La copia contiene un elemento inválido.');
+    }
+  }
   return draft;
 }

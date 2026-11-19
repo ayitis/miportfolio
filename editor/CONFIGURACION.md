@@ -57,3 +57,12 @@ Los originales del repositorio se identifican por su nombre de archivo. Mantén 
 - Selecciona un texto haciendo clic en la vista previa. Las flechas lo mueven 1 px y **Mayús + flecha** lo mueve 10 px. Estos pasos son exactos aunque esté activo el ajuste magnético.
 - Activa **Reglas y guías manuales** y pulsa la regla de arriba para poner una guía vertical, o la de la izquierda para poner una horizontal. Las guías manuales son independientes por página y vista durante la sesión del editor. **Borrar guías de esta vista** retira las de la vista actual.
 - Pulsa **Guardar borrador** o **Publicar cambios** para conservar la posición. Las líneas, las reglas y las medidas son herramientas del editor.
+
+## Textos nuevos, acciones y diseño de la cinta
+
+- **Añadir texto** crea un cuadro en la página actual. Escribe en **Contenido** y ajusta su posición, espaciado y capa en la vista seleccionada.
+- Selecciona un texto en el lienzo para usar **Cmd/Ctrl + C**, **V** o **X**. También puedes usar **Copiar**, **Pegar** y **Duplicar** en el panel. **Suprimir** o **Retroceso** retira la selección. Dentro de un campo, el navegador mantiene sus atajos normales.
+- **Deshacer** y **Rehacer** recorren los cambios de la página abierta durante la sesión. Guarda o publica para hacer persistente el resultado. El historial de versiones sigue disponible por separado.
+- En NUPTIAS, elige **Galería · Cinta completa** o arrastra el control **Mover cinta** del lienzo. Reduce el ancho antes de desplazarla en horizontal. El alto cambia el marco de la cinta. **Restablecer cinta** devuelve su geometría original en la vista actual. Haz clic sobre las fotos para seguir editándolas individualmente.
+
+Si duplicas una foto subida a Storage, aplica una vez en el Supabase de Preview la [migración de permisos para copias](../supabase/migrations/20261119020000_nuptias_photo_copies.sql). En **SQL Editor → New query**, pega el archivo completo y pulsa **Run** después de la migración de Storage. Así, cada copia conserva sus propios ajustes y comparte el archivo de origen. Los visitantes pueden abrir ese archivo solo mientras al menos una de sus instancias esté publicada y visible.

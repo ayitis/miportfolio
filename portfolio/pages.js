@@ -6,6 +6,7 @@ export const pages = {
     label: 'NUPTIAS',
     path: '/nuptias.html',
     targets: [
+      ['gallery.container', 'Galería · Cinta completa', '.marquee', { text: false, gallery: true }],
       ['nav.home', 'Menú · Volver a la portada', 'header .links a[href="./index.html"]'],
       ['nav.work', 'Menú · Work', 'header .links a[href="./index.html#work"]'],
       ['category.number', 'Categoría · Editorial', '.category span:first-child'],

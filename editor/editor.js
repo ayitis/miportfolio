@@ -1,9 +1,10 @@
-import { bounds, emptyDraft, validateDraft } from '../portfolio/design-document.js';
+import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
-import { applyElement, collectElements } from '../portfolio/render-design.js';
-import { visiblePhoto } from '../portfolio/gallery-document.js';
+import { applyElement, collectElements, syncCustomElements } from '../portfolio/render-design.js';
+import { visibleUploads } from '../portfolio/gallery-document.js';
 import { alignRect, shiftRect } from './alignment.js';
 import { createGuideLayer } from './guide-layer.js';
+import { actionHistory } from './action-history.js';
 import { setupGallery } from './gallery.js';
 import { openEditor } from './storage.js';
 
@@ -25,6 +26,9 @@ const manualGuides = new Map();
 let dirty = false;
 let store;
 let revision = null;
+const actions = actionHistory();
+let clipboard;
+const groupTarget = 'gallery.container';
 
 const workspace = find('workspace');
 const access = find('access');
@@ -37,9 +41,46 @@ const snapText = find('snap-text');
 const showDistances = find('show-distances');
 const showRulers = find('show-rulers');
 
-function markDirty() {
-  dirty = true;
-  status.textContent = 'Cambios pendientes de guardar.';
+function updateActionButtons() {
+  find('undo').disabled = !actions.canUndo;
+  find('redo').disabled = !actions.canRedo;
+  find('paste-element').disabled = !clipboard || pagePicker.disabled || (clipboard.type === 'photo' && draft.page !== 'nuptias');
+  for (const id of ['copy-element', 'duplicate-element']) find(id).disabled = (!selected && !gallery.hasSelection) || selected === groupTarget;
+}
+
+function markDirty(group) {
+  actions.record(draft, group);
+  dirty = actions.dirty;
+  updateActionButtons();
+  status.textContent = dirty ? 'Cambios pendientes de guardar.' : 'Sin cambios pendientes.';
+}
+
+function refreshElements() {
+  syncCustomElements(preview.contentDocument, editable, draft);
+  const current = selected;
+  element.options.length = 1;
+  const labels = new Map(pages[draft.page].targets);
+  for (const [id, originals] of editable) {
+    if (draft.elements[id]?.hidden) continue;
+    for (const { node } of originals) if (id !== groupTarget) node.dataset.editorText = id;
+    const name = labels.get(id) ?? (draft.content[id]?.text?.slice(0, 65) || 'Texto nuevo');
+    element.add(new Option(name, id));
+  }
+  select(editable.has(current) && !draft.elements[current]?.hidden ? current : '');
+}
+
+function restoreActions(back) {
+  if (workspace.inert || pagePicker.disabled) return;
+  finishDrag();
+  const version = actions.step(back);
+  if (!version) return;
+  draft = version;
+  refreshElements();
+  applyView(view);
+  gallery.reloadUploads();
+  dirty = actions.dirty;
+  updateActionButtons();
+  status.textContent = back ? 'Acción deshecha.' : 'Acción rehecha.';
 }
 
 function apply(id) {
@@ -49,6 +90,17 @@ function apply(id) {
 function updateFields() {
   const overrides = draft[view][selected] ?? {};
   const original = editable.get(selected)?.[0];
+  const group = selected === groupTarget;
+  find('element-layers').hidden = !selected.startsWith('custom.');
+  find('gallery-layout-help').hidden = !group;
+  find('delete-element').hidden = group;
+  find('reset').textContent = group ? 'Restablecer cinta' : 'Restaurar ajustes de este texto';
+  find('reset-color').closest('.color-setting').hidden = group;
+  for (const input of fields) {
+    if (['text', 'size', 'font', 'align', 'spacing', 'height'].includes(input.dataset.field)) {
+      input.parentElement.hidden = input.dataset.field === 'height' ? !group : group;
+    }
+  }
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
@@ -73,6 +125,7 @@ function select(id, reveal = false) {
   for (const { node } of editable.get(selected) ?? []) node.setAttribute('data-editor-selected', '');
   element.value = id;
   updateFields();
+  updateActionButtons();
 
   const node = editable.get(id)?.[0]?.node;
   if (reveal && node) {
@@ -98,6 +151,7 @@ function finishDrag() {
     previous.node.ownerDocument.documentElement.classList.remove('editor-aligning');
     if (previous.node.hasPointerCapture(previous.pointer)) previous.node.releasePointerCapture(previous.pointer);
   }
+  if (previous) actions.closeGroup();
   clearTimeout(nudgeTimer);
   guideLayer?.clear();
 }
@@ -110,13 +164,127 @@ function syncRulers() {
 
 function clampOffset(axis, value) {
   const [min, max] = bounds[axis];
-  return Math.max(min, Math.min(max, Math.round(value)));
+  const viewportWidth = preview.contentDocument?.documentElement.clientWidth ?? 0;
+  const limit = selected === groupTarget && axis === 'x'
+    ? Math.min(max, Math.max(0, Math.floor((viewportWidth - (draft[view][selected]?.width ?? viewportWidth)) / 2)))
+    : max;
+  return Math.max(Math.max(min, -limit), Math.min(limit, Math.round(value)));
 }
 
 function setPosition(axis, value) {
   const next = clampOffset(axis, value);
   updateSetting(view, axis, next || undefined);
   return next;
+}
+
+function captureElement() {
+  if (!selected) {
+    const photo = gallery.capturePhoto();
+    if (!photo) return false;
+    clipboard = photo;
+    updateActionButtons();
+    status.textContent = 'Fotografía copiada.';
+    return true;
+  }
+  const item = editable.get(selected)?.[0];
+  if (!item || selected === groupTarget) return false;
+  const win = preview.contentWindow;
+  const rect = item.node.getBoundingClientRect();
+  const css = win.getComputedStyle(item.node);
+  const color = css.color.match(/\d+/g)?.slice(0, 3)
+    .map(channel => Number(channel).toString(16).padStart(2, '0')).join('');
+  const base = {
+    size: Math.min(400, Math.max(4, Math.round(parseFloat(css.fontSize)))),
+    width: Math.min(4000, Math.max(30, Math.round(item.node.offsetWidth))),
+    ...(color && { color: '#' + color }),
+    ...(Object.hasOwn({left:1, center:1, right:1, justify:1}, css.textAlign) && { align: css.textAlign }),
+  };
+  const family = Object.entries(fonts).find(([, value]) => value.split(',')[0].replaceAll('"', '') === css.fontFamily.split(',')[0].replaceAll('"', ''));
+  if (family) base.font = family[0];
+  const custom = selected.startsWith('custom.');
+  const current = draft[view][selected] ?? {};
+  const origin = {
+    x: custom ? (current.x ?? 0) : Math.round(rect.left + win.scrollX),
+    y: custom ? (current.y ?? 0) : Math.round(rect.top + win.scrollY),
+  };
+  clipboard = { type: 'text', text: draft.content[selected]?.text ?? item.text, settings: {} };
+  for (const layout of ['desktop', 'mobile']) {
+    const existing = draft[layout][selected] ?? {};
+    clipboard.settings[layout] = {
+      ...base, ...existing,
+      x: custom && layout !== view ? (existing.x ?? 0) : origin.x,
+      y: custom && layout !== view ? (existing.y ?? 0) : origin.y,
+    };
+  }
+  updateActionButtons();
+  status.textContent = 'Texto copiado. Puedes pegarlo en Home o NUPTIAS.';
+  return true;
+}
+
+function addText(copy = null) {
+  if (workspace.inert || pagePicker.disabled) return;
+  const id = 'custom.' + crypto.randomUUID();
+  const win = preview.contentWindow;
+  draft.elements[id] = { type: 'text' };
+  draft.content[id] = { text: copy?.text ?? 'Nuevo texto' };
+  for (const layout of ['desktop', 'mobile']) {
+    const previous = copy?.settings[layout];
+    const maxX = layout === 'mobile' ? 335 : Math.max(40, win.innerWidth - 55);
+    const x = previous ? previous.x + 16 : (layout === 'mobile' ? 30 : 64);
+    const y = previous ? previous.y + 16 : win.scrollY + Math.round(win.innerHeight * .35);
+    draft[layout][id] = { size: 26, width: 245, layer: 10, ...previous,
+      x: Math.max(0, Math.min(maxX, x)), y: Math.max(0, Math.min(4000, y)) };
+  }
+  refreshElements();
+  apply(id);
+  select(id, true);
+  markDirty();
+  if (!copy) {
+    const input = document.querySelector('[data-field="text"]');
+    input.focus();
+    input.select();
+  }
+}
+
+function pasteElement() {
+  if (!clipboard || workspace.inert || pagePicker.disabled) return;
+  if (clipboard.type === 'photo') gallery.pastePhoto(clipboard);
+  else addText(clipboard);
+}
+
+function deleteSelection() {
+  if (workspace.inert || pagePicker.disabled) return false;
+  if (!selected) return gallery.removeSelected();
+  if (selected === groupTarget) return false;
+  if (selected.startsWith('custom.')) {
+    for (const section of ['elements', 'desktop', 'mobile', 'content']) delete draft[section][selected];
+  } else {
+    draft.elements[selected] = { hidden: true };
+    apply(selected);
+  }
+  refreshElements();
+  markDirty();
+  return true;
+}
+
+function shortcuts(event) {
+  if (workspace.hidden || workspace.inert || drag || pagePicker.disabled || event.isComposing ||
+      event.target.closest?.('input, textarea, select, button, [contenteditable], summary')) return;
+  const key = event.key.toLowerCase();
+  if (event.metaKey || event.ctrlKey) {
+    if (key === 'z' && (event.shiftKey ? actions.canRedo : actions.canUndo)) restoreActions(!event.shiftKey);
+    else if (key === 'c') { if (!captureElement()) return; }
+    else if (key === 'v' && clipboard) pasteElement();
+    else if (key === 'x' && captureElement()) deleteSelection();
+    else return;
+    event.preventDefault();
+    return;
+  }
+  if (key === 'delete' || key === 'backspace') {
+    if (deleteSelection()) event.preventDefault();
+    return;
+  }
+  nudge(event);
 }
 
 function nudge(event) {
@@ -175,15 +343,27 @@ function attach() {
     manualGuides,
     isBusy: () => workspace.inert,
   });
-  page.addEventListener('keydown', nudge);
+  page.addEventListener('keydown', shortcuts);
+  page.defaultView.addEventListener('resize', () => {
+    if (preview.contentDocument === page && draft.page === 'nuptias') apply(groupTarget);
+  });
 
   const { targets } = pages[draft.page];
   editable = collectElements(page, targets);
-  for (const [id, label] of targets) {
-    const originals = editable.get(id);
-    if (!originals) continue;
-    for (const { node } of originals) node.dataset.editorText = id;
-    element.add(new Option(label, id));
+  refreshElements();
+  const container = editable.get(groupTarget)?.[0]?.node;
+  if (container) {
+    const handle = page.createElement('button');
+    handle.type = 'button';
+    handle.textContent = 'Mover cinta';
+    handle.dataset.editorGalleryHandle = '';
+    Object.assign(handle.style, {
+      position: 'absolute', right: '8px', top: '8px', zIndex: '5', cursor: 'move',
+      background: '#fff', color: '#43275d', border: '1px solid #a88ec7', borderRadius: '5px',
+      padding: '4px 7px', font: '12px system-ui', touchAction: 'none',
+    });
+    container.append(handle);
+    handle.addEventListener('click', () => select(groupTarget));
   }
 
   page.addEventListener('click', (event) => {
@@ -192,12 +372,13 @@ function attach() {
 
   page.addEventListener('pointerdown', (event) => {
     if (workspace.inert) return;
-    const node = event.target.closest('[data-editor-text]');
+    const handle = event.target.closest('[data-editor-gallery-handle]');
+    const node = handle ? container : event.target.closest('[data-editor-text]');
     if (!node || event.button !== 0 || !event.isPrimary) return;
     event.preventDefault();
     event.stopPropagation();
     finishDrag();
-    select(node.dataset.editorText);
+    select(handle ? groupTarget : node.dataset.editorText);
     page.defaultView.focus();
     page.documentElement.classList.add('editor-aligning');
     const offsets = draft[view][selected] ?? {};
@@ -241,7 +422,7 @@ function attach() {
     const exact = alignRect(placed, targets, fixed, {}, { x: false, y: false });
     guideLayer.draw(placed, exact.lines, targets);
     updateFields();
-    markDirty();
+    markDirty(drag);
   });
 
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
@@ -252,7 +433,22 @@ function attach() {
 }
 
 element.addEventListener('change', () => select(element.value, true));
-document.addEventListener('keydown', nudge);
+document.addEventListener('keydown', shortcuts);
+find('undo').addEventListener('click', () => restoreActions(true));
+find('redo').addEventListener('click', () => restoreActions(false));
+find('add-text').addEventListener('click', () => addText());
+find('copy-element').addEventListener('click', captureElement);
+find('paste-element').addEventListener('click', pasteElement);
+find('duplicate-element').addEventListener('click', () => { if (captureElement()) pasteElement(); });
+find('delete-element').addEventListener('click', deleteSelection);
+for (const [button, layer] of [['layer-back', 1], ['layer-front', 50]]) {
+  find(button).addEventListener('click', () => {
+    updateSetting(view, 'layer', layer);
+    apply(selected);
+    markDirty();
+    status.textContent = `Capa ${draft[view][selected].layer}.`;
+  });
+}
 showRulers.addEventListener('change', syncRulers);
 find('clear-guides').addEventListener('click', () => guideLayer?.clearRulers());
 for (const button of viewButtons) button.addEventListener('click', () => applyView(button.dataset.view));
@@ -268,9 +464,11 @@ for (const input of fields) {
     else updateSetting(view, key, input.value || undefined);
     apply(selected);
     if (key === 'color') updateFields();
-    markDirty();
+    if (key === 'text' && selected.startsWith('custom.')) element.selectedOptions[0].textContent = input.value.slice(0, 65) || 'Texto nuevo';
+    markDirty(input);
   });
   input.addEventListener('blur', () => {
+    actions.closeGroup();
     if (!input.validity.valid) updateFields();
   });
 }
@@ -312,13 +510,14 @@ function runAction(action) {
 async function save(publish) {
   if (publish && !window.confirm(`¿Quieres mostrar los cambios de ${pages[draft.page].label} en el sitio conectado?`)) return;
   if (publish && draft.gallery) {
-    const ids = Object.keys(draft.gallery.uploads).filter(id => visiblePhoto(draft.gallery, id));
+    const ids = visibleUploads(draft.gallery);
     const urls = await store.photoUrls(ids);
     if (urls.size !== ids.length) {
       throw new Error('Algunas fotos visibles no están disponibles en Storage. Ocúltalas o vuelve a subirlas antes de publicar.');
     }
   }
   revision = await store.save(draft, revision, publish);
+  actions.save(draft);
   dirty = false;
   status.textContent = publish ? 'Cambios publicados.' : 'Borrador guardado de forma privada.';
   // A history read failure must not present a successful write as failed.
@@ -351,6 +550,7 @@ older.addEventListener('click', runAction(() => loadHistory(history.options[hist
 restore.addEventListener('click', runAction(async () => {
   if (!history.value || (dirty && !window.confirm('¿Quieres sustituir los cambios pendientes por esta versión?'))) return;
   draft = await store.restore(draft.page, history.value);
+  refreshElements();
   applyView(view);
   gallery.reloadUploads();
   markDirty();
@@ -382,6 +582,7 @@ find('import').addEventListener('change', runAction(async () => {
     const imported = validateDraft(JSON.parse(await file.text()), draft.page);
     if (dirty && !window.confirm('¿Quieres sustituir los cambios pendientes por esta copia?')) return;
     draft = imported;
+    refreshElements();
     applyView(view);
     gallery.reloadUploads();
     markDirty();
@@ -393,7 +594,7 @@ find('import').addEventListener('change', runAction(async () => {
   }
 }));
 
-const pageControls = ['page', 'element', 'save', 'publish', 'export', 'import'];
+const pageControls = ['page', 'element', 'save', 'publish', 'export', 'import', 'add-text'];
 
 function initializePreview() {
   const url = new URL(preview.contentDocument.URL);
@@ -403,10 +604,12 @@ function initializePreview() {
   applyView(view);
   status.textContent = `Editando ${pages[draft.page].label}.`;
   for (const id of pageControls) find(id).disabled = false;
+  updateActionButtons();
 }
 
 async function showPage(page) {
   ({ draft, revision } = await store.load(page));
+  actions.reset(draft);
   gallery.detach();
   finishDrag();
   guideLayer?.detach();
@@ -476,6 +679,8 @@ const gallery = setupGallery({
   getStore: () => store,
   runAction,
   markDirty,
+  closeGroup: () => actions.closeGroup(),
+  selectionChanged: updateActionButtons,
   deselectText: () => select(''),
   status,
   isBusy: () => workspace.inert,

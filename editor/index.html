@@ -25,6 +25,10 @@
         <button type="button" data-view="desktop" aria-pressed="true">Escritorio</button>
         <button type="button" data-view="mobile" aria-pressed="false">Móvil</button>
       </div>
+      <div class="history-actions">
+        <button type="button" id="undo" disabled>Deshacer</button>
+        <button type="button" id="redo" disabled>Rehacer</button>
+      </div>
       <button type="button" id="save" disabled>Guardar borrador</button>
       <button type="button" id="publish" class="primary" disabled>Publicar cambios</button>
       <button type="button" id="logout">Cerrar sesión</button>
@@ -78,8 +82,14 @@
           <button type="button" id="clear-guides" hidden>Borrar guías de esta vista</button>
           <p id="ruler-help" hidden>Haz clic en una regla para colocar una guía.</p>
         </details>
-        <label for="element">Texto de la página</label>
-        <select id="element" disabled><option value="">Selecciona un texto</option></select>
+        <div class="element-actions">
+          <button type="button" id="add-text" disabled>Añadir texto</button>
+          <button type="button" id="copy-element" disabled>Copiar</button>
+          <button type="button" id="paste-element" disabled>Pegar</button>
+          <button type="button" id="duplicate-element" disabled>Duplicar</button>
+        </div>
+        <label for="element">Elemento de la página</label>
+        <select id="element" disabled><option value="">Selecciona un elemento</option></select>
         <p id="instructions">Arrastra un texto o selecciónalo en la vista previa y usa las flechas (1 px). Mayús + flecha mueve 10 px.</p>
         <fieldset id="properties" disabled>
           <legend>Ajustes del texto</legend>
@@ -89,6 +99,13 @@
             <label>Vertical (px) <input type="number" min="-4000" max="4000" placeholder="0" data-field="y"></label>
             <label>Tamaño (px) <input type="number" min="4" max="400" placeholder="Original" data-field="size"></label>
             <label>Ancho (px) <input type="number" min="10" max="4000" placeholder="Original" data-field="width"></label>
+          </div>
+          <p id="gallery-layout-help" hidden>Reduce el ancho para mover la cinta a izquierda o derecha. El alto recorta el marco y las fotos conservan sus ajustes.</p>
+          <label>Alto de la cinta (px) <input type="number" min="60" max="900" placeholder="Original" data-field="height"></label>
+          <label>Espaciado de letras (px) <input type="number" min="-8" max="40" placeholder="Original" data-field="spacing"></label>
+          <div class="element-actions" id="element-layers" hidden>
+            <button type="button" id="layer-back">Enviar detrás</button>
+            <button type="button" id="layer-front">Traer delante</button>
           </div>
           <label>Tipografía
             <select data-field="font">
@@ -113,6 +130,7 @@
             <label>Color <input type="color" data-field="color"></label>
             <button type="button" id="reset-color">Color original</button>
           </div>
+          <button type="button" id="delete-element">Eliminar elemento</button>
           <button type="button" id="reset">Restaurar ajustes de este texto</button>
         </fieldset>
         <div class="backup">

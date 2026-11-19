@@ -9,7 +9,7 @@ const modes = ['hidden', 'removed'];
 const record = value => value && typeof value === 'object' && !Array.isArray(value);
 
 export function emptyGallery() {
-  return { order: [], uploads: {}, photos: {} };
+  return { order: [], uploads: {}, photos: {}, copies: {} };
 }
 
 export function uploadPath(id) {
@@ -18,6 +18,15 @@ export function uploadPath(id) {
 
 export function visiblePhoto(gallery, id) {
   return !gallery.photos[id]?.state;
+}
+
+export function visibleUploads(gallery) {
+  if (!gallery) return [];
+  const ids = new Set(Object.keys(gallery.uploads).filter(id => visiblePhoto(gallery, id)));
+  for (const [copy, source] of Object.entries(gallery.copies)) {
+    if (Object.hasOwn(gallery.uploads, source) && visiblePhoto(gallery, copy)) ids.add(source);
+  }
+  return [...ids];
 }
 
 export function validateGallery(gallery) {
@@ -32,7 +41,15 @@ export function validateGallery(gallery) {
     if (!uploadPath(id) || !record(value) || typeof value.name !== 'string' || !value.name.trim() || value.name.length > 180) fail();
     result.uploads[id] = { name: value.name };
   }
-  const knownId = id => typeof id === 'string' && (repoId.test(id) || Object.hasOwn(result.uploads, id));
+  const sourceId = id => typeof id === 'string' && (repoId.test(id) || Object.hasOwn(result.uploads, id));
+  if (gallery.copies !== undefined) {
+    if (!record(gallery.copies) || Object.keys(gallery.copies).length > 1000) fail();
+    for (const [id, source] of Object.entries(gallery.copies)) {
+      if (!/^copy:[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id) || !sourceId(source)) fail();
+      result.copies[id] = source;
+    }
+  }
+  const knownId = id => sourceId(id) || (typeof id === 'string' && Object.hasOwn(result.copies, id));
   if (!gallery.order.every(knownId)) fail();
   result.order = [...new Set(gallery.order)];
 

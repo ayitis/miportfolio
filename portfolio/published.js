@@ -1,7 +1,7 @@
 import { validateDraft } from './design-document.js';
-import { applyElement, collectElements } from './render-design.js';
+import { applyElement, collectElements, syncCustomElements } from './render-design.js';
 import { pages } from './pages.js';
-import { visiblePhoto } from './gallery-document.js';
+import { visibleUploads } from './gallery-document.js';
 import { signGalleryPhotos, photoLinkLifetime } from './gallery-storage.js';
 import { collectGallery, renderGallery } from './render-gallery.js';
 import { connect } from './supabase.js';
@@ -20,14 +20,15 @@ async function showPublishedDesign() {
   const mobile = matchMedia('(max-width: 700px)');
   const elements = collectElements(document, pages[page].targets);
   const gallery = page === 'nuptias' && collectGallery(document);
-  const uploads = Object.keys(design.gallery?.uploads ?? {}).filter(id => visiblePhoto(design.gallery, id));
+  const uploads = visibleUploads(design.gallery);
   let urls = new Map();
+  syncCustomElements(document, elements, design);
   const render = () => {
     const view = mobile.matches ? 'mobile' : 'desktop';
     for (const id of elements.keys()) applyElement(elements, id, design, view);
     if (gallery) renderGallery(gallery, design.gallery, view, urls);
   };
-  mobile.addEventListener('change', render);
+  window.addEventListener('resize', render);
   render();
 
   if (gallery && uploads.length) {

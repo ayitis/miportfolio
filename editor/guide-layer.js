@@ -2,7 +2,7 @@ import { spacingBetween } from './alignment.js';
 
 const ns = 'http://www.w3.org/2000/svg';
 const rulerSize = 20;
-const selectionTargets = '[data-editor-text], .photo, .thumb img, .brand-logo';
+const selectionTargets = '[data-editor-text], .marquee, .photo, .thumb img, .brand-logo';
 
 export function createGuideLayer(page, { settings, manualGuides, isBusy }) {
   const win = page.defaultView;

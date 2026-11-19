@@ -17,19 +17,27 @@ export function collectGallery(page) {
 }
 
 export function galleryEntries(model, gallery) {
-  const ids = [...new Set([...gallery.order, ...model.originals.keys(), ...Object.keys(gallery.uploads)])];
-  return ids.filter(id => model.originals.has(id) || Object.hasOwn(gallery.uploads, id));
+  const ids = [...new Set([...gallery.order, ...model.originals.keys(), ...Object.keys(gallery.uploads), ...Object.keys(gallery.copies)])];
+  return ids.filter(id => {
+    const source = gallery.copies[id] ?? id;
+    return model.originals.has(source) || Object.hasOwn(gallery.uploads, source);
+  });
 }
 
 export function renderGallery(model, gallery, view, urls, editing = false) {
   const { track, groups, originals, additions } = model;
-  const ids = galleryEntries(model, gallery).filter(id => visiblePhoto(gallery, id) && (originals.has(id) || urls.has(id)));
+  const ids = galleryEntries(model, gallery).filter(id => {
+    const source = gallery.copies[id] ?? id;
+    return visiblePhoto(gallery, id) && (originals.has(source) || urls.has(source));
+  });
   track.closest('.marquee').hidden = ids.length === 0;
   for (const id of additions.keys()) {
-    if (!Object.hasOwn(gallery.uploads, id)) additions.delete(id);
+    if (!Object.hasOwn(gallery.uploads, id) && !Object.hasOwn(gallery.copies, id)) additions.delete(id);
   }
   groups.forEach((group, index) => {
     const figures = ids.map(id => {
+      const source = gallery.copies[id] ?? id;
+      const repoPhoto = originals.get(source);
       let figure = originals.get(id)?.figures[index];
       if (!figure) {
         if (!additions.has(id)) additions.set(id, []);
@@ -46,8 +54,9 @@ export function renderGallery(model, gallery, view, urls, editing = false) {
         }
         figure = copies[index];
         const photo = figure.firstElementChild;
-        photo.alt = index === 0 ? gallery.uploads[id].name : '';
-        if (photo.getAttribute('src') !== urls.get(id)) photo.src = urls.get(id);
+        photo.alt = index === 0 ? (repoPhoto?.name ?? gallery.uploads[source].name) : '';
+        const src = repoPhoto?.figures[index]?.firstElementChild.getAttribute('src') ?? urls.get(source);
+        if (photo.getAttribute('src') !== src) photo.src = src;
       }
       const size = gallery.photos[id]?.[view] ?? {};
       const img = figure.firstElementChild;

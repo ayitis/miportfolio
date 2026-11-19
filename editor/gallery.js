@@ -2,7 +2,7 @@ import { maxPhotoBytes, maxUploads, uploadTypes, visiblePhoto } from '../portfol
 import { photoLinkLifetime } from '../portfolio/gallery-storage.js';
 import { collectGallery, galleryEntries, renderGallery } from '../portfolio/render-gallery.js';
 
-export function setupGallery({ getDraft, getView, getStore, runAction, markDirty, deselectText, status, isBusy }) {
+export function setupGallery({ getDraft, getView, getStore, runAction, markDirty, closeGroup, deselectText, selectionChanged, status, isBusy }) {
   const find = id => document.getElementById(id);
   const panel = find('gallery-tools');
   const picker = find('photo-picker');
@@ -51,6 +51,7 @@ export function setupGallery({ getDraft, getView, getStore, runAction, markDirty
     picker.value = id;
     highlight();
     refreshFields(entries());
+    selectionChanged();
   }
 
   function render({ list = true } = {}) {
@@ -64,8 +65,10 @@ export function setupGallery({ getDraft, getView, getStore, runAction, markDirty
       picker.options.length = 1;
       for (const id of ids) {
         const state = gallery.photos[id]?.state;
-        const label = model.originals.get(id)?.name.replace('NUPTIAS editorial photograph', 'Fotografía') ?? gallery.uploads[id].name;
-        const suffix = state === 'removed' ? ' · retirada' : state === 'hidden' ? ' · oculta' : !model.originals.has(id) && !urls.has(id) ? ' · sin vista previa' : '';
+        const source = gallery.copies[id] ?? id;
+        const name = model.originals.get(source)?.name.replace('NUPTIAS editorial photograph', 'Fotografía') ?? gallery.uploads[source].name;
+        const label = gallery.copies[id] ? name + ' · copia' : name;
+        const suffix = state === 'removed' ? ' · retirada' : state === 'hidden' ? ' · oculta' : !model.originals.has(source) && !urls.has(source) ? ' · sin vista previa' : '';
         picker.add(new Option(label + suffix, id));
       }
       picker.value = selected;
@@ -135,9 +138,10 @@ export function setupGallery({ getDraft, getView, getStore, runAction, markDirty
       if (field.value === '') delete frame[field.dataset.photoField];
       else frame[field.dataset.photoField] = field.valueAsNumber;
       render({ list: false });
-      markDirty();
+      markDirty(field);
     });
     field.addEventListener('blur', () => {
+      closeGroup();
       if (!field.validity.valid) refreshFields(entries());
     });
   }
@@ -241,5 +245,43 @@ export function setupGallery({ getDraft, getView, getStore, runAction, markDirty
     refresh = setInterval(reloadUploads, (photoLinkLifetime - 60) * 1000);
   }
 
-  return { render, attach, detach, select, reloadUploads };
+  function capturePhoto() {
+    if (!model || !selected) return;
+    const gallery = draftGallery();
+    const photo = gallery.photos[selected];
+    return {
+      type: 'photo',
+      source: gallery.copies[selected] ?? selected,
+      original: selected,
+      settings: { ...(photo?.desktop && { desktop: { ...photo.desktop } }), ...(photo?.mobile && { mobile: { ...photo.mobile } }) },
+    };
+  }
+
+  function pastePhoto(copy) {
+    if (!model) return false;
+    const gallery = draftGallery();
+    if (!model.originals.has(copy.source) && !Object.hasOwn(gallery.uploads, copy.source)) {
+      status.textContent = 'La fotografía de origen no está en este borrador.';
+      return false;
+    }
+    const id = 'copy:' + crypto.randomUUID();
+    change(current => {
+      const order = entries();
+      const anchor = order.indexOf(copy.original);
+      order.splice(anchor < 0 ? order.length : anchor + 1, 0, id);
+      current.order = order;
+      current.copies[id] = copy.source;
+      if (Object.keys(copy.settings).length) current.photos[id] = structuredClone(copy.settings);
+    });
+    select(id);
+    return true;
+  }
+
+  function removeSelected() {
+    if (!model || !selected || !visiblePhoto(draftGallery(), selected)) return false;
+    setState('removed');
+    return true;
+  }
+
+  return { render, attach, detach, select, reloadUploads, removeSelected, capturePhoto, pastePhoto, get hasSelection() { return Boolean(selected); } };
 }

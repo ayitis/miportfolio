@@ -74,6 +74,13 @@
           <label for="photo-file">Subir fotografía</label>
           <input type="file" id="photo-file" accept="image/jpeg,image/png,image/webp,image/avif">
         </details>
+        <details class="column-tools" id="column-tools" hidden>
+          <summary>Columna de proyectos de Home</summary>
+          <label><input type="checkbox" id="show-column"> Ver la columna</label>
+          <label>Desplazamiento adicional (px)
+            <input type="number" id="column-offset" min="-4000" max="4000" step="1" placeholder="0">
+          </label>
+        </details>
         <details class="alignment-tools">
           <summary>Guías de alineación</summary>
           <label><input type="checkbox" id="snap-text" checked> Ajuste magnético</label>

@@ -316,6 +316,36 @@ function nudge(event) {
   nudgeTimer = setTimeout(() => guideLayer?.clear(), 650);
 }
 
+const columnOffset = find('column-offset');
+const showColumn = find('show-column');
+
+function syncColumn() {
+  const home = draft.page === 'home';
+  find('column-tools').hidden = !home;
+  if (!home) return;
+  const offset = draft[view]['gallery.column']?.x;
+  columnOffset.value = offset ?? '';
+  const frame = preview.contentDocument;
+  const hero = frame?.querySelector('.hero');
+  if (!hero) return;
+  hero.dataset.columnOffset = offset ?? 0;
+  frame.dispatchEvent(new CustomEvent('portfolio:column-preview', { detail: showColumn.checked }));
+}
+
+showColumn.addEventListener('change', syncColumn);
+columnOffset.addEventListener('input', () => {
+  if (draft.page !== 'home' || !columnOffset.validity.valid) return;
+  if (columnOffset.value === '') delete draft[view]['gallery.column'];
+  else draft[view]['gallery.column'] = { x: columnOffset.valueAsNumber };
+  showColumn.checked = true;
+  syncColumn();
+  markDirty(columnOffset);
+});
+columnOffset.addEventListener('blur', () => {
+  actions.closeGroup();
+  if (!columnOffset.validity.valid) syncColumn();
+});
+
 function applyView(next) {
   finishDrag();
   view = next;
@@ -325,6 +355,7 @@ function applyView(next) {
   updateFields();
   gallery.render();
   syncRulers();
+  syncColumn();
 }
 
 function attach() {
@@ -615,6 +646,8 @@ async function showPage(page) {
   guideLayer?.detach();
   guideLayer = undefined;
   pagePicker.value = page;
+  showColumn.checked = false;
+  find('column-tools').hidden = true;
   dirty = false;
   select('');
   editable.clear();

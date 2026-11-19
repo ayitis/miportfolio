@@ -132,3 +132,8 @@ iframe.mobile { width: 390px; min-width: 0; max-width: 100%; height: min(844px, 
 .element-actions { margin-bottom: .45rem; }
 .element-actions button, #delete-element { font-size: .78rem; }
 .toolbar { flex-wrap: wrap; }
+
+.column-tools { margin: 0 0 1rem; font-size: .83rem; }
+.column-tools summary { cursor: pointer; font-weight: 650; margin-bottom: .4rem; }
+.column-tools label { margin: .4rem 0; }
+.column-tools label:has(input[type="checkbox"]) { display: flex; align-items: center; }

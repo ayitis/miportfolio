@@ -4,6 +4,8 @@ const hero = scene.querySelector('.hero');
 const photo = hero.querySelector('.hero-bg');
 const group = hero.querySelector('.gallery-wrap');
 const header = group.querySelector('.gallery-header');
+const name = hero.querySelector('.heading h1');
+const captions = [...hero.querySelectorAll('.hero-subtitle, .hero-footer span')];
 const track = group.querySelector('.track');
 const cards = [...track.querySelectorAll('.project')];
 const about = document.getElementById('about');
@@ -21,7 +23,7 @@ let needsMeasure = true;
 
 function clearCards() {
   for (const card of cards) {
-    for (const property of ['--project-x', '--project-y', 'opacity', 'pointer-events']) card.style.removeProperty(property);
+    for (const property of ['--project-x', '--project-y', 'opacity', 'pointer-events', 'mask-image', 'mask-position', 'mask-size', 'mask-repeat', 'mask-composite']) card.style.removeProperty(property);
     card.inert = false;
   }
 }
@@ -37,7 +39,8 @@ function stop() {
   header.style.removeProperty('opacity');
   hero.style.removeProperty('--photo-x');
   hero.style.removeProperty('--photo-y');
-  hero.style.removeProperty('--intro-chrome');
+  hero.style.removeProperty('--title-band-top');
+  hero.style.removeProperty('--title-band-bottom');
 }
 
 function configure() {
@@ -67,7 +70,9 @@ function pickCards(width, origin) {
       entries.set(card.getAttribute('href'), { card, left, top: box.top - origin.top, width: box.width, height: box.height, score });
     }
   }
-  return [...entries.values()].sort((a, b) => a.left - b.left);
+  // Map insertion order is the original editorial sequence, even when a
+  // visible copy is picked from the second half of the carousel.
+  return [...entries.values()];
 }
 
 function measure() {
@@ -94,7 +99,21 @@ function measure() {
   const gutter = widest / 2 + 12;
   const offsetX = clamp(photoX + clamp(idealX, gutter, rect.width - gutter) - idealX, rect.width - size, 0);
   const offsetY = clamp(photoY + Math.max(0, rect.height * .14 - idealY), rect.height - size, 0);
-  const columnX = clamp(offsetX + size * fingertip.x, gutter, rect.width - gutter);
+  const offset = Number(hero.dataset.columnOffset ?? 0) || 0;
+  // About 2.8 CSS cm at desktop reference size, scaled down on narrow phones.
+  const rightShift = Math.min(105, rect.width * .073);
+  const columnX = clamp(offsetX + size * fingertip.x + rightShift + offset, gutter, rect.width - gutter);
+  const title = name.getBoundingClientRect();
+  hero.style.setProperty('--title-band-top', `${Math.max(0, title.top - rect.top - 16)}px`);
+  hero.style.setProperty('--title-band-bottom', `${Math.max(0, rect.bottom - title.bottom - 16)}px`);
+  const range = document.createRange();
+  const protectedAreas = captions.flatMap(caption => {
+    range.selectNodeContents(caption);
+    return [...range.getClientRects()].filter(box => box.width && box.height).map(box => ({
+      left: box.left - rect.left - 7, right: box.right - rect.left + 7,
+      top: box.top - rect.top - 8, bottom: box.bottom - rect.top + 8,
+    }));
+  });
   let nextY = clamp(offsetY + size * fingertip.y + 25, 28, rect.height * .68);
   const gap = narrow.matches ? 15 : 20;
   for (const item of entries) {
@@ -102,7 +121,23 @@ function measure() {
     item.destTop = nextY;
     nextY += item.height + gap;
   }
-  return { entries, visible: new Set(entries.map(({ card }) => card)), rise: nextY + 35, photoX, photoY, offsetX, offsetY };
+  return { entries, visible: new Set(entries.map(({ card }) => card)), rise: nextY + 35, protectedAreas, photoX, photoY, offsetX, offsetY };
+}
+
+function protectCaptions(item, left, top, areas) {
+  const overlapping = areas.filter(area => area.left < left + item.width && area.right > left &&
+    area.top < top + item.height && area.bottom > top);
+  const style = item.card.style;
+  if (!overlapping.length) {
+    style.removeProperty('mask-image');
+    return;
+  }
+  style.maskImage = ['linear-gradient(#000, #000)', ...overlapping.map(() =>
+    'linear-gradient(transparent, #000 6px, #000 calc(100% - 6px), transparent)')].join(', ');
+  style.maskPosition = ['0 0', ...overlapping.map(area => `${area.left - left}px ${area.top - top}px`)].join(', ');
+  style.maskSize = ['100% 100%', ...overlapping.map(area => `${area.right - area.left}px ${area.bottom - area.top}px`)].join(', ');
+  style.maskRepeat = 'no-repeat';
+  style.maskComposite = 'exclude';
 }
 
 function draw(progress) {
@@ -116,6 +151,7 @@ function draw(progress) {
   }
 
   const reform = smooth(clamp(progress / .48, 0, 1));
+  const fan = smooth(clamp(progress / .40, 0, 1));
   const glide = clamp((progress - .48) / .52, 0, 1);
   const rise = active.rise * glide * glide;
   const opacity = 1 - smooth(clamp((progress - .84) / .15, 0, 1));
@@ -126,7 +162,6 @@ function draw(progress) {
   group.inert = opacity <= .02;
   group.style.pointerEvents = opacity <= .02 ? 'none' : '';
   header.style.opacity = 1 - reform;
-  hero.style.setProperty('--intro-chrome', String(1 - smooth(clamp(reform * 1.4, 0, 1))));
 
   for (const card of cards) {
     if (!active.visible.has(card)) {
@@ -136,8 +171,11 @@ function draw(progress) {
     }
   }
   for (const item of active.entries) {
-    item.card.style.setProperty('--project-x', `${(item.destLeft - item.left) * reform}px`);
-    item.card.style.setProperty('--project-y', `${(item.destTop - item.top) * reform - rise}px`);
+    const x = (item.destLeft - item.left) * reform;
+    const y = (item.destTop - item.top) * fan - rise;
+    item.card.style.setProperty('--project-x', `${x}px`);
+    item.card.style.setProperty('--project-y', `${y}px`);
+    protectCaptions(item, item.left + x, item.top + y, active.protectedAreas);
   }
 }
 
@@ -186,7 +224,27 @@ function navigateHash() {
   }
 }
 
-if (!inEditor) {
+if (inEditor) {
+  let showColumn = false;
+  function previewColumn() {
+    if (!showColumn || motion.matches) {
+      stop();
+      return;
+    }
+    needsMeasure = true;
+    draw(.48);
+  }
+  document.addEventListener('portfolio:column-preview', event => {
+    showColumn = event.detail === true;
+    previewColumn();
+  });
+  window.addEventListener('resize', previewColumn);
+  motion.addEventListener('change', previewColumn);
+} else {
+  document.addEventListener('portfolio:home-design', () => {
+    needsMeasure = true;
+    schedule();
+  });
   if (lastHash === '#about') goToAbout();
   configure();
   window.addEventListener('scroll', schedule, { passive: true });

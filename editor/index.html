@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Editor de portada · Aya Arbaoui</title>
+  <title>Editor del portfolio · Aya Arbaoui</title>
   <link rel="stylesheet" href="/editor/editor.css">
   <script type="module" src="/editor/editor.js"></script>
 </head>
 <body>
   <section id="access" class="access" aria-labelledby="access-title">
-    <h1 id="access-title">Editor de portada</h1>
+    <h1 id="access-title">Editor del portfolio</h1>
     <p id="access-status" role="status">Comprobando el acceso…</p>
     <form id="login" method="post" hidden>
       <label>Correo <input type="email" name="email" autocomplete="username" required></label>
@@ -20,7 +20,7 @@
   </section>
   <div id="workspace" hidden>
     <header class="toolbar">
-      <h1>Editor de portada</h1>
+      <h1>Editor del portfolio</h1>
       <div class="views" aria-label="Vista del portfolio">
         <button type="button" data-view="desktop" aria-pressed="true">Escritorio</button>
         <button type="button" data-view="mobile" aria-pressed="false">Móvil</button>
@@ -31,9 +31,21 @@
     </header>
     <main>
       <aside>
-        <label for="element">Texto de la portada</label>
+        <label for="page">Página</label>
+        <select id="page" disabled>
+          <option value="home">Home / Portada</option>
+          <option value="nuptias">NUPTIAS</option>
+          <optgroup label="Otros proyectos · próximamente" disabled>
+            <option>Maison Carnage</option>
+            <option>AYAM Studio</option>
+            <option>IRE Magazine</option>
+            <option>Yves Rocher España</option>
+            <option>Villa Tiger Marrakech</option>
+          </optgroup>
+        </select>
+        <label for="element">Texto de la página</label>
         <select id="element" disabled><option value="">Selecciona un texto</option></select>
-        <p id="instructions">Haz clic sobre un texto de la portada. Arrástralo o ajusta su posición aquí.</p>
+        <p id="instructions">Haz clic sobre un texto de la página. Arrástralo o ajusta su posición aquí.</p>
         <fieldset id="properties" disabled>
           <legend>Ajustes del texto</legend>
           <label>Contenido <textarea rows="3" maxlength="2000" data-field="text" placeholder="Texto original"></textarea></label>
@@ -62,6 +74,10 @@
               <option value="justify">Justificada</option>
             </select>
           </label>
+          <div class="color-setting">
+            <label>Color <input type="color" data-field="color"></label>
+            <button type="button" id="reset-color">Color original</button>
+          </div>
           <button type="button" id="reset">Restaurar ajustes de este texto</button>
         </fieldset>
         <div class="backup">
@@ -81,7 +97,7 @@
         <p id="status" role="status" aria-live="polite">Cargando la portada…</p>
       </aside>
       <section class="canvas" aria-label="Vista previa editable">
-        <iframe id="preview" title="Portada editable del portfolio"></iframe>
+        <iframe id="preview" title="Página editable del portfolio"></iframe>
       </section>
     </main>
   </div>

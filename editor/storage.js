@@ -2,7 +2,6 @@ import { emptyDraft, validateDraft } from '../portfolio/design-document.js';
 import { connect } from '../portfolio/supabase.js';
 
 const sessionKey = 'miportfolio.editor.session.v1';
-const page = 'page=eq.home';
 
 export async function openEditor() {
   const request = await connect();
@@ -53,30 +52,34 @@ export async function openEditor() {
         setSession(null);
       }
     },
-    async load() {
+    async verifyOwner() {
       if (await authorized('/rest/v1/rpc/portfolio_is_owner', {}) !== true) {
         await this.signOut().catch(() => {});
         throw new Error('Esta cuenta no tiene acceso al editor.');
       }
-      const [saved] = await authorized(`/rest/v1/portfolio_drafts?${page}&select=document,revision`);
-      return saved ? { draft: validateDraft(saved.document), revision: saved.revision }
-        : { draft: emptyDraft(), revision: null };
+    },
+    async load(page) {
+      const [saved] = await authorized(`/rest/v1/portfolio_drafts?page=eq.${page}&select=document,revision`);
+      return saved ? { draft: validateDraft(saved.document, page), revision: saved.revision }
+        : { draft: emptyDraft(page), revision: null };
     },
     async save(draft, revision, publish) {
-      return authorized('/rest/v1/rpc/portfolio_save_home', {
+      const home = draft.page === 'home';
+      return authorized(`/rest/v1/rpc/${home ? 'portfolio_save_home' : 'portfolio_save_page'}`, {
+        ...(!home && { page_key: draft.page }),
         design: validateDraft(draft),
         expected_revision: revision,
         publish_now: publish,
       });
     },
-    async history(before) {
+    async history(page, before) {
       const cursor = before === undefined ? '' : `&revision=lt.${before}`;
-      return authorized(`/rest/v1/portfolio_history?${page}&select=revision,published,created_at&order=revision.desc&limit=20${cursor}`);
+      return authorized(`/rest/v1/portfolio_history?page=eq.${page}&select=revision,published,created_at&order=revision.desc&limit=20${cursor}`);
     },
-    async restore(revision) {
-      const [entry] = await authorized(`/rest/v1/portfolio_history?${page}&revision=eq.${revision}&select=document`);
+    async restore(page, revision) {
+      const [entry] = await authorized(`/rest/v1/portfolio_history?page=eq.${page}&revision=eq.${revision}&select=document`);
       if (!entry) throw new Error('No se encontró esta versión.');
-      return validateDraft(entry.document);
+      return validateDraft(entry.document, page);
     },
   };
 }

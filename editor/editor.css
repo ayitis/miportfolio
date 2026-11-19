@@ -103,3 +103,8 @@ iframe.mobile { width: 390px; min-width: 0; max-width: 100%; height: min(844px, 
   main { height: auto; }
   .canvas { height: 80vh; }
 }
+
+#page { margin: .35rem 0 .85rem; }
+.color-setting { display: flex; align-items: end; gap: .65rem; }
+.color-setting input { width: 3rem; height: 2rem; cursor: pointer; }
+.color-setting button { font-size: .78rem; }

@@ -1,10 +1,12 @@
 import { bounds, emptyDraft, validateDraft } from '../portfolio/design-document.js';
-import { applyElement, collectElements, targets } from '../portfolio/home-design.js';
+import { pages } from '../portfolio/pages.js';
+import { applyElement, collectElements } from '../portfolio/render-design.js';
 import { openEditor } from './storage.js';
 
 const find = (id) => document.getElementById(id);
 const preview = find('preview');
 const element = find('element');
+const pagePicker = find('page');
 const status = find('status');
 const fields = [...document.querySelectorAll('[data-field]')];
 const viewButtons = [...document.querySelectorAll('[data-view]')];
@@ -41,7 +43,13 @@ function updateFields() {
   for (const input of fields) {
     const key = input.dataset.field;
     if (key === 'text') {
-      input.value = draft.content[selected]?.text ?? original?.text ?? '';
+      input.disabled = original?.allowText === false;
+      input.value = input.disabled ? '' : (draft.content[selected]?.text ?? original?.text ?? '');
+      input.placeholder = input.disabled ? 'Edita FORM, & y FEELING. por separado.' : 'Texto original';
+    } else if (key === 'color') {
+      const rgb = original && getComputedStyle(original.node).color.match(/\d+/g);
+      input.value = rgb ? '#' + rgb.slice(0, 3).map(value => Number(value).toString(16).padStart(2, '0')).join('') : '#161616';
+      find('reset-color').disabled = !overrides.color;
     } else {
       input.value = overrides[key] ?? '';
     }
@@ -91,7 +99,8 @@ function attach() {
   `;
   page.head.append(style);
 
-  editable = collectElements(page);
+  const { targets } = pages[draft.page];
+  editable = collectElements(page, targets);
   for (const [id, label] of targets) {
     const originals = editable.get(id);
     if (!originals) continue;
@@ -104,6 +113,7 @@ function attach() {
   }, true);
 
   page.addEventListener('pointerdown', (event) => {
+    if (workspace.inert) return;
     const node = event.target.closest('[data-editor-text]');
     if (!node || event.button !== 0 || !event.isPrimary) return;
     event.preventDefault();
@@ -156,12 +166,20 @@ for (const input of fields) {
     else if (input.type === 'number') updateSetting(view, key, input.value === '' ? undefined : input.valueAsNumber);
     else updateSetting(view, key, input.value || undefined);
     apply(selected);
+    if (key === 'color') updateFields();
     markDirty();
   });
   input.addEventListener('blur', () => {
     if (!input.validity.valid) updateFields();
   });
 }
+
+find('reset-color').addEventListener('click', () => {
+  updateSetting(view, 'color', undefined);
+  apply(selected);
+  updateFields();
+  markDirty();
+});
 
 find('reset').addEventListener('click', () => {
   delete draft[view][selected];
@@ -180,7 +198,9 @@ function runAction(action) {
     } catch (error) {
       status.textContent = error.code === '40001'
         ? 'Hay un borrador más reciente. Descarga una copia de tus cambios y recarga el editor.'
-        : error.message;
+        : error.code === 'PGRST202' && draft.page === 'nuptias'
+          ? 'Ejecuta primero la migración de NUPTIAS en el proyecto de Supabase de Preview.'
+          : error.message;
     } finally {
       workspace.inert = false;
     }
@@ -188,7 +208,7 @@ function runAction(action) {
 }
 
 async function save(publish) {
-  if (publish && !window.confirm('¿Quieres mostrar estos cambios a los visitantes del sitio conectado?')) return;
+  if (publish && !window.confirm(`¿Quieres mostrar los cambios de ${pages[draft.page].label} en el sitio conectado?`)) return;
   revision = await store.save(draft, revision, publish);
   dirty = false;
   status.textContent = publish ? 'Cambios publicados.' : 'Borrador guardado de forma privada.';
@@ -199,7 +219,7 @@ async function save(publish) {
 }
 
 async function loadHistory(before) {
-  const entries = await store.history(before);
+  const entries = await store.history(draft.page, before);
   const selectedRevision = history.value;
   if (before === undefined) history.options.length = 1;
   for (const entry of entries) {
@@ -221,7 +241,7 @@ history.addEventListener('change', () => { restore.disabled = !history.value; })
 older.addEventListener('click', runAction(() => loadHistory(history.options[history.options.length - 1].value)));
 restore.addEventListener('click', runAction(async () => {
   if (!history.value || (dirty && !window.confirm('¿Quieres sustituir los cambios pendientes por esta versión?'))) return;
-  draft = await store.restore(history.value);
+  draft = await store.restore(draft.page, history.value);
   applyView(view);
   markDirty();
   status.textContent = 'Versión cargada. Puedes guardarla como borrador o publicarla.';
@@ -238,18 +258,18 @@ find('export').addEventListener('click', () => {
   const url = URL.createObjectURL(file);
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'miportfolio-portada.json';
+  link.download = `miportfolio-${draft.page === 'home' ? 'portada' : draft.page}.json`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 
-find('import').addEventListener('change', async (event) => {
-  const input = event.currentTarget;
+find('import').addEventListener('change', runAction(async () => {
+  const input = find('import');
   const file = input.files[0];
   if (!file) return;
   try {
     if (file.size > 1_000_000) throw new Error('La copia supera el tamaño permitido.');
-    const imported = validateDraft(JSON.parse(await file.text()));
+    const imported = validateDraft(JSON.parse(await file.text()), draft.page);
     if (dirty && !window.confirm('¿Quieres sustituir los cambios pendientes por esta copia?')) return;
     draft = imported;
     applyView(view);
@@ -260,23 +280,49 @@ find('import').addEventListener('change', async (event) => {
   } finally {
     input.value = '';
   }
-});
+}));
+
+const pageControls = ['page', 'element', 'save', 'publish', 'export', 'import'];
 
 function initializePreview() {
-  if (preview.contentDocument.URL === 'about:blank') return;
-  preview.removeEventListener('load', initializePreview);
+  const url = new URL(preview.contentDocument.URL);
+  if (url.pathname !== pages[draft.page].path || !url.searchParams.has('editor-preview')) return;
   attach();
   applyView(view);
-  status.textContent = 'Los cambios se muestran a los visitantes al pulsar Publicar cambios.';
-  for (const id of ['element', 'save', 'publish', 'export', 'import']) find(id).disabled = false;
+  status.textContent = `Editando ${pages[draft.page].label}.`;
+  for (const id of pageControls) find(id).disabled = false;
 }
 
+async function showPage(page) {
+  ({ draft, revision } = await store.load(page));
+  pagePicker.value = page;
+  dirty = false;
+  drag = null;
+  select('');
+  editable.clear();
+  element.options.length = 1;
+  history.options.length = 1;
+  history.closest('details').open = false;
+  restore.disabled = true;
+  older.hidden = true;
+  for (const id of pageControls) find(id).disabled = true;
+  status.textContent = `Cargando ${pages[page].label}…`;
+  preview.src = `${pages[page].path}?editor-preview=1`;
+}
+
+preview.addEventListener('load', initializePreview);
+pagePicker.addEventListener('change', runAction(async () => {
+  const next = pagePicker.value;
+  pagePicker.value = draft.page;
+  if (dirty && !window.confirm('¿Cambiar de página sin guardar los cambios pendientes?')) return;
+  await showPage(next);
+}));
+
 async function enterWorkspace() {
-  ({ draft, revision } = await store.load());
+  await store.verifyOwner();
+  await showPage('home');
   access.hidden = true;
   workspace.hidden = false;
-  preview.addEventListener('load', initializePreview);
-  preview.src = '/index.html?editor-preview=1';
 }
 
 login.addEventListener('submit', async (event) => {

@@ -34,3 +34,10 @@ values ('PEGA_AQUI_EL_USER_UID');
 ## Mantener las ediciones en futuros cambios de código
 
 Los identificadores permanentes de la portada están en `portfolio/home-design.js`. Mantén las claves, como `hero.title` y `card.nuptias.title`, si cambias el HTML. Actualiza el selector asociado si se mueve o cambia el elemento. El editor y la portada usan el mismo registro. Los campos sin ajustes usan el HTML y CSS originales. Un cambio de estructura en el documento guardado necesita una migración de datos y compatibilidad con las copias anteriores.
+
+## Ampliar un Preview existente a NUPTIAS
+
+1. Abre en Supabase el proyecto que usa tu **Preview** actual. En **SQL Editor → New query**, pega todo el contenido de [la migración de NUPTIAS](../supabase/migrations/20261119000000_portfolio_nuptias.sql) y pulsa **Run** una vez. Esta migración se aplica después de la migración inicial y conserva los borradores, publicaciones, historial y cuenta administradora de la portada.
+2. En Vercel conserva las dos variables de **Preview** que ya tienes. La rama actualizada usa el mismo proyecto, usuario y enlace de Preview.
+3. Abre `/editor` en Preview y elige **NUPTIAS** en **Página**. Guarda un borrador y comprueba que la página pública del Preview sigue mostrando su versión anterior. Pulsa **Publicar cambios** y abre `/nuptias.html` en el Preview para comprobar la publicación.
+4. Si quieres ajustar el título **FORM & FEELING.**, selecciona el título completo para moverlo o elige sus partes por separado para editar su contenido. Las copias de seguridad y el historial corresponden a la página seleccionada.

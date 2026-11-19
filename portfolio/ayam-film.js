@@ -1,10 +1,10 @@
 const frame = document.querySelector('#fashion-film');
 const video = frame.querySelector('video');
-const audioButton = frame.querySelector('.film-audio-toggle');
 let start = 0;
 let end;
 let currentSource = video.querySelector('source').getAttribute('src');
 let inView = false;
+let userInteracted = false;
 
 function interval() {
   const duration = video.duration;
@@ -14,37 +14,43 @@ function interval() {
   return [from, Math.min(duration, Math.max(from + .1, end ?? fallback))];
 }
 
-function canPlay() {
+function shouldPlay() {
   return inView && !document.hidden;
 }
 
-function play() {
-  if (canPlay()) video.play().catch(() => {});
+function resume() {
+  if (!shouldPlay()) return;
+  // Try audible playback first. Autoplay policies may reject it until a
+  // user gesture; in that case keep the moving picture visible, muted.
+  if (userInteracted) video.muted = false;
+  const attempt = video.play();
+  if (attempt?.catch) attempt.catch(() => {
+    if (!shouldPlay()) return;
+    video.muted = true;
+    video.play().catch(() => {});
+  });
 }
 
 function syncVisibility() {
-  if (canPlay()) play();
-  else video.pause();
+  if (!shouldPlay()) video.pause();
+  else resume();
 }
 
-function loop() {
+function restartLoop() {
   video.currentTime = interval()[0];
-  play();
+  resume();
 }
 
-function syncSoundButton() {
-  audioButton.textContent = video.muted ? 'ACTIVAR SONIDO' : 'SILENCIAR';
-  audioButton.setAttribute('aria-label', video.muted ? 'Activar sonido del fashion film' : 'Silenciar fashion film');
-  audioButton.setAttribute('aria-pressed', String(!video.muted));
+function activateAudio() {
+  userInteracted = true;
+  if (!shouldPlay()) return;
+  video.muted = false;
+  resume();
 }
-
-audioButton.addEventListener('click', () => {
-  video.muted = !video.muted;
-  syncSoundButton();
-  // Called directly from a click: browsers permit audible playback here.
-  play();
-});
-syncSoundButton();
+// Browsers normally allow unmuting only as a result of a real interaction.
+// No sound/pause controls are added to the interface.
+document.addEventListener('pointerdown', activateAudio, { capture: true, passive: true });
+document.addEventListener('keydown', activateAudio, { capture: true });
 
 const visibility = new IntersectionObserver(([entry]) => {
   inView = entry.intersectionRatio >= .2;
@@ -59,14 +65,14 @@ video.addEventListener('loadedmetadata', () => {
   syncVisibility();
 });
 video.addEventListener('loadeddata', () => frame.classList.add('has-video'));
+video.addEventListener('playing', () => frame.classList.add('has-video'));
 video.addEventListener('error', () => frame.classList.remove('has-video'));
 video.addEventListener('timeupdate', () => {
   const [from, to] = interval();
-  if (video.currentTime < from || video.currentTime >= to) loop();
+  if (video.currentTime < from || video.currentTime >= to) restartLoop();
 });
-video.addEventListener('ended', loop);
-document.addEventListener('portfolio:ayam-restart', loop);
-
+video.addEventListener('ended', restartLoop);
+document.addEventListener('portfolio:ayam-restart', restartLoop);
 document.addEventListener('portfolio:ayam-film', ({ detail }) => {
   const { source, start: nextStart = 0, end: nextEnd } = detail;
   const trimChanged = nextStart !== start || nextEnd !== end;
@@ -82,3 +88,6 @@ document.addEventListener('portfolio:ayam-film', ({ detail }) => {
     if (video.currentTime < from || video.currentTime >= to) video.currentTime = from;
   }
 });
+// A muted video can start reliably even on browsers that block audio.
+video.muted = false;
+syncVisibility();

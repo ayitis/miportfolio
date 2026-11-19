@@ -48,10 +48,7 @@ main{overflow:clip}
 .reel-fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6)}
 .reel-caption{z-index:1;position:relative;padding:20px;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;text-shadow:0 1px 8px #000b}
 .reel-status{display:block;font-size:10px;letter-spacing:.09em;margin-top:8px;color:#ddd;font-weight:400;text-transform:none}
-.reel-toggle{position:absolute;z-index:4;right:12px;bottom:12px;display:none;border:1px solid #fff9;background:#1119;color:#fff;padding:8px 10px;cursor:pointer;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
-.reel-frame.has-media .reel-toggle{display:block}
-.reel-audio-toggle{position:absolute;z-index:4;left:12px;bottom:12px;border:1px solid #fff9;background:#1119;color:#fff;padding:8px 10px;cursor:pointer;font-size:10px;letter-spacing:.1em;text-transform:uppercase}.reel-audio-toggle:hover,.reel-audio-toggle:focus-visible{background:#111}
-.intro-footer{display:flex;justify-content:space-between;gap:20px;margin-top:clamp(20px,4vh,50px);font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+.reel-frame.has-media .intro-footer{display:flex;justify-content:space-between;gap:20px;margin-top:clamp(20px,4vh,50px);font-size:10px;letter-spacing:.13em;text-transform:uppercase}
 .intro-footer a{border-bottom:1px solid currentColor}
 @media(max-width:900px){
   .masthead span{font-size:clamp(48px,10.5vw,110px)}
@@ -130,9 +127,7 @@ main{overflow:clip}
           <feBlend in2="red" mode="screen"/>
         </filter>
       </svg>
-      <button class="reel-toggle" type="button" aria-label="Play campaign film">PLAY</button>
-      <button class="reel-audio-toggle" type="button" aria-label="Activar sonido del vídeo de Maison Carnage" aria-pressed="false">ACTIVAR SONIDO</button>
-    </div>
+      </div>
     <div class="details">
       <p class="label">ABOUT THE PROJECT</p>
       <p>From campaign imagery to everyday digital content, the project brought Maison Carnage's visual world to life across social media and e-commerce.</p>

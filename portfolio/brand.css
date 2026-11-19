@@ -55,9 +55,10 @@
       inset: 0;
       pointer-events: none;
       mask: url("wordmark-arabic-mask.png") center / 100% 100% no-repeat;
-      background: linear-gradient(103deg, transparent 24%, rgb(255 199 211 / 0.15) 44%,
-        rgb(255 217 226 / 0.34) 51%, rgb(255 199 211 / 0.13) 59%, transparent 78%)
-        150% 0 / 32% 100% no-repeat;
+      background: linear-gradient(103deg, transparent 16%, rgb(255 192 209 / 0.29) 37%,
+        rgb(255 231 237 / 0.68) 48%, rgb(255 231 237 / 0.68) 54%,
+        rgb(255 192 209 / 0.28) 66%, transparent 85%)
+        170% 0 / 40% 100% no-repeat;
       animation: arabic-satin-reflection 6.5s linear infinite;
     }
   }
@@ -65,8 +66,8 @@
 
 /* 1.5 s of travel, followed by 5 s with the band entirely off the canvas. */
 @keyframes arabic-satin-reflection {
-  0% { background-position-x: 150%; }
-  23.076923%, 100% { background-position-x: -50%; }
+  0% { background-position-x: 170%; }
+  23.076923%, 100% { background-position-x: -70%; }
 }
 
 .site-wordmark:focus-visible {

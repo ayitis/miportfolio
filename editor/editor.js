@@ -2,6 +2,8 @@ import { bounds, emptyDraft, validateDraft } from '../portfolio/design-document.
 import { pages } from '../portfolio/pages.js';
 import { applyElement, collectElements } from '../portfolio/render-design.js';
 import { visiblePhoto } from '../portfolio/gallery-document.js';
+import { alignRect, shiftRect } from './alignment.js';
+import { createGuideLayer } from './guide-layer.js';
 import { setupGallery } from './gallery.js';
 import { openEditor } from './storage.js';
 
@@ -17,6 +19,9 @@ let draft = emptyDraft();
 let view = 'desktop';
 let selected = '';
 let drag = null;
+let guideLayer;
+let nudgeTimer;
+const manualGuides = new Map();
 let dirty = false;
 let store;
 let revision = null;
@@ -28,6 +33,9 @@ const login = find('login');
 const history = find('history');
 const older = find('older');
 const restore = find('restore');
+const snapText = find('snap-text');
+const showDistances = find('show-distances');
+const showRulers = find('show-rulers');
 
 function markDirty() {
   dirty = true;
@@ -83,14 +91,72 @@ function updateSetting(section, key, value) {
   if (Object.keys(settings).length === 0) delete draft[section][selected];
 }
 
-function applyView(next) {
+function finishDrag() {
+  const previous = drag;
   drag = null;
+  if (previous) {
+    previous.node.ownerDocument.documentElement.classList.remove('editor-aligning');
+    if (previous.node.hasPointerCapture(previous.pointer)) previous.node.releasePointerCapture(previous.pointer);
+  }
+  clearTimeout(nudgeTimer);
+  guideLayer?.clear();
+}
+
+function syncRulers() {
+  guideLayer?.setRulers(showRulers.checked, `${draft.page}:${view}`);
+  find('clear-guides').hidden = !showRulers.checked;
+  find('ruler-help').hidden = !showRulers.checked;
+}
+
+function clampOffset(axis, value) {
+  const [min, max] = bounds[axis];
+  return Math.max(min, Math.min(max, Math.round(value)));
+}
+
+function setPosition(axis, value) {
+  const next = clampOffset(axis, value);
+  updateSetting(view, axis, next || undefined);
+  return next;
+}
+
+function nudge(event) {
+  if (!selected || drag || workspace.inert || event.altKey || event.ctrlKey || event.metaKey || event.isComposing ||
+      event.target.closest?.('input, textarea, select, button, [contenteditable], summary')) return;
+  const directions = { ArrowLeft: ['x', -1], ArrowRight: ['x', 1], ArrowUp: ['y', -1], ArrowDown: ['y', 1] };
+  if (!Object.hasOwn(directions, event.key)) return;
+  const candidates = editable.get(selected);
+  if (!candidates?.length) return;
+  event.preventDefault();
+  const [axis, direction] = directions[event.key];
+  const offset = draft[view][selected]?.[axis] ?? 0;
+  if (setPosition(axis, offset + direction * (event.shiftKey ? 10 : 1)) === offset) return;
+  apply(selected);
+  updateFields();
+  markDirty();
+
+  const node = candidates.find(({ node }) => {
+    const rect = node.getBoundingClientRect();
+    const win = node.ownerDocument.defaultView;
+    return rect.right > 0 && rect.left < win.innerWidth && rect.bottom > 0 && rect.top < win.innerHeight;
+  })?.node;
+  if (!node || !guideLayer) return;
+  const rect = node.getBoundingClientRect();
+  const targets = guideLayer.references(node, selected);
+  const alignment = alignRect(rect, targets, guideLayer.fixedLines(), {}, { x: false, y: false });
+  guideLayer.draw(rect, alignment.lines, targets);
+  clearTimeout(nudgeTimer);
+  nudgeTimer = setTimeout(() => guideLayer?.clear(), 650);
+}
+
+function applyView(next) {
+  finishDrag();
   view = next;
   preview.classList.toggle('mobile', next === 'mobile');
   for (const button of viewButtons) button.setAttribute('aria-pressed', String(button.dataset.view === view));
   for (const id of editable.keys()) apply(id);
   updateFields();
   gallery.render();
+  syncRulers();
 }
 
 function attach() {
@@ -99,9 +165,17 @@ function attach() {
   style.textContent = `
     [data-editor-text] { pointer-events: auto; cursor: move; user-select: none; touch-action: none; }
     [data-editor-text]:hover { outline: 1px dashed #9661e8; }
+    .editor-aligning .track, .editor-aligning .marquee-track { animation-play-state: paused !important; }
     [data-editor-selected] { outline: 2px solid #9661e8 !important; outline-offset: 2px; }
   `;
   page.head.append(style);
+  guideLayer?.detach();
+  guideLayer = createGuideLayer(page, {
+    settings: { distance: () => showDistances.checked },
+    manualGuides,
+    isBusy: () => workspace.inert,
+  });
+  page.addEventListener('keydown', nudge);
 
   const { targets } = pages[draft.page];
   editable = collectElements(page, targets);
@@ -122,9 +196,17 @@ function attach() {
     if (!node || event.button !== 0 || !event.isPrimary) return;
     event.preventDefault();
     event.stopPropagation();
+    finishDrag();
     select(node.dataset.editorText);
+    page.defaultView.focus();
+    page.documentElement.classList.add('editor-aligning');
     const offsets = draft[view][selected] ?? {};
     drag = {
+      node,
+      rect: node.getBoundingClientRect(),
+      scrollX: page.defaultView.scrollX,
+      scrollY: page.defaultView.scrollY,
+      locks: {},
       pointer: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
@@ -136,28 +218,43 @@ function attach() {
   }, true);
 
   page.addEventListener('pointermove', (event) => {
-    if (drag?.pointer !== event.pointerId) return;
+    if (drag?.pointer !== event.pointerId || workspace.inert) return;
     const dx = event.clientX - drag.startX;
     const dy = event.clientY - drag.startY;
     if (!drag.moved && Math.hypot(dx, dy) < 3) return;
     drag.moved = true;
-    for (const [key, delta] of [['x', dx], ['y', dy]]) {
-      const [min, max] = bounds[key];
-      updateSetting(view, key, Math.max(min, Math.min(max, Math.round(drag[key] + delta))));
-    }
+    const win = page.defaultView;
+    const scrollX = win.scrollX - drag.scrollX;
+    const scrollY = win.scrollY - drag.scrollY;
+    const requestedX = clampOffset('x', drag.x + dx + scrollX);
+    const requestedY = clampOffset('y', drag.y + dy + scrollY);
+    const raw = shiftRect(drag.rect, requestedX - drag.x - scrollX, requestedY - drag.y - scrollY);
+    const targets = guideLayer.references(drag.node, selected);
+    const fixed = guideLayer.fixedLines();
+    const snapping = { x: snapText.checked && Math.abs(dx) >= 3, y: snapText.checked && Math.abs(dy) >= 3 };
+    const alignment = alignRect(raw, targets, fixed, drag.locks, snapping);
+    drag.locks = alignment.locks;
+    const x = setPosition('x', requestedX + alignment.x);
+    const y = setPosition('y', requestedY + alignment.y);
     apply(selected);
+    const placed = shiftRect(drag.rect, x - drag.x - scrollX, y - drag.y - scrollY);
+    const exact = alignRect(placed, targets, fixed, {}, { x: false, y: false });
+    guideLayer.draw(placed, exact.lines, targets);
     updateFields();
     markDirty();
   });
 
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
     page.addEventListener(type, (event) => {
-      if (drag?.pointer === event.pointerId) drag = null;
+      if (drag?.pointer === event.pointerId) finishDrag();
     }, true);
   }
 }
 
 element.addEventListener('change', () => select(element.value, true));
+document.addEventListener('keydown', nudge);
+showRulers.addEventListener('change', syncRulers);
+find('clear-guides').addEventListener('click', () => guideLayer?.clearRulers());
 for (const button of viewButtons) button.addEventListener('click', () => applyView(button.dataset.view));
 for (const input of fields) {
   input.addEventListener('input', () => {
@@ -196,6 +293,7 @@ find('reset').addEventListener('click', () => {
 function runAction(action) {
   return async () => {
     if (workspace.inert) return;
+    finishDrag();
     workspace.inert = true;
     try {
       await action();
@@ -310,9 +408,11 @@ function initializePreview() {
 async function showPage(page) {
   ({ draft, revision } = await store.load(page));
   gallery.detach();
+  finishDrag();
+  guideLayer?.detach();
+  guideLayer = undefined;
   pagePicker.value = page;
   dirty = false;
-  drag = null;
   select('');
   editable.clear();
   element.options.length = 1;

@@ -50,3 +50,10 @@ Los identificadores permanentes de la portada están en `portfolio/home-design.j
 4. Usa **Subir fotografía** para elegir un JPG, PNG, WebP o AVIF de hasta 10 MB. La foto se sube de forma privada. Pulsa **Guardar borrador** para conservar las ediciones de textos y fotos, o **Publicar cambios** para mostrarlas en la página de Preview.
 
 Los originales del repositorio se identifican por su nombre de archivo. Mantén sus nombres al editar el HTML para conservar sus ajustes. La copia JSON y el historial contienen el orden, los ajustes y las referencias a las subidas. Las imágenes subidas siguen en el Storage del proyecto, incluido cuando se ocultan o se retiran, para que las versiones anteriores puedan restaurarlas. Mantén una copia de los archivos si vas a usar otro proyecto de Supabase.
+
+## Guías y movimiento preciso
+
+- Arrastra un texto en la vista previa. Las líneas rosas señalan bordes y centros coincidentes con otros textos, las fotos o el centro de la página. En **Guías de alineación** puedes desmarcar **Ajuste magnético** para moverlo libremente y activar o desactivar **Mostrar distancias**.
+- Selecciona un texto haciendo clic en la vista previa. Las flechas lo mueven 1 px y **Mayús + flecha** lo mueve 10 px. Estos pasos son exactos aunque esté activo el ajuste magnético.
+- Activa **Reglas y guías manuales** y pulsa la regla de arriba para poner una guía vertical, o la de la izquierda para poner una horizontal. Las guías manuales son independientes por página y vista durante la sesión del editor. **Borrar guías de esta vista** retira las de la vista actual.
+- Pulsa **Guardar borrador** o **Publicar cambios** para conservar la posición. Las líneas, las reglas y las medidas son herramientas del editor.

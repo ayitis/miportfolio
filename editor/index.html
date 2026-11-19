@@ -70,9 +70,17 @@
           <label for="photo-file">Subir fotografía</label>
           <input type="file" id="photo-file" accept="image/jpeg,image/png,image/webp,image/avif">
         </details>
+        <details class="alignment-tools">
+          <summary>Guías de alineación</summary>
+          <label><input type="checkbox" id="snap-text" checked> Ajuste magnético</label>
+          <label><input type="checkbox" id="show-distances" checked> Mostrar distancias</label>
+          <label><input type="checkbox" id="show-rulers"> Reglas y guías manuales</label>
+          <button type="button" id="clear-guides" hidden>Borrar guías de esta vista</button>
+          <p id="ruler-help" hidden>Haz clic en una regla para colocar una guía.</p>
+        </details>
         <label for="element">Texto de la página</label>
         <select id="element" disabled><option value="">Selecciona un texto</option></select>
-        <p id="instructions">Haz clic sobre un texto de la página. Arrástralo o ajusta su posición aquí.</p>
+        <p id="instructions">Arrastra un texto o selecciónalo en la vista previa y usa las flechas (1 px). Mayús + flecha mueve 10 px.</p>
         <fieldset id="properties" disabled>
           <legend>Ajustes del texto</legend>
           <label>Contenido <textarea rows="3" maxlength="2000" data-field="text" placeholder="Texto original"></textarea></label>

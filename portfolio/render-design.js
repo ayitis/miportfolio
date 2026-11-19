@@ -1,5 +1,5 @@
 import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
-import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasPositionBounds } from './nuptias-layout.js';
+import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasLeftCaptions, nuptiasPositionBounds } from './nuptias-layout.js';
 import { fonts } from './design-document.js';
 
 const properties = ['translate', 'font-size', 'font-family', 'text-align', 'width', 'white-space', 'color', 'display', 'letter-spacing', 'z-index', 'height', 'margin-inline', 'max-width'];
@@ -115,7 +115,7 @@ export function applyElement(editable, id, draft, view) {
       if (original.title !== null) node.dataset.title = content ?? original.title;
       original.appliedText = content;
     }
-    if (nuptias) {
+    if (nuptias || (draft.page === 'nuptias' && nuptiasLeftCaptions.includes(id))) {
       node.dataset.nuptiasX = x;
       node.dataset.nuptiasY = y;
     }
@@ -141,10 +141,13 @@ export function constrainNuptiasPositions(page, editable, design, view) {
     node.dataset.nuptiasY = y;
   }
 
+  if (view !== 'desktop') return;
+  alignNuptiasCaptions(page, editable, design.desktop);
+
   // Saved offsets from the previous desktop layout can leave the paragraph
   // inset from the title. Keep them in the document and render the shared edge
   // until the paragraph is explicitly repositioned in the editor.
-  if (view !== 'desktop' || design.desktop[nuptiasDescription]?.independentX) return;
+  if (design.desktop[nuptiasDescription]?.independentX) return;
   const description = editable.get(nuptiasDescription)?.[0].node;
   const title = editable.get('concept.title')?.[0].node;
   if (!description?.offsetWidth || !title?.offsetWidth) return;
@@ -154,4 +157,31 @@ export function constrainNuptiasPositions(page, editable, design, view) {
   const x = Math.max(minX, Math.min(maxX, Math.round(targetX)));
   description.style.translate = `${x}px ${description.dataset.nuptiasY}px`;
   description.dataset.nuptiasX = x;
+}
+
+
+function alignNuptiasCaptions(page, editable, settings) {
+  const title = editable.get('editorial.title')?.[0].node;
+  if (!title?.offsetWidth) return;
+  const canvas = page.createElement('canvas').getContext('2d');
+  const left = firstGlyphLeft(page, canvas, title);
+  for (const id of nuptiasLeftCaptions) {
+    const caption = editable.get(id)?.[0].node;
+    if (!caption?.offsetWidth || settings[id]?.independentX) continue;
+    const x = Number(caption.dataset.nuptiasX) + left - firstGlyphLeft(page, canvas, caption);
+    caption.style.translate = `${x}px ${caption.dataset.nuptiasY}px`;
+    caption.dataset.nuptiasX = x;
+  }
+}
+
+function firstGlyphLeft(page, canvas, node) {
+  const text = node.firstChild;
+  if (text?.nodeType !== 3 || !text.length) return node.getBoundingClientRect().left;
+  const range = page.createRange();
+  range.setStart(text, 0);
+  range.setEnd(text, 1);
+  const style = page.defaultView.getComputedStyle(node);
+  canvas.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  const glyph = style.textTransform === 'uppercase' ? text.data[0].toUpperCase() : text.data[0];
+  return range.getBoundingClientRect().left - canvas.measureText(glyph).actualBoundingBoxLeft;
 }

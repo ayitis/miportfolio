@@ -1,5 +1,7 @@
 export const nuptiasEditorial = 'editorial.right';
 export const nuptiasDescription = 'concept.description';
+export const nuptiasLeftCaptions = ['editorial.eyebrow', 'editorial.credit'];
+export const followsNuptiasHeading = id => id === nuptiasDescription || nuptiasLeftCaptions.includes(id);
 const moving = new Set([nuptiasEditorial, 'editorial.roles', 'concept.title', nuptiasDescription]);
 const existing = [...moving, 'editorial.eyebrow', 'editorial.title', 'editorial.credit',
   'concept.form', 'concept.ampersand', 'concept.feeling'];

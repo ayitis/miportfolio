@@ -1,4 +1,4 @@
-import { nuptiasDescription, nuptiasEditorial } from './nuptias-layout.js';
+import { followsNuptiasHeading, nuptiasEditorial } from './nuptias-layout.js';
 import { pages } from './pages.js';
 import { emptyGallery, validateGallery } from './gallery-document.js';
 
@@ -51,7 +51,7 @@ export function validateDraft(value, page = value?.page) {
           : (range && Number.isInteger(setting) && setting >= range[0] && setting <= range[1])
             || (field === 'font' && typeof setting === 'string' && Object.hasOwn(fonts, setting))
             || (field === 'align' && alignments.includes(setting))
-            || (field === 'independentX' && page === 'nuptias' && view === 'desktop' && id === nuptiasDescription && setting === true)
+            || (field === 'independentX' && page === 'nuptias' && view === 'desktop' && followsNuptiasHeading(id) && setting === true)
             || (field === 'layout' && page === 'nuptias' && id === nuptiasEditorial && ['center', 'split'].includes(setting))
             || (field === 'color' && typeof setting === 'string' && /^#[0-9a-f]{6}$/i.test(setting));
         if (!valid) throw new Error('La copia contiene un valor inválido.');

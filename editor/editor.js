@@ -1,4 +1,4 @@
-import { applyNuptiasLayout, hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasEditorial, nuptiasPositionBounds, nuptiasRightLimit, nuptiasLayout } from '../portfolio/nuptias-layout.js';
+import { applyNuptiasLayout, followsNuptiasHeading, hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasEditorial, nuptiasPositionBounds, nuptiasRightLimit, nuptiasLayout } from '../portfolio/nuptias-layout.js';
 import { applyHomeGalleryLayout, horizontalGallery, verticalGallery, verticalStage } from '../portfolio/home-gallery-layout.js';
 import { bounds, emptyDraft, fonts, validateDraft } from '../portfolio/design-document.js';
 import { pages } from '../portfolio/pages.js';
@@ -125,8 +125,8 @@ function updateFields() {
       input.value = rgb ? '#' + rgb.slice(0, 3).map(value => Number(value).toString(16).padStart(2, '0')).join('') : '#161616';
       find('reset-color').disabled = !overrides.color;
     } else {
-      const actual = key === 'x' && draft.page === 'nuptias' && isNuptiasPosition(selected)
-        ? Number(original?.node.dataset.nuptiasX) : NaN;
+      const actual = key === 'x' && (isDesktopHeadingFollower() || (draft.page === 'nuptias' && isNuptiasPosition(selected)))
+        ? Math.round(Number(original?.node.dataset.nuptiasX)) : NaN;
       input.value = Number.isFinite(actual) && actual !== (overrides[key] ?? 0) ? actual : (overrides[key] ?? '');
     }
   }
@@ -210,13 +210,19 @@ function clampOffset(axis, value) {
   return Math.max(Math.max(min, -limit), Math.min(limit, Math.round(value)));
 }
 
-function isDesktopDescription() {
-  return draft.page === 'nuptias' && view === 'desktop' && selected === nuptiasDescription;
+function isDesktopHeadingFollower() {
+  return draft.page === 'nuptias' && view === 'desktop' && followsNuptiasHeading(selected);
+}
+
+function currentPosition(axis) {
+  const live = axis === 'x' && isDesktopHeadingFollower()
+    ? Number(editable.get(selected)?.[0].node.dataset.nuptiasX) : NaN;
+  return Number.isFinite(live) ? live : (draft[view][selected]?.[axis] ?? 0);
 }
 
 function setPosition(axis, value) {
   const next = clampOffset(axis, value);
-  if (isDesktopDescription() && axis === 'x') {
+  if (isDesktopHeadingFollower() && axis === 'x') {
     updateSetting(view, 'independentX', true);
   }
   updateSetting(view, axis, next || undefined);
@@ -349,7 +355,7 @@ function nudge(event) {
   if (!candidates?.length) return;
   event.preventDefault();
   const [axis, direction] = directions[event.key];
-  const offset = clampOffset(axis, draft[view][selected]?.[axis] ?? 0);
+  const offset = clampOffset(axis, currentPosition(axis));
   if (setPosition(axis, offset + direction * (event.shiftKey ? 10 : 1)) === offset) return;
   apply(selected);
   updateFields();
@@ -511,7 +517,7 @@ function attach() {
       pointer: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      x: clampOffset('x', offsets.x ?? 0),
+      x: clampOffset('x', currentPosition('x')),
       y: clampOffset('y', offsets.y ?? 0),
       moved: false,
     };
@@ -535,7 +541,7 @@ function attach() {
     const snapping = { x: snapText.checked && Math.abs(dx) >= 3, y: snapText.checked && Math.abs(dy) >= 3 };
     const alignment = alignRect(raw, targets, fixed, drag.locks, snapping);
     drag.locks = alignment.locks;
-    const followTitle = isDesktopDescription() && !draft.desktop[nuptiasDescription]?.independentX;
+    const followTitle = isDesktopHeadingFollower() && !draft.desktop[selected]?.independentX;
     const x = followTitle && !dx && !scrollX ? drag.x : setPosition('x', requestedX + alignment.x);
     const y = setPosition('y', requestedY + alignment.y);
     apply(selected);
@@ -578,10 +584,10 @@ for (const input of fields) {
   input.addEventListener('input', () => {
     if (!selected || !input.validity.valid) return;
     const key = input.dataset.field;
-    if ((homeGallery(selected) || (draft.page === 'nuptias' && isNuptiasPosition(selected))) && (key === 'x' || key === 'y')) {
+    if ((homeGallery(selected) || (draft.page === 'nuptias' && isNuptiasPosition(selected)) || isDesktopHeadingFollower()) && (key === 'x' || key === 'y')) {
       if (input.value === '') {
         updateSetting(view, key, undefined);
-        if (isDesktopDescription() && key === 'x') {
+        if (isDesktopHeadingFollower() && key === 'x') {
           updateSetting(view, 'independentX', undefined);
         }
       } else setPosition(key, input.valueAsNumber);
@@ -595,7 +601,7 @@ for (const input of fields) {
     if (draft.page === 'nuptias' && isNuptiasPosition(selected)) {
       const applied = Number(editable.get(selected)?.[0]?.node.dataset.nuptiasX);
       const requested = draft[view][selected]?.x ?? 0;
-      const followTitle = isDesktopDescription() && !draft.desktop[nuptiasDescription]?.independentX;
+      const followTitle = isDesktopHeadingFollower() && !draft.desktop[selected]?.independentX;
       if (!followTitle && ['x', 'size', 'width', 'font', 'spacing', 'text'].includes(key) &&
           Number.isFinite(applied) && applied !== requested) {
         updateSetting(view, 'x', applied || undefined);

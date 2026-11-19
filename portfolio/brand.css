@@ -30,3 +30,26 @@
   .site-brand { gap: 5px; }
   .site-brand .brand-logo { width: 52px; }
 }
+
+.site-wordmark .brand-logo {
+  width: clamp(116px, 34vw, 174px);
+  aspect-ratio: 2172 / 724;
+  transition: transform .2s ease;
+}
+
+@media (max-width: 480px) {
+  .site-wordmark .brand-logo { width: clamp(108px, 32vw, 145px); }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .site-wordmark:hover .brand-logo { transform: translateY(-2px); }
+}
+
+.site-wordmark:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+@media (min-width: 701px) and (max-height: 610px) {
+  header .site-wordmark .brand-logo { width: 140px; }
+}

@@ -9,7 +9,6 @@ export function collectElements(page, targets) {
       node,
       allowText: options?.text !== false,
       inline: options?.inline === true,
-      showWhenEdited: options?.showWhenEdited === true,
       children: [...node.childNodes],
       text: node.innerText.trim() || node.textContent,
       title: node.getAttribute('data-title'),
@@ -40,9 +39,6 @@ export function applyElement(editable, id, draft, view) {
 
   for (const original of editable.get(id) ?? []) {
     const { node } = original;
-    if (original.showWhenEdited) {
-      node.toggleAttribute('data-design-override', content !== undefined || Object.keys(overrides).length > 0);
-    }
     const display = original.inline && (styles.translate || styles.width || styles['text-align'])
       ? 'inline-block' : null;
     for (const [property, value] of Object.entries({ ...styles, display })) {

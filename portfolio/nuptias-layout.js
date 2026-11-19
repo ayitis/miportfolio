@@ -20,9 +20,11 @@ export function applyNuptiasLayout(page, design, view) {
 export function nuptiasRightLimit(page, view) {
   const gutter = parseFloat(page.defaultView.getComputedStyle(page.querySelector('.category')).paddingRight) || 0;
   if (view !== 'desktop') return page.documentElement.clientWidth - gutter;
-  const canvas = page.querySelector('.page');
-  const guide = Number(page.defaultView.getComputedStyle(canvas).getPropertyValue('--editorial-guide-percent')) || 76;
-  return canvas.clientWidth * guide / 100;
+  const width = page.documentElement.clientWidth;
+  const about = page.querySelector('header .links a[href="/#about"]')?.getBoundingClientRect();
+  // Use the actual navigation edge if About is visible.
+  return about?.width && about.right > gutter && about.right <= width
+    ? about.right : width - gutter;
 }
 
 export function nuptiasPositionBounds(node, axis, view) {

@@ -87,8 +87,8 @@ h1{font:800 clamp(82px,14vw,232px)/.83 Arial,Helvetica,sans-serif;letter-spacing
   html[data-nuptias-layout="split"] .concept h2{margin:0 0 10px}
   html[data-nuptias-layout="split"] .concept p{margin:0}
 }
-/* The red editorial guide is 76% across the page in the reference. Use the
-   page's content width, so the editor and the public page share the same edge. */
+/* Preserve the editorial starting position. The editor's movement limit
+   is separate and comes from the navigation edge. */
 @media (min-width:701px){
   .page{container-type:inline-size;--editorial-guide-percent:76}
   .editorial-bottom{

@@ -2,7 +2,7 @@
 // card share a key, so the same change appears throughout the animation.
 export const targets = [
   ['brand.latin', 'Marca · latín', '.brand-text'],
-  ['brand.arabic', 'Marca · árabe', '.brand-arabic'],
+  ['brand.arabic', 'Marca · árabe (ajuste anterior)', '.brand-arabic', { showWhenEdited: true }],
   ['nav.work', 'Menú · Work', '.menu a[href="#work"]'],
   ['nav.about', 'Menú · About', '.menu a[href="#about"]'],
   ['nav.contact', 'Menú · Contact', '.menu a[href^="mailto:"]'],

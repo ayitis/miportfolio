@@ -1,0 +1,32 @@
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  height: 1lh;
+  white-space: nowrap;
+}
+
+.site-brand .brand-logo {
+  display: block;
+  flex: none;
+  width: 104px;
+  height: auto;
+  aspect-ratio: 1922 / 818;
+  object-fit: contain;
+}
+
+.site-brand .brand-name {
+  position: relative;
+  display: inline-block;
+}
+
+@media (max-width: 700px) {
+  .site-brand { gap: 7px; }
+  .site-brand .brand-logo { width: clamp(52px, 17vw, 80px); }
+}
+
+@media (max-width: 360px) {
+  .site-brand { gap: 5px; }
+  .site-brand .brand-logo { width: 52px; }
+}

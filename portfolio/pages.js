@@ -6,7 +6,7 @@ export const pages = {
     label: 'NUPTIAS',
     path: '/nuptias.html',
     targets: [
-      ['nav.brand', 'Menú · Aya Arbaoui', 'header .brand'],
+      ['nav.brand', 'Menú · Aya Arbaoui', 'header .brand-name'],
       ['nav.home', 'Menú · Volver a la portada', 'header .links a[href="./index.html"]'],
       ['nav.work', 'Menú · Work', 'header .links a[href="./index.html#work"]'],
       ['category.number', 'Categoría · Editorial', '.category span:first-child'],

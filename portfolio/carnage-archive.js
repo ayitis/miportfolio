@@ -2,24 +2,25 @@ const archive = document.querySelector('#campaign');
 const runway = archive.querySelector('.archive-runway');
 const stage = archive.querySelector('.archive-stage');
 const cards = [...stage.querySelectorAll('figure')];
+const cover = cards[0].querySelector('img');
+const coverAspect = Number(cover.getAttribute('width')) / Number(cover.getAttribute('height'));
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const narrow = matchMedia('(max-width: 650px)');
 
-// Editorial rows use different margins, proportions and vertical offsets.
-// All sizes are relative to the stage width so the composition reflows.
+// Variable widths stagger the seams while each row fills the stage edge to edge.
 const desktopRows = [
-  [[.02, .37, .04, .46], [.43, .23, .00, .28], [.70, .29, .12, .30]],
-  [[.11, .24, .05, .33], [.40, .40, .00, .31], [.83, .16, .09, .23]],
-  [[.00, .39, .02, .30], [.43, .19, .17, .25], [.65, .33, .05, .40]],
-  [[.08, .23, .12, .29], [.33, .36, .00, .26], [.73, .25, .08, .30]],
-  [[.00, .27, .06, .35], [.31, .17, .00, .22], [.51, .20, .14, .25], [.74, .26, .03, .34]],
+  { height: .43, widths: [5, 3, 4] },
+  { height: .28, widths: [3, 2, 4, 3] },
+  { height: .36, widths: [4, 5, 3] },
+  { height: .31, widths: [3, 4, 5] },
+  { height: .33, widths: [5, 3, 4] },
 ];
 const mobileRows = [
-  [[.00, .54, .00, .73], [.58, .42, .17, .45]],
-  [[.11, .78, .00, .60]],
-  [[.00, .44, .09, .62], [.49, .51, .00, .63]],
-  [[.03, .58, .00, .68], [.66, .34, .25, .42]],
-  [[.18, .82, .00, .61]],
+  { height: .68, widths: [7, 5] },
+  { height: .63, widths: [5, 7] },
+  { height: .45, widths: [1] },
+  { height: .61, widths: [6, 6] },
+  { height: .57, widths: [7, 5] },
 ];
 const spread = [
   [.50, .52, 1, 0], [.26, .28, .91, -8], [.71, .23, .78, 7], [.46, .18, .64, -5],
@@ -39,17 +40,22 @@ let scenes, distance, frame, lastProgress;
 function finalComposition(width, height) {
   const rows = narrow.matches ? mobileRows : desktopRows;
   const positions = [];
-  let top = height * .15;
+  let top = Math.round(height * .15);
   let row = 0;
   while (positions.length < cards.length) {
-    let bottom = top;
-    for (const [left, size, offset, ratio] of rows[row % rows.length]) {
-      if (positions.length === cards.length) break;
-      const y = top + offset * width;
-      positions.push([left * width, y, size * width, ratio * width, 0, 1]);
-      bottom = Math.max(bottom, y + ratio * width);
+    const shape = rows[row % rows.length];
+    const widths = shape.widths.slice(0, cards.length - positions.length);
+    const total = widths.reduce((sum, size) => sum + size, 0);
+    const rowHeight = Math.round(shape.height * width);
+    let left = 0;
+    let used = 0;
+    for (const size of widths) {
+      used += size;
+      const right = Math.round(width * used / total);
+      positions.push([left, top, right - left, rowHeight, 0, 1]);
+      left = right;
     }
-    top = bottom + width * (narrow.matches ? .075 : .055);
+    top += rowHeight;
     row++;
   }
   archive.style.setProperty('--archive-tail', `${Math.max(0, top - height)}px`);
@@ -73,7 +79,7 @@ function measure() {
     const pieceWidth = collageWidth * scale;
     const pieceHeight = pieceWidth * (i % 3 === 1 ? .82 : 1.2);
     return [
-      state(width / 2, height * .5, coverWidth, coverWidth * 1.32, 0, i === 0 ? 1 : 0),
+      state(width / 2, height * .5, coverWidth, coverWidth / coverAspect, 0, i === 0 ? 1 : 0),
       state(width * (narrow.matches ? mix(.5, x, .84) : x), height * y,
         pieceWidth, pieceHeight, tilt * (narrow.matches ? .65 : 1)),
       state((width - bandWidth) / 2 + stripWidth * (i + .5), height * .51,

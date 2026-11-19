@@ -12,9 +12,11 @@ import { signGalleryPhotos, photoLinkLifetime } from './gallery-storage.js';
 import { collectGallery, renderGallery } from './render-gallery.js';
 import { connect } from './supabase.js';
 
+const isEditorPreview = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
+
 async function showPublishedDesign() {
   // The editor renders its own draft on the original HTML inside the frame.
-  if (window.parent !== window && new URLSearchParams(location.search).has('editor-preview')) return;
+  if (isEditorPreview) return;
 
   const page = document.documentElement.dataset.designPage ?? 'home';
   if (!Object.hasOwn(pages, page)) return;
@@ -90,4 +92,9 @@ async function loadPublished(page) {
 
 showPublishedDesign().catch(() => {
   // The original page remains usable when data or configuration is unavailable.
-}).finally(() => window.nuptiasFirstPaint?.done());
+}).finally(() => {
+  window.nuptiasFirstPaint?.done();
+  if (document.documentElement.dataset.designPage === ayamPage && !isEditorPreview) {
+    import('./ayam-reveal.js').then(({ startAyamReveals }) => startAyamReveals(document)).catch(() => {});
+  }
+});

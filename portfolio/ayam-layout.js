@@ -44,7 +44,10 @@ export function syncAyamNodes(page, design, editable) {
     image.loading = 'lazy';
     const frame = page.createElement('div');
     frame.className = 'story-image';
-    frame.append(image);
+    const reveal = page.createElement('div');
+    reveal.className = 'story-reveal';
+    reveal.append(image);
+    frame.append(reveal);
     const caption = page.createElement('figcaption');
     const line = page.createElement('span');
     line.textContent = 'Campaign image';

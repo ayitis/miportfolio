@@ -43,7 +43,8 @@ a{color:inherit;text-decoration:none}
 .section-head span,.ayam-news .eyebrow,.closing-line{font-size:10px;letter-spacing:.13em;text-transform:uppercase}
 .ayam-news{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(25px,calc(4 * var(--ayam-vw)),60px) clamp(12px,calc(1.6 * var(--ayam-vw)),25px);align-items:start}
 .ayam-news figure{position:relative;min-width:0;margin:0}
-.ayam-news .story-image{overflow:hidden;background:#e6e4e0;aspect-ratio:4/5}
+.ayam-news .story-image{aspect-ratio:4/5}
+.ayam-news .story-reveal{width:100%;height:100%;overflow:hidden;background:#e6e4e0}
 .ayam-news img{width:100%;height:100%;object-fit:cover;object-position:50% var(--ayam-crop-y,43%)}
 .ayam-news figcaption{padding-top:10px;color:#252525;font-size:clamp(11px,calc(.9 * var(--ayam-vw)),14px);line-height:1.4}
 .ayam-news figcaption strong{display:block;font-size:clamp(13px,calc(1.1 * var(--ayam-vw)),17px);line-height:1.13;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
@@ -135,15 +136,15 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
     </div>
     <div class="ayam-news">
       <figure class="story-a" data-ayam-media="photo-04">
-        <div class="story-image"><img src="/E%CC%81clat%20dore%CC%81%20en%20robe%20satine%CC%81e.png" alt="Detail of a white dress and gold jewellery" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/E%CC%81clat%20dore%CC%81%20en%20robe%20satine%CC%81e.png" alt="Detail of a white dress and gold jewellery" loading="lazy"></div></div>
         <figcaption><strong>A study in silhouette</strong><p>An intimate detail, cropped close.</p><span>AYAM / Fashion photography — 04</span></figcaption>
       </figure>
       <figure class="story-b" data-ayam-media="photo-01">
-        <div class="story-image"><img src="/Portrait%20dore%CC%81%20dans%20les%20herbes%20se%CC%80ches.png" alt="Front portrait in a white dress among dry grass" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/Portrait%20dore%CC%81%20dans%20les%20herbes%20se%CC%80ches.png" alt="Front portrait in a white dress among dry grass" loading="lazy"></div></div>
         <figcaption><strong>Visual identity through fashion</strong><p>A portrait framed in deep shadow.</p><span>AYAM / Campaign photography — 01</span></figcaption>
       </figure>
       <figure class="story-c" data-ayam-media="photo-03">
-        <div class="story-image"><img src="/Portrait%20dore%CC%81%20au%20bord%20de%20l%E2%80%99eau.png" alt="Close-up of the white-veiled model against blue sky" loading="lazy" style="--ayam-crop-y:26%"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/Portrait%20dore%CC%81%20au%20bord%20de%20l%E2%80%99eau.png" alt="Close-up of the white-veiled model against blue sky" loading="lazy" style="--ayam-crop-y:26%"></div></div>
         <figcaption><strong>One collection, multiple expressions</strong><p>Light and landscape frame the figure.</p><span>AYAM / Fashion campaign — 03</span></figcaption>
       </figure>
       <div class="editorial-note">
@@ -152,15 +153,15 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
         <p>Fashion becomes a medium for self-expression, where each silhouette contributes to a larger visual narrative.</p>
       </div>
       <figure class="story-d" data-ayam-media="photo-07">
-        <div class="story-image"><img src="/Portrait%20dore%CC%81%20aux%20bijoux%20audacieux.png" alt="Model dressed in red resting her face on her hand" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/Portrait%20dore%CC%81%20aux%20bijoux%20audacieux.png" alt="Model dressed in red resting her face on her hand" loading="lazy"></div></div>
         <figcaption><strong>The collection in motion</strong><p>A study in light and gesture.</p><span>AYAM / Campaign study — 07</span></figcaption>
       </figure>
       <figure class="story-e" data-ayam-media="photo-05">
-        <div class="story-image"><img src="/Portrait%20e%CC%81ditorial%20au%20soleil%20dore%CC%81.png" alt="Seated portrait in red" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/Portrait%20e%CC%81ditorial%20au%20soleil%20dore%CC%81.png" alt="Seated portrait in red" loading="lazy"></div></div>
         <figcaption><strong>Beyond the frame</strong><p>A portrait between light and shadow.</p><span>AYAM / Visual exploration — 05</span></figcaption>
       </figure>
       <figure class="story-f" data-ayam-media="photo-02">
-        <div class="story-image"><img src="/E%CC%81clat%20solaire%20en%20terres%20arides.png" alt="Two models wearing pale blue and red" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/E%CC%81clat%20solaire%20en%20terres%20arides.png" alt="Two models wearing pale blue and red" loading="lazy"></div></div>
         <figcaption><strong>Behind the image</strong><p>A full-length silhouette in an open landscape.</p><span>AYAM / Creative direction — 02</span></figcaption>
       </figure>
       <div class="section-break">
@@ -171,15 +172,15 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
         </div>
       </div>
       <figure class="story-g" data-ayam-media="photo-06">
-        <div class="story-image"><img src="/Portrait%20cine%CC%81matographique%20dans%20les%20herbes%20dore%CC%81es.png" alt="Full-length portrait in dry grass" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/Portrait%20cine%CC%81matographique%20dans%20les%20herbes%20dore%CC%81es.png" alt="Full-length portrait in dry grass" loading="lazy"></div></div>
         <figcaption><strong>Fashion in focus</strong><p>Two figures in an open landscape.</p><span>AYAM / Image-making — 06</span></figcaption>
       </figure>
       <figure class="story-h" data-ayam-media="photo-08">
-        <div class="story-image"><img src="/Portrait%20dore%CC%81%20dans%20un%20canyon%20de%CC%81sertique.png" alt="Full-length portrait in a desert canyon" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/Portrait%20dore%CC%81%20dans%20un%20canyon%20de%CC%81sertique.png" alt="Full-length portrait in a desert canyon" loading="lazy"></div></div>
         <figcaption><strong>An editorial perspective</strong><p>Red and shadow in close-up.</p><span>AYAM / Campaign study — 08</span></figcaption>
       </figure>
       <figure class="story-i" data-ayam-media="photo-09">
-        <div class="story-image"><img src="/Portrait%20e%CC%81ditorial%20au%20coucher%20du%20soleil.png" alt="Two models dressed in white in dry vegetation" loading="lazy"></div>
+        <div class="story-image"><div class="story-reveal"><img src="/Portrait%20e%CC%81ditorial%20au%20coucher%20du%20soleil.png" alt="Two models dressed in white in dry vegetation" loading="lazy"></div></div>
         <figcaption><strong>Two silhouettes</strong><p>Two figures, two silhouettes.</p><span>AYAM / Collection study — 09</span></figcaption>
       </figure>
       <div class="magazine-note">

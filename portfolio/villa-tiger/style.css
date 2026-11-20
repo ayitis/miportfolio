@@ -205,3 +205,25 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 .application:has(> .application-images:not(:has(> .villa-frame:not([hidden])))) {
   display: none !important;
 }
+
+.villa-sketch { width: min(82%, 455px); }
+@media (width > 760px) {
+  .villa-sketch { grid-column: 1; grid-row: 2; }
+}
+.villa-sketch-defs { position: absolute; }
+.villa-sketch img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] {
+  filter: url(#villa-sketch-ink);
+}
+.villa-sketch[data-drawing] img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] {
+  mask: url(#villa-sketch-reveal);
+}
+#villa-sketch-reveal path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.villa-sketch-finish { opacity: 0; }
+.villa-sketch-defs.is-drawing path {
+  animation: villa-sketch-stroke var(--duration) var(--delay) both linear;
+}
+.villa-sketch-defs.is-drawing .villa-sketch-finish {
+  animation: villa-sketch-finish 600ms 4000ms both ease-in;
+}
+@keyframes villa-sketch-stroke { to { stroke-dashoffset: 0; } }
+@keyframes villa-sketch-finish { to { opacity: 1; } }

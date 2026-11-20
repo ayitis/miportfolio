@@ -35,3 +35,38 @@ if (!editing && !reducedMotion.matches && 'IntersectionObserver' in window) {
 
   for (const element of document.querySelectorAll('[data-reveal]')) observer.observe(element);
 }
+
+const sketch = document.querySelector('.villa-sketch');
+if (sketch && !editing && !reducedMotion.matches && 'IntersectionObserver' in window
+  && CSS.supports('mask-image', 'url(#villa-sketch-reveal)')) {
+  const defs = document.querySelector('.villa-sketch-defs');
+  const finish = defs.querySelector('.villa-sketch-finish');
+  sketch.dataset.drawing = 'waiting';
+
+  function complete() {
+    delete sketch.dataset.drawing;
+    defs.classList.remove('is-drawing');
+    observer.disconnect();
+    reducedMotion.removeEventListener('change', reduce);
+  }
+
+  function reduce(event) {
+    if (event.matches) complete();
+  }
+
+  const observer = new IntersectionObserver(async ([entry]) => {
+    if (!entry.isIntersecting) return;
+    observer.disconnect();
+    try {
+      await sketch.querySelector('img').decode();
+    } catch {
+      complete();
+      return;
+    }
+    if ('drawing' in sketch.dataset) defs.classList.add('is-drawing');
+  }, { threshold: .15 });
+
+  finish.addEventListener('animationend', complete, { once: true });
+  reducedMotion.addEventListener('change', reduce);
+  observer.observe(sketch);
+}

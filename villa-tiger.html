@@ -38,6 +38,9 @@
         <p data-villa-text="brand-copy">Villa Tiger is a private hospitality experience in Marrakech, transformed into a distinctive visual identity that brings together contemporary comfort, Moroccan warmth and an editorial approach to communication.</p>
         <p class="label scope" data-villa-text="scope">Brand Identity · Logo System · Art Direction · Social Media · Editorial Content</p>
       </div>
+      <div class="villa-frame villa-sketch" data-villa-image="croquis" style="--villa-ratio:1448 / 1086">
+        <img src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png" width="1448" height="1086" alt="Architectural pencil sketch of Villa Tiger, its garden and pool" loading="lazy" decoding="async">
+      </div>
       <div class="brand-images" data-reveal><div class="villa-frame" data-villa-image="interior" style="--villa-ratio:768 / 960"><img src="/portfolio/villa-tiger/interior.webp" width="768" height="960" alt="Private corner with a lounge chair and warm light" loading="lazy" decoding="async"></div><div class="villa-frame" data-villa-image="balloon" style="--villa-ratio:540 / 960"><img src="/portfolio/villa-tiger/balloon.webp" width="540" height="960" alt="Illustrated hot-air balloon story template" loading="lazy" decoding="async"></div></div>
     </section>
     <section data-villa-section="identity" class="identity chapter" id="identity" aria-labelledby="identity-title">
@@ -115,6 +118,30 @@
     <a href="/#work" data-villa-text="back">← Back to selected work</a>
     <a href="/nuptias.html" data-villa-text="next">Next project / 01 NUPTIAS ↗</a>
   </footer>
+  <svg class="villa-sketch-defs" width="0" height="0" aria-hidden="true">
+    <defs>
+      <filter id="villa-sketch-ink" color-interpolation-filters="sRGB">
+        <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -.34 -1.15 -.11 0 1.53" result="ink"/>
+        <feFlood flood-color="#4E4C37"/>
+        <feComposite in2="ink" operator="in"/>
+      </filter>
+      <mask id="villa-sketch-reveal" maskContentUnits="objectBoundingBox" style="mask-type:alpha">
+        <g transform="scale(.001282051 .001709402)" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Structure, then facade and glazing. Coordinates match the original artwork. -->
+          <path pathLength="1" stroke-width="28" style="--delay:0ms;--duration:1260ms" d="M99 244 Q96 109 104 39 Q237 62 398 120 L524 158 M397 258 L396 193 Q566 117 764 51"/>
+          <path pathLength="1" stroke-width="42" style="--delay:320ms;--duration:1480ms" d="M105 74 L399 155 L520 178 M104 240 L396 256 L774 157 M398 248 L399 400"/>
+          <path pathLength="1" stroke-width="65" style="--delay:810ms;--duration:1220ms" d="M154 110 L455 170 L400 224 L145 202 L151 143 L375 181 M405 216 Q560 159 773 84 L624 154 L756 127"/>
+          <path pathLength="1" stroke-width="64" style="--delay:1020ms;--duration:1330ms" d="M201 291 L379 303 L365 358 L196 359 M436 304 L729 248 L715 327 L446 354 L547 260 L545 395 M651 230 L647 406 M429 373 L760 419"/>
+          <!-- Foliage and smaller details. -->
+          <path pathLength="1" stroke-width="67" style="--delay:1800ms;--duration:1370ms" d="M535 141 Q548 88 554 31 L489 61 M556 85 Q606 17 681 28 L644 82 M158 280 Q104 256 26 206 L23 345 L74 337 M146 379 L132 276 L178 326 L211 272 L191 374 M489 370 L467 310 M721 404 L755 337 L780 322"/>
+          <!-- Pool edges, steps and their pencil shading. -->
+          <path pathLength="1" stroke-width="38" style="--delay:2750ms;--duration:1110ms" d="M0 407 Q165 363 256 403 L408 391 L753 473 L675 533 L508 568 L265 405 M94 411 L191 434 L289 421 L369 509 L417 509 L455 561"/>
+          <path pathLength="1" stroke-width="108" style="--delay:3160ms;--duration:1440ms" d="M73 447 L266 474 L333 521 L393 551 L171 532 L30 515 M287 412 L505 433 L710 485 L616 512 L467 477 L533 526 L465 565 L764 551"/>
+        </g>
+        <rect class="villa-sketch-finish" width="1" height="1" fill="white"/>
+      </mask>
+    </defs>
+  </svg>
   <script type="module" src="/portfolio/villa-tiger/reveal.js"></script>
   <script type="module" src="/portfolio/villa-tiger/intro.js"></script>
   <script type="module" src="/portfolio/published.js"></script>

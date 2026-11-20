@@ -135,8 +135,9 @@ export const pages = {
       ['yves.work-title', 'Contenido · Título', '.work-top h2'],
       ['yves.work-copy', 'Contenido · Descripción', '.work-top p'],
       ['yves.work-gallery', 'Contenido · Galería completa', '.work-grid', { text: false }],
-      ...Array.from({ length: 6 }, (_, i) => [
+      ...Array.from({ length: 5 }, (_, i) => [
         ['yves.work-card-' + (i + 1), 'Campaña · Tarjeta ' + (i + 1), '.work-card:nth-child(' + (i + 1) + ')', { text: false }],
+        ['yves.work-image-' + (i + 1), 'Campaña · Fotografía ' + (i + 1), '.work-card:nth-child(' + (i + 1) + ') img', { text: false }],
         ['yves.work-number-' + (i + 1), 'Campaña · Número ' + (i + 1), '.work-card:nth-child(' + (i + 1) + ') span'],
         ['yves.work-title-' + (i + 1), 'Campaña · Título ' + (i + 1), '.work-card:nth-child(' + (i + 1) + ') strong'],
         ['yves.work-caption-' + (i + 1), 'Campaña · Texto ' + (i + 1), '.work-card:nth-child(' + (i + 1) + ') em'],

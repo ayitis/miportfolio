@@ -18,7 +18,7 @@
 /* Editor position offsets and moving carousels must never make the full page
    horizontally scrollable (which exposes a cream strip beside olive sections). */
 html[data-design-page="villa-tiger"],
-html[data-design-page="villa-tiger"] body { max-width: 100%; overflow-x: clip; }
+html[data-design-page="villa-tiger"] body { overflow-x: clip; }
 body { margin: 0; color: var(--ink); background: var(--paper); font: 17px/1.5 Georgia, serif; }
 /* Wait until the published Supabase document has been applied before revealing
    the project: otherwise the old HTML defaults visibly flash on initial load. */

@@ -1,7 +1,7 @@
 const feed = document.querySelector('.social-feed');
 const strip = feed.querySelector('.social-strip');
 const section = feed.closest('.social-action');
-const desktopMotion = matchMedia('(width > 760px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+const desktopMotion = matchMedia('(prefers-reduced-motion: no-preference)');
 const editing = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
 
 if (!editing) {
@@ -16,7 +16,7 @@ if (!editing) {
   let clones = [];
   function playback() {
     if (!motion) return;
-    if (viewportVisible && !document.hidden && !feed.matches(':hover, :focus-within')) motion.play();
+    if (viewportVisible && !document.hidden) motion.play();
     else motion.pause();
   }
 
@@ -69,7 +69,6 @@ if (!editing) {
   }).observe(feed);
   desktopMotion.addEventListener('change', schedule);
   document.addEventListener('visibilitychange', playback);
-  for (const event of ['mouseenter', 'mouseleave', 'focusin', 'focusout']) feed.addEventListener(event, () => requestAnimationFrame(playback));
   schedule();
 }
 
@@ -79,7 +78,7 @@ if (!editing) {
 const storiesFeed = document.querySelector('.social-stories-feed');
 if (storiesFeed && !editing) {
   const storyStrip = storiesFeed.querySelector('.social-stories-strip');
-  const storyMediaQuery = matchMedia('(min-width: 761px) and (prefers-reduced-motion: no-preference)');
+  const storyMediaQuery = matchMedia('(prefers-reduced-motion: no-preference)');
   let storyTrack;
   let storyAnimation;
   let storyClones = [];
@@ -88,7 +87,7 @@ if (storiesFeed && !editing) {
 
   const storyPlayback = () => {
     if (!storyAnimation) return;
-    if (storyVisible && !document.hidden && !storiesFeed.matches(':hover, :focus-within')) {
+    if (storyVisible && !document.hidden) {
       storyAnimation.play();
     } else storyAnimation.pause();
   };
@@ -116,7 +115,7 @@ if (storiesFeed && !editing) {
     storiesFeed.scrollLeft = 0;
     storyAnimation = storyTrack.animate(
       [{ transform: 'translateX(0)' }, { transform: `translateX(-${distance}px)` }],
-      { duration: 28000, iterations: Infinity, easing: 'linear' },
+      { duration: 39000, iterations: Infinity, easing: 'linear' },
     );
     storyPlayback();
   }
@@ -139,8 +138,5 @@ if (storiesFeed && !editing) {
   }).observe(storiesFeed);
   storyMediaQuery.addEventListener('change', scheduleStories);
   document.addEventListener('visibilitychange', storyPlayback);
-  for (const type of ['mouseenter', 'mouseleave', 'focusin', 'focusout']) {
-    storiesFeed.addEventListener(type, () => requestAnimationFrame(storyPlayback));
-  }
   scheduleStories();
 }

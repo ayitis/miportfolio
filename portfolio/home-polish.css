@@ -1,8 +1,13 @@
+.about .closing-statement {
+  line-height: 1.12;
+  padding-block-end: .1em;
+  overflow: visible;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   @supports (background-clip: text) or (-webkit-background-clip: text) {
-    .about .closing-statement[data-shimmer-visible],
     .gallery-wrap .project:is(:hover, :focus-visible, [data-shimmer-visible]) .card-info strong {
-      --shimmer-duration: 8.4s;
+      --shimmer-duration: 4.8s;
       background-image: linear-gradient(105deg,
         currentColor 43%, #716970 47%, #b9a9b0 49%,
         #cdc6c8 50%, #9e8d94 51%, #70676d 53%, currentColor 57%);
@@ -12,10 +17,6 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: editorial-letter-shimmer var(--shimmer-duration) linear var(--shimmer-delay, 0s) infinite;
-    }
-
-    .gallery-wrap .project:is(:hover, :focus-visible) .card-info strong {
-      --shimmer-duration: 4.8s;
     }
 
     @media (hover: none) {

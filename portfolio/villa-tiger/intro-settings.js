@@ -11,8 +11,8 @@ export function readVillaIntro(design, view) {
     scenes: (settings?.order ?? introScenes).map(scene => ({
       scene, src: design?.villaIntro?.sources?.[scene] ?? introAsset(scene),
     })),
-    transition: settings?.transition ?? 650,
-    logoSize: settings?.logoSize ?? (view === 'mobile' ? 47 : 20),
+    transition: settings?.transition ?? 400,
+    logoSize: settings?.logoSize ?? (view === 'mobile' ? 43 : 18),
   };
 }
 

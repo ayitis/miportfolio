@@ -1,6 +1,7 @@
 const frame = document.querySelector('#fashion-film');
 const video = frame.querySelector('video');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const touch = matchMedia('(pointer: coarse)');
 let start = 0;
 let end;
 let currentSource = video.querySelector('source').getAttribute('src');
@@ -42,7 +43,8 @@ function restartLoop() {
   resume();
 }
 
-function activateAudio() {
+function activateAudio(event) {
+  if (touch.matches && event.type === 'pointerdown' && !frame.contains(event.target)) return;
   userInteracted = true;
   if (!shouldPlay()) return;
   video.muted = false;
@@ -91,5 +93,5 @@ document.addEventListener('portfolio:ayam-film', ({ detail }) => {
   }
 });
 // A muted video can start reliably even on browsers that block audio.
-video.muted = false;
+video.muted = touch.matches;
 syncVisibility();

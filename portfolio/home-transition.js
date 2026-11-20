@@ -16,7 +16,7 @@ const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const narrow = matchMedia('(max-width: 700px)');
 const formedAt = verticalStage / 100;
 const exitAt = .76;
-const pixelsPerSecond = 52;
+const touchLayout = matchMedia('(max-width: 768px) and (pointer: coarse)');
 const formationDuration = 780;
 const inEditor = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
@@ -167,7 +167,7 @@ function tick(progress, timestamp) {
   // Once aligned, the vertical runway keeps moving automatically even on hover.
   const paused = document.hidden || active.entries.some(({ card }) => card.matches(':focus-within'));
   if (lastTick !== null && !paused) {
-    distance += Math.min(timestamp - lastTick, 50) * pixelsPerSecond / 1000;
+    distance += Math.min(timestamp - lastTick, 50) * (touchLayout.matches ? 40 : 52) / 1000;
   }
   lastTick = timestamp;
   schedule();

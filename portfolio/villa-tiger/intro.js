@@ -30,8 +30,9 @@ function paint() {
     const outgoing = index === current;
     const incoming = index === next && fade > 0;
     const opacity = outgoing ? 1 : incoming ? eased : 0;
-    image.style.opacity = opacity;
-    image.style.zIndex = incoming ? '2' : '1';
+    const layer = incoming ? '2' : '1';
+    if (image.style.opacity !== String(opacity)) image.style.opacity = opacity;
+    if (image.style.zIndex !== layer) image.style.zIndex = layer;
     if (opacity) image.style.scale = reducedMotion.matches ? 1 : 1.015 + .055 * (incoming ? fade * .2 : .2 + progress * .8);
   });
 }

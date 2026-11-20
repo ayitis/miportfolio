@@ -32,3 +32,8 @@
     52%, 100% { background-position: 0% 0; }
   }
 }
+
+/* Fit the original wordmark to the narrow composition, including tablet portrait. */
+@media (max-width: 768px) {
+  .heading h1 { transform: none; }
+}

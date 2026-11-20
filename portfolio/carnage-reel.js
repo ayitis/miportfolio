@@ -5,7 +5,7 @@ const context = canvas.getContext('2d');
 const header = document.querySelector('header');
 const masthead = document.querySelector('.masthead');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const mobile = matchMedia('(max-width: 650px)');
+const mobile = matchMedia('(max-width: 768px) and (pointer: coarse)');
 
 let frame = 0;
 function renderScroll() {
@@ -27,7 +27,7 @@ for (const element of [header, masthead, reel]) layout.observe(element);
 reducedMotion.addEventListener('change', scheduleScroll);
 mobile.addEventListener('change', scheduleScroll);
 renderScroll();
-video.muted = false;
+video.muted = mobile.matches;
 
 const sequence = [
   { name: 'tracking', gap: 4500, duration: 180 },
@@ -56,7 +56,8 @@ function syncPlayback() {
   });
 }
 
-function activateAudio() {
+function activateAudio(event) {
+  if (mobile.matches && event.type === 'pointerdown' && !reel.contains(event.target)) return;
   userInteracted = true;
   if (!inView || document.hidden || reducedMotion.matches) return;
   video.muted = false;

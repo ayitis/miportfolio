@@ -141,6 +141,14 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:12p
   .editorial-bottom{padding-top:clamp(44px,8svh,80px)}
   .concept p{line-height:1.6}
 }
+@media(max-width:768px) and (prefers-reduced-motion:no-preference){
+  .marquee-track{animation-duration:76s}
+  #title{animation-name:nuptiasMobileReveal}
+}
+@keyframes nuptiasMobileReveal{
+  from{opacity:.78;transform:translateY(7px) scaleX(.985)}
+  to{opacity:1;transform:translateY(0) scaleX(1)}
+}
 </style><link rel="stylesheet" href="/portfolio/brand.css"><link rel="stylesheet" href="/portfolio/project-home-return.css"></head>
 <body><div class="page">
 <header><a class="brand site-brand site-wordmark" href="/" aria-label="Aya Arbaoui — Home"><span class="wordmark-art"><img class="brand-logo" src="/portfolio/wordmark-black.png" width="2172" height="724" alt=""></span></a><nav class="links" aria-label="Main navigation"><a href="./index.html">← BACK HOME</a><a href="./index.html#work">WORK</a><a href="/#about">ABOUT</a></nav></header>

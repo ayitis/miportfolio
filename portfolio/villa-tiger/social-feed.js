@@ -72,3 +72,75 @@ if (!editing) {
   for (const event of ['mouseenter', 'mouseleave', 'focusin', 'focusout']) feed.addEventListener(event, () => requestAnimationFrame(playback));
   schedule();
 }
+
+
+/* Separate Instagram-story carousel. Placeholder cards remain still; real 9:16
+   story assets will auto-scroll once inserted into .social-stories-strip. */
+const storiesFeed = document.querySelector('.social-stories-feed');
+if (storiesFeed && !editing) {
+  const storyStrip = storiesFeed.querySelector('.social-stories-strip');
+  const storyMediaQuery = matchMedia('(min-width: 761px) and (prefers-reduced-motion: no-preference)');
+  let storyTrack;
+  let storyAnimation;
+  let storyClones = [];
+  let storyVisible = false;
+  let storyScheduled = false;
+
+  const storyPlayback = () => {
+    if (!storyAnimation) return;
+    if (storyVisible && !document.hidden && !storiesFeed.matches(':hover, :focus-within')) {
+      storyAnimation.play();
+    } else storyAnimation.pause();
+  };
+
+  function rebuildStories() {
+    storyScheduled = false;
+    storyAnimation?.cancel();
+    storyAnimation = undefined;
+    for (const clone of storyClones) clone.remove();
+    storyClones = [];
+    delete storiesFeed.dataset.looping;
+    // No animation until actual story images/videos are available.
+    if (!storyMediaQuery.matches || !storyStrip.querySelector('.social-story') || !storiesFeed.clientWidth) return;
+    const distance = storyStrip.getBoundingClientRect().width;
+    if (!distance) return;
+    const copies = Math.ceil(storiesFeed.clientWidth / distance) + 1;
+    for (let i = 0; i < copies; i++) {
+      const clone = storyStrip.cloneNode(true);
+      clone.inert = true;
+      clone.setAttribute('aria-hidden', 'true');
+      storyTrack.append(clone);
+      storyClones.push(clone);
+    }
+    storiesFeed.dataset.looping = '';
+    storiesFeed.scrollLeft = 0;
+    storyAnimation = storyTrack.animate(
+      [{ transform: 'translateX(0)' }, { transform: `translateX(-${distance}px)` }],
+      { duration: 28000, iterations: Infinity, easing: 'linear' },
+    );
+    storyPlayback();
+  }
+
+  function scheduleStories() {
+    if (storyScheduled) return;
+    storyScheduled = true;
+    requestAnimationFrame(rebuildStories);
+  }
+
+  storyTrack = document.createElement('div');
+  storyTrack.className = 'social-stories-track';
+  storyStrip.replaceWith(storyTrack);
+  storyTrack.append(storyStrip);
+  new ResizeObserver(scheduleStories).observe(storiesFeed);
+  new ResizeObserver(scheduleStories).observe(storyStrip);
+  new IntersectionObserver(([entry]) => {
+    storyVisible = entry.isIntersecting;
+    storyPlayback();
+  }).observe(storiesFeed);
+  storyMediaQuery.addEventListener('change', scheduleStories);
+  document.addEventListener('visibilitychange', storyPlayback);
+  for (const type of ['mouseenter', 'mouseleave', 'focusin', 'focusout']) {
+    storiesFeed.addEventListener(type, () => requestAnimationFrame(storyPlayback));
+  }
+  scheduleStories();
+}

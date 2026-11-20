@@ -96,12 +96,13 @@ export const pages = {
     label: 'Villa Tiger Marrakech',
     path: '/villa-tiger.html',
     targets: [
-      ...['nav-work', 'nav-about', 'display-sample', 'serif-sample', 'index', 'title', 'subtitle', 'brand-label', 'brand-title', 'brand-copy', 'scope', 'identity-label', 'identity-title', 'identity-copy', 'monogram', 'palette-label', 'palette-title', 'color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'type-label', 'type-title', 'display-name', 'display-copy', 'serif-name', 'serif-copy', 'type-note', 'action-label', 'action-title', 'suite', 'food', 'stories', 'menu', 'review', 'closing-label', 'closing-title', 'back', 'next']
+      ...['nav-work', 'nav-about', 'display-sample', 'serif-sample', 'index', 'title', 'subtitle', 'brand-label', 'brand-title', 'brand-copy', 'scope', 'identity-label', 'identity-title', 'identity-copy', 'monogram', 'palette-label', 'palette-title', 'color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'type-label', 'type-title', 'display-name', 'display-copy', 'serif-name', 'serif-copy', 'type-note', 'action-label', 'action-title', 'stories-label', 'stories-title', 'stories-note', 'suite', 'food', 'stories', 'menu', 'review', 'closing-label', 'closing-title', 'back', 'next']
         .map(key => [`villa.${key}`, `Texto · ${key.replaceAll('-', ' ')}`, `[data-villa-text="${key}"]`]),
       ...['cover', 'primary', 'interior', 'balloon', 'pool', 'monogram', 'olive', 'orange', 'dark', 'cream', 'suite', 'terrace', 'food', 'camel', 'menu', 'review', 'closing', 'croquis', 'post-pool', 'post-suite', 'post-interior', 'post-food', 'post-cover', 'post-orange', 'post-camel', 'post-textures']
         .map(key => [`villa-image.${key}`, `Imagen · ${key}`, `[data-villa-image="${key}"]`, { text: false, villaKind: 'image' }]),
       ...['villa', 'brand', 'identity', 'palette', 'type', 'action', 'closing']
         .map(key => [`villa-section.${key}`, `Sección · ${key}`, `[data-villa-section="${key}"]`, { text: false, villaKind: 'section' }]),
+      ['villa-section.stories', 'Sección · Stories in Motion (subir/bajar)', '.social-stories', { text: false, villaKind: 'section' }],
       ...Array.from({ length: 6 }, (_, i) => [`villa-swatch.color-${i + 1}`, `Paleta · Muestra ${i + 1}`, `[data-villa-swatch="${i + 1}"]`, { text: false, villaKind: 'swatch' }]),
       // Decorative groups, color blocks and divider-like containers can be selected,
       // hidden and restored without changing the hard-coded source artwork.
@@ -116,6 +117,8 @@ export const pages = {
         ['type-specimens', 'Bloques · muestras tipográficas', '.specimens'],
         ['social-phone', 'Teléfono · perfil de Villa Tiger', '.social-phone'],
         ['social-feed', 'Posición · carrusel de publicaciones', '.social-feed'],
+        ['social-stories-heading', 'Posición · bloque de títulos de stories', '.social-stories-heading'],
+        ['social-stories-feed', 'Posición · carrusel de historias', '.social-stories-feed'],
         ['applications-grid', 'Cuadrícula · aplicaciones', '.applications'],
         ['closing-grid', 'Bloque · cierre', '.closing-grid'],
         ['header-rule', 'Línea · debajo del menú', '.villa-header'],

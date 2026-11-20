@@ -287,14 +287,9 @@
               <label>Encuadre Y (%) <input type="number" min="0" max="100" data-villa-field="cropY" placeholder="Original"></label>
             </div>
             <div id="villa-sketch-tools" hidden>
-              <p>**Croquis arquitectónico:** estira el dibujo sin alterar su animación de lápiz. Usa Horizontal y Vertical del elemento para moverlo.</p>
-              <label>Estirar a los lados <output id="villa-sketch-x-value">100 %</output>
-                <input type="range" min="40" max="250" step="1" value="100" data-villa-field="stretchX">
-              </label>
-              <label>Estirar hacia arriba o abajo <output id="villa-sketch-y-value">100 %</output>
-                <input type="range" min="40" max="250" step="1" value="100" data-villa-field="stretchY">
-              </label>
-              <p>100 % = tamaño original. Los cambios de estiramiento pueden modificar las proporciones del dibujo.</p>
+              <p>Arrastra los tiradores para redimensionar el dibujo o arrastra el interior para moverlo.</p>
+              <label><input type="checkbox" data-villa-field="locked"> Bloquear proporciones del croquis</label>
+              <button type="button" id="villa-reset-sketch-dimensions">Restablecer dimensiones originales</button>
             </div>
             <label><input type="checkbox" data-villa-field="invisible"> Ocultar en esta vista</label>
           </div>
@@ -302,7 +297,7 @@
             <label>Subir / bajar sección <output id="villa-section-shift-value">0 px</output>
               <input type="range" min="-700" max="700" step="5" value="0" data-villa-field="shift">
             </label>
-            <p>Desliza a la izquierda para subir la sección (incluida la verde) y a la derecha para bajarla. Reorganiza también el espacio de las secciones siguientes.</p>
+            <p>También puedes arrastrar el tirador en el borde superior de la sección verde.</p>
             <div class="pair">
             <label>Relleno superior (px) <input type="number" min="0" max="600" data-villa-field="spaceBefore" placeholder="Original"></label>
             <label>Relleno inferior (px) <input type="number" min="0" max="600" data-villa-field="spaceAfter" placeholder="Original"></label>

@@ -1,5 +1,6 @@
+import { attachVillaHandles, resizeVillaSketch } from './villa-handles.js';
 import { introAsset, introScenes, readVillaIntro } from '../portfolio/villa-tiger/intro-settings.js';
-import { villaAddedImage, villaImagePath, villaPage } from '../portfolio/villa-design.js';
+import { constrainVillaIdentity, villaAddedImage, villaIdentity, villaIdentityClearance, villaImagePath, villaPage, villaSketch } from '../portfolio/villa-design.js';
 import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { mobileMaxWidth } from '../portfolio/viewport.js';
@@ -116,6 +117,7 @@ function apply(id) {
   if (homeGallery(id)) { syncColumn(); return; }
   applyElement(editable, id, draft, view);
   constrainNuptiasPositions(preview.contentDocument, editable, draft, view);
+  if (draft.page === villaPage) constrainVillaIdentity(preview.contentDocument, draft, view);
 }
 
 function updateFields() {
@@ -128,7 +130,7 @@ function updateFields() {
   const villaBlock = image || villaSection || villaSwatch || villaDecoration;
   find('villa-add-photo').hidden = draft.page !== villaPage;
   find('villa-image-tools').hidden = !image;
-  find('villa-sketch-tools').hidden = selected !== 'villa-image.croquis';
+  find('villa-sketch-tools').hidden = selected !== villaSketch;
   find('villa-section-tools').hidden = !villaSection;
   find('villa-swatch-tools').hidden = !villaSwatch;
   find('villa-restore-photo').hidden = !image || !draft.elements[selected]?.hidden;
@@ -138,9 +140,7 @@ function updateFields() {
     const key = input.dataset.villaField;
     if (input.type === 'checkbox') input.checked = Boolean(overrides[key]);
     else input.value = overrides[key] ?? (key === 'fill' ? original?.swatch ?? '#000000'
-      : ['stretchX', 'stretchY'].includes(key) ? 100 : key === 'shift' ? 0 : '');
-    if (key === 'stretchX') find('villa-sketch-x-value').textContent = `${input.value} %`;
-    if (key === 'stretchY') find('villa-sketch-y-value').textContent = `${input.value} %`;
+      : key === 'shift' ? 0 : '');
     if (key === 'shift') find('villa-section-shift-value').textContent = `${input.value} px`;
   }
   villaImageSource.parentElement.hidden = !image;
@@ -173,6 +173,10 @@ function updateFields() {
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
+    if (key === 'width' || key === 'height') {
+      const rect = selected === villaSketch && original?.node.getBoundingClientRect();
+      input.placeholder = rect && rect[key] ? String(Math.round(rect[key] / designScale(original.node.ownerDocument))) : 'Original';
+    }
     if (key === 'text') {
       input.disabled = original?.allowText === false;
       input.value = input.disabled ? '' : (draft.content[selected]?.text ?? original?.text ?? '');
@@ -705,6 +709,23 @@ const pointerUpdates = frameUpdate((page, event) => {
   const scrollX = win.scrollX - drag.scrollX;
   const scrollY = win.scrollY - drag.scrollY;
   const scale = designScale(page);
+  if (drag.villaHandle) {
+    if (drag.villaHandle === 'section') {
+      const shift = drag.shift + (dy + scrollY) / scale;
+      updateSetting(view, 'shift', Math.round(Math.max(drag.minShift, Math.min(700, shift))));
+    } else {
+      const size = resizeVillaSketch(drag, (dx + scrollX) / scale, (dy + scrollY) / scale);
+      updateSetting(view, 'width', size.width);
+      updateSetting(view, 'height', size.height);
+      for (const key of ['stretchX', 'stretchY', 'zoom']) updateSetting(view, key, undefined);
+      setPosition('x', drag.x + size.x);
+      setPosition('y', drag.y + size.y);
+    }
+    apply(selected);
+    updateFields();
+    markDirty(drag);
+    return;
+  }
   const requestedX = clampOffset('x', drag.x + (dx + scrollX) / scale);
   const requestedY = clampOffset('y', drag.y + (dy + scrollY) / scale);
   const raw = shiftRect(drag.rect, (requestedX - drag.x) * scale - scrollX, (requestedY - drag.y) * scale - scrollY);
@@ -763,6 +784,7 @@ function attach() {
   const { targets } = pages[draft.page];
   editable = collectElements(page, targets);
   refreshElements();
+  if (draft.page === villaPage) attachVillaHandles(page);
   for (const [id, label] of [[groupTarget, 'Mover cinta'], [nuptiasEditorial, 'Mover bloque editorial'], [horizontalGallery, 'Mover carrusel'], [verticalGallery, 'Mover cinta vertical']]) {
     const group = editable.get(id)?.[0]?.node;
     if (!group) continue;
@@ -787,13 +809,15 @@ function attach() {
 
   page.addEventListener('pointerdown', (event) => {
     if (workspace.inert) return;
+    const villaHandle = event.target.closest('[data-villa-handle]')?.dataset.villaHandle;
     const handle = event.target.closest('[data-editor-gallery-handle]');
     const heading = event.target.closest('.concept h2[data-editor-text="concept.title"]');
     const partSelected = ['concept.form', 'concept.ampersand', 'concept.feeling'].includes(selected);
     const text = heading && !partSelected ? heading : event.target.closest('[data-editor-text]');
     const photo = event.target.closest('.hero .project .thumb');
     const stage = Number(columnStage.value);
-    const galleryId = handle?.dataset.editorGalleryHandle ?? (!text && photo && draft.page === 'home'
+    const villaTarget = villaHandle === 'section' ? villaIdentity : villaHandle ? villaSketch : null;
+    const galleryId = villaTarget ?? handle?.dataset.editorGalleryHandle ?? (!text && photo && draft.page === 'home'
       ? stage === 0 ? horizontalGallery : stage >= verticalStage && stage < 76 ? verticalGallery : null
       : null);
     const node = galleryId ? editable.get(galleryId)?.[0]?.node : text;
@@ -805,9 +829,16 @@ function attach() {
     page.defaultView.focus();
     page.documentElement.classList.add('editor-aligning');
     const offsets = draft[view][selected] ?? {};
+    const rect = node.getBoundingClientRect();
+    const scale = designScale(page);
     drag = {
       node,
-      rect: node.getBoundingClientRect(),
+      rect,
+      edge: villaHandle,
+      villaHandle,
+      width: rect.width / scale,
+      height: rect.height / scale,
+      locked: offsets.locked === true,
       scrollX: page.defaultView.scrollX,
       scrollY: page.defaultView.scrollY,
       locks: {},
@@ -818,6 +849,10 @@ function attach() {
       y: clampOffset('y', offsets.y ?? 0),
       moved: false,
     };
+    if (villaHandle === 'section') {
+      drag.minShift = Math.max(-700, Math.min(700, -villaIdentityClearance(page) - (offsets.marginBefore ?? 0)));
+      drag.shift = Math.max(drag.minShift, offsets.shift ?? 0);
+    }
     node.setPointerCapture(event.pointerId);
   }, true);
 
@@ -894,8 +929,26 @@ for (const input of fields) {
         }
       } else setPosition(key, input.valueAsNumber);
     }
-    else if (input.type === 'number') updateSetting(view, key, input.value === '' ? undefined : input.valueAsNumber);
-    else updateSetting(view, key, input.value || undefined);
+    else if (input.type === 'number') {
+      if (selected === villaSketch && ['width', 'height'].includes(key) && input.value !== '') {
+        const node = editable.get(selected)[0].node;
+        const rect = node.getBoundingClientRect();
+        const scale = designScale(node.ownerDocument);
+        const size = resizeVillaSketch({
+          edge: key === 'width' ? 'e' : 's', width: rect.width / scale, height: rect.height / scale,
+          locked: draft[view][selected]?.locked === true,
+        }, key === 'width' ? input.valueAsNumber - rect.width / scale : 0,
+        key === 'height' ? input.valueAsNumber - rect.height / scale : 0);
+        updateSetting(view, key, size[key]);
+        if (draft[view][selected].locked) {
+          const other = key === 'width' ? 'height' : 'width';
+          updateSetting(view, other, size[other]);
+          fields.find(field => field.dataset.field === other).value = size[other];
+        }
+      } else {
+        updateSetting(view, key, input.value === '' ? undefined : input.valueAsNumber);
+      }
+    } else updateSetting(view, key, input.value || undefined);
     apply(selected);
     syncNuptiasField(key);
     if (key === 'color') updateFields();
@@ -939,14 +992,20 @@ for (const input of villaInputs) {
       : input.value === '' ? undefined
       : input.type === 'number' ? input.valueAsNumber : input.value;
     updateSetting(view, input.dataset.villaField, value);
-    if (input.dataset.villaField === 'stretchX') find('villa-sketch-x-value').textContent = `${value ?? 100} %`;
-    if (input.dataset.villaField === 'stretchY') find('villa-sketch-y-value').textContent = `${value ?? 100} %`;
     if (input.dataset.villaField === 'shift') find('villa-section-shift-value').textContent = `${value ?? 0} px`;
     apply(selected);
     markDirty(input);
   });
   input.addEventListener('blur', () => actions.closeGroup());
 }
+
+find('villa-reset-sketch-dimensions').addEventListener('click', () => {
+  if (selected !== villaSketch || workspace.inert) return;
+  for (const key of ['width', 'height', 'stretchX', 'stretchY', 'zoom']) updateSetting(view, key, undefined);
+  apply(selected);
+  updateFields();
+  markDirty();
+});
 
 find('villa-add-photo').addEventListener('click', () => {
   find('villa-add-tools').hidden = !find('villa-add-tools').hidden;

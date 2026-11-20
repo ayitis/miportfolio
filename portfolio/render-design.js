@@ -1,4 +1,4 @@
-import { renderVillaElement, villaAddedImage, villaPage } from './villa-design.js';
+import { renderVillaElement, villaAddedImage, villaPage, villaSketch } from './villa-design.js';
 import { scheduleCanvasSize } from './ayam-canvas.js';
 import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
 import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasLeftCaptions, nuptiasPositionBounds } from './nuptias-layout.js';
@@ -142,7 +142,7 @@ export function applyElement(editable, id, draft, view) {
       const intro = node.ownerDocument.querySelector('.home-scroll > .hero');
       node.toggleAttribute('data-home-below-scene', Boolean(intro && y >= intro.offsetHeight));
     }
-    if (draft.page === villaPage && styles.width !== null) {
+    if (draft.page === villaPage && id !== villaSketch && styles.width !== null) {
       styles.width = `min(${overrides.width}px, 100%)`;
     }
     if (original.villaKind === 'image' && overrides.height !== undefined) adapted['max-height'] = 'none';

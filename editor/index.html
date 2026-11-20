@@ -46,6 +46,18 @@
             <option>Yves Rocher España</option>
           </optgroup>
         </select>
+        <details id="villa-intro-tools" hidden>
+          <summary>Portada animada de Villa Tiger</summary>
+          <label>Jardín floral <input type="text" data-villa-intro-source="garden" maxlength="2000"></label>
+          <label>Verde oliva <input type="text" data-villa-intro-source="olive" maxlength="2000"></label>
+          <label>Terracota y piscina <input type="text" data-villa-intro-source="pool" maxlength="2000"></label>
+          <div class="pair">
+            <label>Tamaño del logo (%) <input type="number" id="villa-intro-logo" min="12" max="72"></label>
+            <label>Fundido (ms) <input type="number" id="villa-intro-duration" min="250" max="2500"></label>
+          </div>
+          <label>Orden de las escenas <select id="villa-intro-order"></select></label>
+          <p>Las imágenes se comparten entre vistas. El orden, el tamaño y el fundido se ajustan por separado en Escritorio y Móvil.</p>
+        </details>
         <details id="viewport-tools">
           <summary>Tamaño de la vista previa</summary>
           <div class="pair">

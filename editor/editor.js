@@ -1,3 +1,4 @@
+import { introAsset, introScenes, readVillaIntro } from '../portfolio/villa-tiger/intro-settings.js';
 import { villaAddedImage, villaImagePath, villaPage } from '../portfolio/villa-design.js';
 import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
@@ -601,6 +602,71 @@ find('not-ego-reset').addEventListener('click', () => {
   markDirty();
 });
 
+const villaIntroTools = find('villa-intro-tools');
+const villaIntroSources = [...villaIntroTools.querySelectorAll('[data-villa-intro-source]')];
+const villaIntroLogo = find('villa-intro-logo');
+const villaIntroDuration = find('villa-intro-duration');
+const villaIntroOrder = find('villa-intro-order');
+const villaSceneNames = { garden: 'Jardín floral', olive: 'Verde oliva', pool: 'Terracota y piscina' };
+
+for (const first of introScenes) {
+  const rest = introScenes.filter(scene => scene !== first);
+  for (const order of [[first, ...rest], [first, ...[...rest].reverse()]]) {
+    villaIntroOrder.add(new Option(order.map(scene => villaSceneNames[scene]).join(' → '), order.join(',')));
+  }
+}
+
+function updateVillaIntroTools() {
+  villaIntroTools.hidden = draft.page !== villaPage;
+  if (villaIntroTools.hidden) return;
+  const settings = readVillaIntro(draft, view);
+  for (const input of villaIntroSources) {
+    const scene = input.dataset.villaIntroSource;
+    input.value = draft.villaIntro?.sources?.[scene] ?? '';
+    input.placeholder = introAsset(scene);
+    input.setCustomValidity('');
+  }
+  villaIntroLogo.value = settings.logoSize;
+  villaIntroDuration.value = settings.transition;
+  villaIntroOrder.value = settings.scenes.map(({ scene }) => scene).join(',');
+}
+
+function applyVillaIntroChange() {
+  preview.contentDocument?.dispatchEvent(new CustomEvent('portfolio:villa-intro', { detail: readVillaIntro(draft, view) }));
+  markDirty();
+}
+
+for (const input of villaIntroSources) {
+  input.addEventListener('input', () => input.setCustomValidity(''));
+  input.addEventListener('change', () => {
+    if (draft.page !== villaPage || workspace.inert) return;
+    const value = input.value.trim();
+    if (value && !villaImagePath(value)) {
+      input.setCustomValidity('Usa una ruta del portfolio o una URL HTTPS de imagen.');
+      input.reportValidity();
+      return;
+    }
+    const intro = draft.villaIntro ??= {};
+    const sources = intro.sources ??= {};
+    const scene = input.dataset.villaIntroSource;
+    if (value) sources[scene] = value;
+    else delete sources[scene];
+    applyVillaIntroChange();
+  });
+}
+
+for (const [input, key] of [[villaIntroLogo, 'logoSize'], [villaIntroDuration, 'transition'], [villaIntroOrder, 'order']]) {
+  input.addEventListener('change', () => {
+    if (draft.page !== villaPage || workspace.inert || !input.validity.valid) return;
+    const intro = draft.villaIntro ??= {};
+    const settings = intro[view] ??= {};
+    if (input.value) settings[key] = key === 'order' ? input.value.split(',') : input.valueAsNumber;
+    else delete settings[key];
+    updateVillaIntroTools();
+    applyVillaIntroChange();
+  });
+}
+
 function applyView(next) {
   finishDrag();
   view = next;
@@ -617,6 +683,7 @@ function applyView(next) {
   });
   updateNotEgoTools();
   updateIreTools();
+  updateVillaIntroTools();
   updateFields();
   syncRulers();
 }
@@ -1092,6 +1159,7 @@ async function showPage(page) {
   guideLayer = undefined;
   pagePicker.value = page;
   find('villa-add-tools').hidden = true;
+  villaIntroTools.hidden = true;
   villaNewSource.value = '';
   villaNewSource.setCustomValidity('');
   columnStage.value = '0';

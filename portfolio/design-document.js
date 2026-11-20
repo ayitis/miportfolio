@@ -1,3 +1,4 @@
+import { validateVillaIntro } from './villa-tiger/intro-settings.js';
 import { validVillaField, villaAddedImage, villaImagePath, villaPage } from './villa-design.js';
 import { ayamPage, emptyAyam, validateAyam } from './ayam-document.js';
 import { carnagePage, emptyCarnage, validateCarnage } from './carnage-document.js';
@@ -75,6 +76,7 @@ export function validateDraft(value, page = value?.page) {
   }
   if (page === 'nuptias' && value.gallery !== undefined) draft.gallery = validateGallery(value.gallery);
   if (page === carnagePage && value.carnage !== undefined) draft.carnage = validateCarnage(value.carnage);
+  if (page === villaPage && value.villaIntro !== undefined) draft.villaIntro = validateVillaIntro(value.villaIntro);
   if (page === ayamPage && value.ayam !== undefined) draft.ayam = validateAyam(value.ayam);
   if (value.elements !== undefined) {
     if (!isRecord(value.elements) || Object.keys(value.elements).length > 1000) {

@@ -153,3 +153,40 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 [data-villa-section="brand"] { gap: var(--villa-section-gap, var(--gap)); }
 [data-villa-section] :is(.hero-board, .swatches) { --villa-default-gap: 0px; }
 [data-villa-section] .applications { --villa-default-gap: clamp(18px, calc(3 * var(--villa-vw)), 42px) var(--gap); }
+
+.villa-intro {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--olive);
+  --villa-intro-logo-size: 23%;
+}
+@media (width > 760px) {
+  html[data-villa-scale] .villa-intro { min-height: calc(100svh / var(--villa-scale)); }
+}
+@media (max-width: 760px) {
+  .villa-intro { --villa-intro-logo-size: 53%; }
+}
+.villa-intro-scenes,
+.villa-intro-scenes img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.villa-intro-scenes { z-index: 0; }
+.villa-intro-scenes img { object-fit: cover; object-position: var(--villa-intro-focus, center); }
+@media (max-width: 760px) {
+  .villa-intro-scenes [data-scene="olive"] { --villa-intro-focus: 62% center; }
+  .villa-intro-scenes [data-scene="pool"] { --villa-intro-focus: 60% center; }
+}
+.villa-intro-logo {
+  position: relative;
+  z-index: 1;
+  width: var(--villa-intro-logo-size);
+  max-height: calc(66svh / var(--villa-scale, 1));
+  object-fit: contain;
+}

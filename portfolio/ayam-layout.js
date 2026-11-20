@@ -105,6 +105,36 @@ export function renderIreSettings(page, design, view) {
   page.dispatchEvent(new CustomEvent('portfolio:ire-settings', { detail: design.ayam[view].ire ?? {} }));
 }
 
+// Keep the red chapter close to the final row of campaign photos, independently
+// of the original grid rows or user-adjusted image positions. The negative margin
+// pulls NOT EGO and the following magazine up together without moving any photo.
+const notEgoGapListeners = new WeakSet();
+function positionNotEgoAfterPhotos(page) {
+  const section = page.querySelector('.chapter-list');
+  const lastPhotos = [...page.querySelectorAll('.ayam-news :is(.story-g,.story-h,.story-i)')]
+    .filter(node => !node.hidden && node.getClientRects().length);
+  if (!section || !lastPhotos.length) return;
+  // Reset the previous correction before measuring to avoid cumulative offsets.
+  section.style.marginTop = '';
+  const scale = designScale(page);
+  const photoBottom = Math.max(...lastPhotos.map(node => node.getBoundingClientRect().bottom));
+  const naturalGap = section.getBoundingClientRect().top - photoBottom;
+  // Roughly 3 cm of clear space at the desktop reference width.
+  const desiredGap = 113 * scale;
+  const shift = Math.min(0, (desiredGap - naturalGap) / scale);
+  section.style.marginTop = shift ? `${shift}px` : '';
+}
+function scheduleNotEgoGap(page) {
+  const win = page.defaultView;
+  win.requestAnimationFrame(() => positionNotEgoAfterPhotos(page));
+}
+function watchNotEgoGap(page) {
+  if (notEgoGapListeners.has(page)) return;
+  notEgoGapListeners.add(page);
+  page.defaultView.addEventListener('resize', () => scheduleNotEgoGap(page));
+  page.querySelector('.ayam-news')?.addEventListener('load', () => scheduleNotEgoGap(page), true);
+}
+
 export function renderAyam(page, design, view) {
   const { grid, slots, storyClasses, media, originalIds } = collect(page);
   const layout = design.ayam[view];
@@ -168,4 +198,6 @@ export function renderAyam(page, design, view) {
     if (!film) reserve = Math.max(reserve, Math.ceil((rect.bottom - galleryBounds.bottom) / scale + y));
   }
   grid.style.paddingBottom = reserve ? `${reserve}px` : '';
+  watchNotEgoGap(page);
+  scheduleNotEgoGap(page);
 }

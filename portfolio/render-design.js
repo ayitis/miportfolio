@@ -132,6 +132,7 @@ export function applyElement(editable, id, draft, view) {
     const viewportWidth = original.gallery ? node.ownerDocument.documentElement.clientWidth : 0;
     const room = Math.max(0, (viewportWidth - (overrides.width ?? viewportWidth)) / 2);
     const boundedX = Math.max(-room, Math.min(room, x));
+    const socialPost = node.classList.contains('social-post');
     const adapted = original.gallery ? {
       translate: boundedX || y ? `${boundedX}px ${y}px` : null,
       'margin-inline': overrides.width !== undefined ? 'auto' : null,
@@ -142,7 +143,7 @@ export function applyElement(editable, id, draft, view) {
       const intro = node.ownerDocument.querySelector('.home-scroll > .hero');
       node.toggleAttribute('data-home-below-scene', Boolean(intro && y >= intro.offsetHeight));
     }
-    if (draft.page === villaPage && id !== villaSketch && styles.width !== null) {
+    if (draft.page === villaPage && id !== villaSketch && !socialPost && styles.width !== null) {
       styles.width = `min(${overrides.width}px, 100%)`;
     }
     if (original.villaKind === 'image' && overrides.height !== undefined) adapted['max-height'] = 'none';
@@ -167,7 +168,7 @@ export function applyElement(editable, id, draft, view) {
     }
     const display = hidden && original.villaKind !== 'rule' ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
       ? 'inline-block' : null;
-    for (const [property, value] of Object.entries({ ...styles, ...adapted, ...(original.villaKind === 'section' && { height: null }), display })) {
+    for (const [property, value] of Object.entries({ ...styles, ...adapted, ...((original.villaKind === 'section' || socialPost) && { height: null }), display })) {
       if (value === null) node.style.setProperty(property, ...original.styles[property]);
       else node.style.setProperty(property, value);
     }

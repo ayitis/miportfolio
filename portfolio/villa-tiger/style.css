@@ -236,19 +236,21 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   background: radial-gradient(ellipse at 27% 35%, #3d291e, #201713 65%, #181311);
   overflow: clip;
   --social-gap: 14px;
-  --social-card: 205px;
+  --social-card: 190px;
   --social-seconds: 30;
 }
 .social-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 28%) minmax(0, 1fr);
-  gap: clamp(20px, 6%, 80px);
-  align-items: center;
+  --social-join-gap: clamp(26px, calc(5 * var(--villa-vw)), 64px);
+  --social-overlap: 42px;
+  display: flex;
+  gap: var(--social-join-gap);
+  align-items: flex-start;
 }
 .social-phone {
+  flex: 0 0 auto;
   position: relative;
   z-index: 3; /* Keep the phone above the cards as they emerge. */
-  width: min(100%, 270px);
+  width: min(28%, 270px);
   padding: 5px;
   border: 2px solid #8d7a69;
   border-radius: 34px;
@@ -283,20 +285,21 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 .social-highlights img { aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 1px solid #c9ab90; margin-bottom: 4px; }
 .social-profile-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
 .social-profile-grid img { aspect-ratio: 4 / 5; object-fit: cover; }
-.social-showcase { min-width: 0; position: relative; z-index: 1; }
-/* Extend the horizontal track behind the right edge of the fixed phone.
-   The posts start beneath its frame and continue towards the right. */
-@media (min-width: 761px) {
-  .social-showcase .social-feed {
-    margin-left: calc(-1 * (clamp(20px, 6vw, 80px) + 56px));
-    padding-left: 0;
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 72px);
-    mask-image: linear-gradient(to right, transparent 0, #000 72px);
-  }
+.social-showcase {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  padding-top: 10px;
 }
-.social-showcase .label { color: #ddb89a; }
-.social-showcase h2 { margin-bottom: clamp(20px, 5%, 48px); }
-.social-feed { overflow: auto hidden; padding: 2px 0 18px; scrollbar-color: #9c7962 #32231b; }
+.social-showcase .label { color: #ddb89a; margin-bottom: 8px; }
+.social-showcase h2 { margin-bottom: clamp(14px, 3%, 25px); }
+.social-feed {
+  margin-inline-start: calc(-1 * (var(--social-join-gap) + var(--social-overlap)));
+  overflow: auto hidden;
+  padding: 2px 0 18px;
+  scrollbar-color: #9c7962 #32231b;
+}
 .social-feed[data-looping] { overflow-x: hidden; }
 .social-strip {
   display: flex;
@@ -316,13 +319,22 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   box-shadow: 0 8px 12px #100a0829;
 }
 .social-post img { object-fit: cover; }
-.social-post:nth-of-type(even) { margin-top: 14px; }
+.social-post:nth-of-type(even) { margin-top: 6px; }
 .social-archive { margin-top: 36px; }
 .social-archive summary { width: fit-content; cursor: pointer; color: #ddb89a; font-size: .88rem; }
 @media (max-width: 760px) {
-  .social-layout { grid-template-columns: minmax(0, 1fr); gap: 26px; }
-  .social-phone { justify-self: center; width: min(70%, 226px); }
-  .social-action { --social-card: 159px; }
+  .social-layout { --social-join-gap: 12px; --social-overlap: 16px; }
+  .social-phone { width: min(42%, 226px); padding: 3px; border-radius: 22px; }
+  .social-phone::after { height: 7px; top: 9px; }
+  .social-screen { border-radius: 16px; font-size: clamp(8px, 2.2vw, 12px); }
+  .social-account { margin: 22px 7px 9px; }
+  .social-profile { gap: 5px; padding-inline: 7px; }
+  .social-screen p { padding: 7px; }
+  .social-highlights { gap: 3px; padding: 2px 6px 9px; font-size: clamp(5px, 1.5vw, 9px); }
+  .social-showcase { padding-top: 6px; }
+  .social-showcase .label { font-size: .55rem; letter-spacing: .09em; }
+  .social-showcase h2 { font-size: clamp(1.4rem, 6vw, 2.6rem); }
+  .social-action { --social-card: clamp(115px, 35vw, 165px); }
   .social-feed { scroll-snap-type: x proximity; }
   .social-post { scroll-snap-align: start; }
 }

@@ -165,7 +165,7 @@ function updateFields() {
   find('reset-color').closest('.color-setting').hidden = group || Boolean(villaBlock);
   for (const input of fields) {
     if (['text', 'size', 'font', 'align', 'spacing', 'height'].includes(input.dataset.field)) {
-      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing && draft.page !== ayamPage && !image && !villaSection : group || Boolean(villaBlock);
+      input.parentElement.hidden = input.dataset.field === 'height' ? post || (!groupSizing && draft.page !== ayamPage && !image && !villaSection) : group || Boolean(villaBlock);
     }
   }
   fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected) || selected === nuptiasEditorial || villaSection;

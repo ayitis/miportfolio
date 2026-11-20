@@ -40,11 +40,11 @@ const sketch = document.querySelector('.villa-sketch');
 if (sketch && !editing && !reducedMotion.matches && 'IntersectionObserver' in window) {
   const drawing = sketch.querySelector('.villa-sketch-drawing');
   const stages = [
-    ['structure', 0, 3200],
-    ['facade', 2800, 4800],
-    ['pool', 7100, 4000],
-    ['detail', 10400, 3700],
-    ['shading', 12800, 3700],
+    ['structure', 0, 1260],
+    ['facade', 1100, 1890],
+    ['pool', 2800, 1575],
+    ['detail', 4100, 1450],
+    ['shading', 5050, 1450],
   ];
   const animations = [];
   sketch.dataset.drawing = '';

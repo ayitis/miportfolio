@@ -228,7 +228,7 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   animation: villa-sketch-stroke var(--duration) var(--delay) both linear;
 }
 .villa-sketch-defs.is-drawing .villa-sketch-finish {
-  animation: villa-sketch-finish 600ms 4000ms both ease-in;
+  animation: villa-sketch-finish 2200ms 13800ms both linear;
 }
 @keyframes villa-sketch-stroke { to { stroke-dashoffset: 0; } }
 @keyframes villa-sketch-finish { to { opacity: 1; } }

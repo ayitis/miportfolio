@@ -286,6 +286,7 @@
               <label>Encuadre X (%) <input type="number" min="0" max="100" data-villa-field="cropX" placeholder="50"></label>
               <label>Encuadre Y (%) <input type="number" min="0" max="100" data-villa-field="cropY" placeholder="Original"></label>
             </div>
+            <label id="villa-post-tools" hidden>Orden en el carrusel (menor primero) <input type="number" min="1" max="99" data-villa-field="postOrder"></label>
             <div id="villa-sketch-tools" hidden>
               <p>Arrastra los tiradores para redimensionar el dibujo o arrastra el interior para moverlo.</p>
               <label><input type="checkbox" data-villa-field="locked"> Bloquear proporciones del croquis</label>
@@ -294,6 +295,12 @@
             <label><input type="checkbox" data-villa-field="invisible"> Ocultar en esta vista</label>
           </div>
           <div id="villa-section-tools" hidden>
+            <div id="villa-social-tools" hidden>
+              <label>Duración de la vuelta (s) <input type="number" min="5" max="120" data-villa-field="socialSeconds" placeholder="30"></label>
+              <label>Ancho de las tarjetas (px) <input type="number" min="72" max="460" data-villa-field="socialCard" placeholder="Original"></label>
+              <label>Separación de las tarjetas (px) <input type="number" min="0" max="80" data-villa-field="socialGap" placeholder="14"></label>
+              <label><input type="checkbox" data-villa-field="invisible"> Ocultar Brand in Action en esta vista</label>
+            </div>
             <label>Subir / bajar sección <output id="villa-section-shift-value">0 px</output>
               <input type="range" min="-700" max="700" step="5" value="0" data-villa-field="shift">
             </label>

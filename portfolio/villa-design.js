@@ -6,8 +6,8 @@ export const villaSketch = 'villa-image.croquis';
 export const villaIdentity = 'villa-section.identity';
 export const villaAddedImage = id => /^villa-image\.added-[a-f0-9-]{36}$/.test(id);
 export const villaFields = {
-  image: { zoom: [50, 400], cropX: [0, 100], cropY: [0, 100], stretchX: [40, 250], stretchY: [40, 250], locked: true, fit: ['contain', 'cover'], invisible: true },
-  section: { spaceBefore: [0, 600], spaceAfter: [0, 600], marginBefore: [0, 600], marginAfter: [0, 600], shift: [-700, 700], gap: [0, 240] },
+  image: { zoom: [50, 400], cropX: [0, 100], cropY: [0, 100], stretchX: [40, 250], stretchY: [40, 250], locked: true, postOrder: [1, 99], fit: ['contain', 'cover'], invisible: true },
+  section: { spaceBefore: [0, 600], spaceAfter: [0, 600], marginBefore: [0, 600], marginAfter: [0, 600], shift: [-700, 700], invisible: true, socialSeconds: [5, 120], socialCard: [72, 460], socialGap: [0, 80], gap: [0, 240] },
   swatch: { fill: 'color' },
 };
 
@@ -37,6 +37,9 @@ export function renderVillaElement(original, settings, content) {
     image.style.objectPosition = settings.cropX !== undefined || settings.cropY !== undefined ? `${x}% ${y}%` : '';
     image.style.transformOrigin = `${x}% ${y}%`;
     image.style.scale = settings.zoom === undefined ? '' : settings.zoom / 100;
+    if (node.classList.contains('social-post')) {
+      node.style.setProperty('--social-order', settings.postOrder ?? '');
+    }
     if (node.dataset.villaImage === 'croquis') {
       // Keep legacy stretch settings readable until the frame is resized.
       image.style.objectFit = 'fill';
@@ -57,6 +60,11 @@ export function renderVillaElement(original, settings, content) {
     node.style.marginBlockEnd = pixels(settings.marginAfter);
     node.style.minHeight = pixels(settings.height);
     node.style.setProperty('--villa-section-gap', pixels(settings.gap));
+    if (node.classList.contains('social-action')) {
+      node.style.setProperty('--social-seconds', settings.socialSeconds ?? '');
+      node.style.setProperty('--social-card', pixels(settings.socialCard));
+      node.style.setProperty('--social-gap', pixels(settings.socialGap));
+    }
   }
   if (villaKind === 'swatch') {
     const color = settings.fill ?? original.swatch;

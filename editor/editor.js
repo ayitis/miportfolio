@@ -132,6 +132,10 @@ function updateFields() {
   find('villa-image-tools').hidden = !image;
   find('villa-sketch-tools').hidden = selected !== villaSketch;
   find('villa-section-tools').hidden = !villaSection;
+  find('villa-social-tools').hidden = selected !== 'villa-section.action';
+  const post = original?.node.classList.contains('social-post');
+  find('villa-post-tools').hidden = !post;
+  find('villa-post-tools').querySelector('input').placeholder = post ? original.node.dataset.postIndex : '';
   find('villa-swatch-tools').hidden = !villaSwatch;
   find('villa-restore-photo').hidden = !image || !draft.elements[selected]?.hidden;
   find('villa-restore-decoration').hidden = !((villaSwatch || villaDecoration) && draft.elements[selected]?.hidden);
@@ -212,6 +216,9 @@ function select(id, reveal = false) {
   const node = editable.get(id)?.[0]?.node;
   if (reveal && node) {
     // Scrolling a carousel item into view would shift the looping track.
+    const archive = node.closest('.social-archive');
+    if (archive) archive.open = true;
+    if (node.classList.contains('social-post')) node.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     const anchor = node.closest('.marquee') ?? node;
     const { top, bottom } = anchor.getBoundingClientRect();
     const frame = preview.contentWindow;

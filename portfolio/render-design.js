@@ -151,7 +151,7 @@ export function applyElement(editable, id, draft, view) {
       styles.width = `min(${overrides.width}px, max(24px, calc(100% - ${Math.max(0, x)}px)))`;
     }
     const hidden = draft.elements[id]?.hidden === true
-      || (original.villaKind === 'image' && overrides.invisible === true);
+      || ((original.villaKind === 'image' || id === 'villa-section.action') && overrides.invisible === true);
     // Keep removals identical in the editor and published surface, even if a
     // decorative CSS rule supplies display:grid/flex or the viewport changes.
     if (draft.page === villaPage && original.villaKind) {

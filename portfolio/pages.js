@@ -98,7 +98,7 @@ export const pages = {
     targets: [
       ...['nav-work', 'nav-about', 'display-sample', 'serif-sample', 'index', 'title', 'subtitle', 'brand-label', 'brand-title', 'brand-copy', 'scope', 'identity-label', 'identity-title', 'identity-copy', 'monogram', 'palette-label', 'palette-title', 'color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'type-label', 'type-title', 'display-name', 'display-copy', 'serif-name', 'serif-copy', 'type-note', 'action-label', 'action-title', 'suite', 'food', 'stories', 'menu', 'review', 'closing-label', 'closing-title', 'back', 'next']
         .map(key => [`villa.${key}`, `Texto · ${key.replaceAll('-', ' ')}`, `[data-villa-text="${key}"]`]),
-      ...['cover', 'primary', 'interior', 'balloon', 'pool', 'monogram', 'olive', 'orange', 'dark', 'cream', 'suite', 'terrace', 'food', 'camel', 'menu', 'review', 'closing', 'croquis']
+      ...['cover', 'primary', 'interior', 'balloon', 'pool', 'monogram', 'olive', 'orange', 'dark', 'cream', 'suite', 'terrace', 'food', 'camel', 'menu', 'review', 'closing', 'croquis', 'post-pool', 'post-suite', 'post-interior', 'post-food', 'post-cover', 'post-orange', 'post-camel']
         .map(key => [`villa-image.${key}`, `Imagen · ${key}`, `[data-villa-image="${key}"]`, { text: false, villaKind: 'image' }]),
       ...['villa', 'brand', 'identity', 'palette', 'type', 'action', 'closing']
         .map(key => [`villa-section.${key}`, `Sección · ${key}`, `[data-villa-section="${key}"]`, { text: false, villaKind: 'section' }]),
@@ -114,6 +114,8 @@ export const pages = {
         ['color-grid', 'Cuadrícula · colores', '.swatches'],
         ['type-board', 'Recuadro · tipografía', '.type-board'],
         ['type-specimens', 'Bloques · muestras tipográficas', '.specimens'],
+        ['social-phone', 'Teléfono · perfil de Villa Tiger', '.social-phone'],
+        ['social-feed', 'Posición · carrusel de publicaciones', '.social-feed'],
         ['applications-grid', 'Cuadrícula · aplicaciones', '.applications'],
         ['closing-grid', 'Bloque · cierre', '.closing-grid'],
         ['header-rule', 'Línea · debajo del menú', '.villa-header'],

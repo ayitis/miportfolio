@@ -36,6 +36,43 @@
   .mobile .ig-grid-uploaded{width:100%}
   .work-card,.work-card:first-child{min-height:0}
 }
+
+/* Full-bleed phone: the real uploaded screenshot is the only on-screen content. */
+.mobile.mobile-full-grid {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 9 / 16;
+  padding: 0;
+  border: 7px solid #151d18;
+  border-radius: 30px;
+  background: #fff;
+  overflow: hidden;
+}
+.mobile.mobile-full-grid .ig-grid-uploaded {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
+  display: block;
+  background: #fff;
+  overflow: hidden;
+}
+.mobile.mobile-full-grid .ig-grid-uploaded .uploaded-instagram-grid {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: fill;
+}
+@media (max-width: 560px) {
+  .mobile.mobile-full-grid { aspect-ratio: 9 / 16; }
+  .mobile.mobile-full-grid .ig-grid-uploaded { height: 100%; }
+  .mobile.mobile-full-grid .ig-grid-uploaded .uploaded-instagram-grid { height: 100%; }
+}
 </style>
 <link rel="stylesheet" href="/portfolio/project-home-return.css"></head>
 <body>
@@ -51,7 +88,7 @@
       <div class="ig-profile"><div class="ig-head"><div class="ig-avatar">Y</div><div><strong>Yves Rocher España</strong><span>Botanical beauty · Visual identity</span></div></div><div class="ig-stats"><div><b>Social</b>Media</div><div><b>Visual</b>Content</div><div><b>Digital</b>Stories</div></div><div class="ig-grid">
         <div class="ig-tile">Botanical<br>Beauty</div><div class="ig-tile">Yves<br>Rocher</div><div class="ig-tile">Nature<br>First</div><div class="ig-tile">Skin<br>Care</div><div class="ig-tile">Beauty<br>Rituals</div><div class="ig-tile">Everyday<br>Glow</div><div class="ig-tile">Solar<br>Care</div><div class="ig-tile">Fresh<br>Skin</div><div class="ig-tile">Brand<br>Story</div>
       </div></div>
-      <div class="mobile" aria-label="Mobile feed mockup"><div class="mobile-notch"></div><div class="mobile-title">yvesrocherespana</div><div class="ig-head"><div class="ig-avatar">Y</div><div><strong>Yves Rocher España</strong><span>Beauty · España</span></div></div><div class="ig-grid ig-grid-uploaded"><img class="uploaded-instagram-grid" src="/portfolio/yves-rocher/feed-grid.png" alt="Yves Rocher España — publicaciones reales organizadas como una cuadrícula de Instagram" loading="eager" decoding="async"></div><div class="mobile-bar"><span>⌂</span><span>⌕</span><span>＋</span><span>♡</span></div></div>
+      <div class="mobile mobile-full-grid" aria-label="Mockup de móvil con la cuadrícula real de Yves Rocher"><div class="ig-grid ig-grid-uploaded"><img class="uploaded-instagram-grid" src="/portfolio/yves-rocher/feed-grid.png" alt="Cuadrícula Instagram Yves Rocher España" loading="eager" decoding="async"></div></div>
     </div>
   </div>
 </div></section>

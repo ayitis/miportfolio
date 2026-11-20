@@ -4,7 +4,8 @@ import { introAsset, readVillaIntro } from './intro-settings.js';
 const stage = document.querySelector('.villa-intro');
 const backgrounds = stage.querySelector('.villa-intro-scenes');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const hold = 1800;
+// One new illustration every second, including the crossfade.
+const slideInterval = 1000;
 let slides = [];
 let settings;
 let signature;
@@ -15,12 +16,14 @@ let visible = false;
 
 function paint() {
   if (!slides.length) return;
-  const step = hold + settings.transition;
-  const current = Math.floor(elapsed / step) % slides.length;
+  const current = Math.floor(elapsed / slideInterval) % slides.length;
   const next = (current + 1) % slides.length;
-  const progress = (elapsed % step) / step;
+  const phase = elapsed % slideInterval;
+  const progress = phase / slideInterval;
+  // Preserve editor-selectable fade duration without slowing the one-second cycle.
+  const fadeDuration = Math.min(settings.transition, slideInterval);
   const fade = slides.length > 1 && !reducedMotion.matches
-    ? Math.max(0, ((elapsed % step) - hold) / settings.transition) : 0;
+    ? Math.max(0, (phase - (slideInterval - fadeDuration)) / fadeDuration) : 0;
   const eased = fade * fade * (3 - 2 * fade);
 
   slides.forEach((image, index) => {
@@ -35,7 +38,7 @@ function paint() {
 
 function tick(time) {
   elapsed = (elapsed + (previousTime === undefined ? 0 : time - previousTime))
-    % ((hold + settings.transition) * slides.length);
+    % (slideInterval * slides.length);
   previousTime = time;
   paint();
   frame = requestAnimationFrame(tick);
@@ -52,8 +55,6 @@ function playback() {
 }
 
 async function apply(next) {
-  const oldStep = hold + (settings?.transition ?? next.transition);
-  elapsed = elapsed / oldStep * (hold + next.transition);
   settings = next;
   stage.style.setProperty('--villa-intro-logo-size', `${settings.logoSize}%`);
   const key = JSON.stringify(next.scenes);

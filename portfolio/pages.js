@@ -117,7 +117,10 @@ export const pages = {
         ['applications-grid', 'Cuadrícula · aplicaciones', '.applications'],
         ['closing-grid', 'Bloque · cierre', '.closing-grid'],
         ['header-rule', 'Línea · debajo del menú', '.villa-header'],
-      ].map(([id, label, selector]) => [`villa-decoration.${id}`, label, selector, { text: false, villaKind: 'decoration' }]),
+      ].filter(([id]) => id !== 'header-rule').map(([id, label, selector]) => [`villa-decoration.${id}`, label, selector, { text: false, villaKind: 'decoration' }]),
+      ['villa-rule.header', 'Línea · bajo el menú', '.villa-header', { text: false, villaKind: 'rule' }],
+      ['villa-rule.type-first', 'Línea · tipografía primera', '.specimens article:nth-child(1)', { text: false, villaKind: 'rule' }],
+      ['villa-rule.type-second', 'Línea · tipografía segunda', '.specimens article:nth-child(2)', { text: false, villaKind: 'rule' }],
     ],
   },
 };

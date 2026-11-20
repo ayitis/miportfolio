@@ -3,8 +3,8 @@ import { mediaPath } from './ayam-document.js';
 export const villaPage = 'villa-tiger';
 export const villaAddedImage = id => /^villa-image\.added-[a-f0-9-]{36}$/.test(id);
 export const villaFields = {
-  image: { zoom: [50, 400], cropX: [0, 100], cropY: [0, 100], fit: ['contain', 'cover'], invisible: true },
-  section: { spaceBefore: [0, 600], spaceAfter: [0, 600], marginBefore: [0, 600], marginAfter: [0, 600], gap: [0, 240] },
+  image: { zoom: [50, 400], cropX: [0, 100], cropY: [0, 100], stretchX: [40, 250], stretchY: [40, 250], fit: ['contain', 'cover'], invisible: true },
+  section: { spaceBefore: [0, 600], spaceAfter: [0, 600], marginBefore: [0, 600], marginAfter: [0, 600], shift: [-700, 700], gap: [0, 240] },
   swatch: { fill: 'color' },
 };
 
@@ -34,11 +34,20 @@ export function renderVillaElement(original, settings, content) {
     image.style.objectPosition = settings.cropX !== undefined || settings.cropY !== undefined ? `${x}% ${y}%` : '';
     image.style.transformOrigin = `${x}% ${y}%`;
     image.style.scale = settings.zoom === undefined ? '' : settings.zoom / 100;
+    if (node.dataset.villaImage === 'croquis') {
+      // Stretch the actual illustration and its pen-stroke SVG together.
+      // Keep the SVG animation and transparent base aligned as one visual.
+      const transform = `scale(${(settings.stretchX ?? 100) / 100}, ${(settings.stretchY ?? 100) / 100})`;
+      image.style.transform = transform;
+      node.querySelector('.villa-sketch-drawing')?.style.setProperty('transform', transform);
+    }
   }
   if (villaKind === 'section') {
     node.style.paddingBlockStart = pixels(settings.spaceBefore);
     node.style.paddingBlockEnd = pixels(settings.spaceAfter);
-    node.style.marginBlockStart = pixels(settings.marginBefore);
+    node.style.marginBlockStart = settings.shift === undefined
+      ? pixels(settings.marginBefore)
+      : `calc(${settings.marginBefore ?? 0}px + ${settings.shift}px)`;
     node.style.marginBlockEnd = pixels(settings.marginAfter);
     node.style.minHeight = pixels(settings.height);
     node.style.setProperty('--villa-section-gap', pixels(settings.gap));

@@ -111,6 +111,11 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
 @media(max-width:800px){.links{gap:12px;font-size:9px}.hero-film{height:calc(59 * var(--ayam-vw));min-height:270px}.chapter-list .chapters{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:540px){.site-header{padding-top:12px;padding-bottom:12px}.site-header .site-brand{width:145px}.links a:nth-child(2){display:none}.hero-film{height:calc(62 * var(--ayam-svh));min-height:340px}.film-strap{font-size:9px}.hero-intro h1{font-size:calc(24 * var(--ayam-vw))}.hero-intro{padding-bottom:65px}.chapter-list .chapters{gap:25px 12px}footer{font-size:9px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-film video{transition:none}}
+@media (max-width:430px){
+  .links a{display:inline-flex;align-items:center;min-height:44px}
+  .hero-intro .subtitle{line-height:1.6}
+  .ayam-news .section-break{row-gap:12px}
+}
 </style>
 <link rel="stylesheet" href="/portfolio/project-home-return.css"></head>
 <body>
@@ -123,7 +128,7 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
   <section class="hero" aria-labelledby="ayam-title">
     <div class="hero-film" id="fashion-film" data-ayam-media="film">
       <img src="/DSC01108.jpg" alt="Fashion editorial photograph from the portfolio">
-      <video autoplay muted playsinline preload="metadata" aria-label="AYAM fashion film"><source src="/FASHION%20FILM%20IRE.MP4" type="video/mp4"></video>
+      <video muted playsinline preload="metadata" aria-label="AYAM fashion film"><source src="/FASHION%20FILM%20IRE.MP4" type="video/mp4"></video>
       <div class="film-strap"><span>AYA ARBAOUI / TFG</span><span>FASHION FILM — 01</span></div>
     </div>
     <div class="hero-intro">

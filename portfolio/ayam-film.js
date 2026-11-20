@@ -1,5 +1,6 @@
 const frame = document.querySelector('#fashion-film');
 const video = frame.querySelector('video');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let start = 0;
 let end;
 let currentSource = video.querySelector('source').getAttribute('src');
@@ -15,7 +16,7 @@ function interval() {
 }
 
 function shouldPlay() {
-  return inView && !document.hidden;
+  return inView && !document.hidden && !reducedMotion.matches;
 }
 
 function resume() {
@@ -58,6 +59,7 @@ const visibility = new IntersectionObserver(([entry]) => {
 }, { threshold: [0, .2] });
 visibility.observe(frame);
 document.addEventListener('visibilitychange', syncVisibility);
+reducedMotion.addEventListener('change', syncVisibility);
 
 video.addEventListener('loadedmetadata', () => {
   const [from, to] = interval();

@@ -169,7 +169,9 @@ function size() {
   const height = Math.max(450, innerHeight / designScale(document));
   introTravel = reduced.matches ? 0 : height * (settings.duration ?? 115) / 100;
   // Use native scrolling, with a short distance per reversible paper turn.
-  turnDistance = Math.max(105, Math.min(185, height * (mobile() ? .17 : .21)));
+  turnDistance = mobile()
+    ? Math.max(85, Math.min(125, height * .14))
+    : Math.max(105, Math.min(185, height * .21));
   travel = introTravel + (spreadCount() - 1) * turnDistance;
   section.style.setProperty('--ire-stage', `${height}px`);
   section.style.setProperty('--ire-travel', `${travel}px`);

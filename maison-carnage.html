@@ -83,6 +83,12 @@ main{overflow:clip}
   .reel-frame[data-effect] .reel-effects,.reel-frame[data-effect]::after{visibility:hidden}
 }
 .campaign-intro{max-width:550px;margin:0 var(--gutter) clamp(32px,6vw,72px);font-size:clamp(14px,1.3vw,19px);line-height:1.5;color:#e7e7e7}.campaign-intro strong{display:inline-block;margin-bottom:7px;color:#fff}
+@media (max-width:430px){
+  .nav-links a{display:inline-flex;align-items:center;min-height:44px}
+  .masthead span{font-size:clamp(50px,17vw,72px)}
+  .copy-large{text-align:start}
+  .reel-frame{width:min(100%,calc(78svh * 9 / 19))}
+}
 </style>
 <link rel="stylesheet" href="/portfolio/project-home-return.css"></head>
 <body>

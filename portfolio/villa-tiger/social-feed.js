@@ -1,10 +1,32 @@
 const feed = document.querySelector('.social-feed');
 const strip = feed.querySelector('.social-strip');
 const section = feed.closest('.social-action');
-const desktopMotion = matchMedia('(prefers-reduced-motion: no-preference)');
+const allowMotion = matchMedia('(prefers-reduced-motion: no-preference)');
 const editing = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
 
+const visibleVideos = new Set();
+function syncVideos() {
+  for (const video of visibleVideos) {
+    if (allowMotion.matches && !document.hidden) video.play().catch(() => {});
+    else video.pause();
+  }
+}
+const videoVisibility = new IntersectionObserver(entries => {
+  for (const { target, intersectionRatio } of entries) {
+    if (intersectionRatio >= .3) visibleVideos.add(target);
+    else {
+      visibleVideos.delete(target);
+      target.pause();
+    }
+  }
+  syncVideos();
+}, { threshold: .3 });
 if (!editing) {
+  for (const video of section.querySelectorAll('.social-profile-grid video, .social-post-video video')) {
+    videoVisibility.observe(video);
+  }
+  allowMotion.addEventListener('change', syncVideos);
+  document.addEventListener('visibilitychange', syncVideos);
   const track = document.createElement('div');
   track.className = 'social-track';
   strip.replaceWith(track);
@@ -25,11 +47,18 @@ if (!editing) {
     const progress = motion?.effect.getComputedTiming().progress ?? 0;
     motion?.cancel();
     motion = undefined;
-    clones.forEach(clone => clone.remove());
+    for (const clone of clones) {
+      for (const video of clone.querySelectorAll('video')) {
+        videoVisibility.unobserve(video);
+        visibleVideos.delete(video);
+        video.pause();
+      }
+      clone.remove();
+    }
     clones = [];
     delete feed.dataset.looping;
     const visiblePosts = [...strip.children].filter(post => !post.hidden && post.getClientRects().length);
-    if (!desktopMotion.matches || !visiblePosts.length || !feed.clientWidth) return;
+    if (!allowMotion.matches || !visiblePosts.length || !feed.clientWidth) return;
     const length = parseFloat(getComputedStyle(strip).width);
     if (!length) return;
     const copies = Math.ceil(feed.clientWidth / length) + 1;
@@ -39,6 +68,7 @@ if (!editing) {
       clone.setAttribute('aria-hidden', 'true');
       clone.querySelectorAll('[data-villa-image]').forEach(post => post.removeAttribute('data-villa-image'));
       track.append(clone);
+      for (const video of clone.querySelectorAll('video')) videoVisibility.observe(video);
       clones.push(clone);
     }
     feed.scrollLeft = 0;
@@ -67,7 +97,7 @@ if (!editing) {
     viewportVisible = entry.isIntersecting;
     playback();
   }).observe(feed);
-  desktopMotion.addEventListener('change', schedule);
+  allowMotion.addEventListener('change', schedule);
   document.addEventListener('visibilitychange', playback);
   schedule();
 }
@@ -101,7 +131,7 @@ if (storiesFeed && !editing) {
     delete storiesFeed.dataset.looping;
     // No animation until actual story images/videos are available.
     if (!storyMediaQuery.matches || !storyStrip.querySelector('.social-story') || !storiesFeed.clientWidth) return;
-    const distance = storyStrip.getBoundingClientRect().width;
+    const distance = parseFloat(getComputedStyle(storyStrip).width);
     if (!distance) return;
     const copies = Math.ceil(storiesFeed.clientWidth / distance) + 1;
     for (let i = 0; i < copies; i++) {

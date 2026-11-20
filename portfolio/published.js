@@ -107,6 +107,14 @@ showPublishedDesign().catch((error) => {
     document.body.append(warning);
   }
 }).finally(() => {
+  // Only show Villa Tiger once the real published design has rendered.
+  // Editor previews also unlock immediately after this module initializes.
+  // On read failure, allow the existing visible warning/fallback instead of
+  // leaving the page blank indefinitely.
+  if (document.documentElement.dataset.designPage === 'villa-tiger') {
+    document.documentElement.dataset.villaReady = '';
+    if (!isEditorPreview && window.scrollX !== 0) window.scrollTo({ left: 0, top: window.scrollY, behavior: 'instant' });
+  }
   window.nuptiasFirstPaint?.done();
   if (document.documentElement.dataset.designPage === ayamPage && !isEditorPreview) {
     import('./ayam-reveal.js').then(({ startAyamReveals }) => startAyamReveals(document)).catch(() => {});

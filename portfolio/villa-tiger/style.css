@@ -247,6 +247,7 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 }
 .social-phone {
   position: relative;
+  z-index: 3; /* Keep the phone above the cards as they emerge. */
   width: min(100%, 270px);
   padding: 5px;
   border: 2px solid #8d7a69;
@@ -282,7 +283,17 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 .social-highlights img { aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 1px solid #c9ab90; margin-bottom: 4px; }
 .social-profile-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
 .social-profile-grid img { aspect-ratio: 4 / 5; object-fit: cover; }
-.social-showcase { min-width: 0; }
+.social-showcase { min-width: 0; position: relative; z-index: 1; }
+/* Extend the horizontal track behind the right edge of the fixed phone.
+   The posts start beneath its frame and continue towards the right. */
+@media (min-width: 761px) {
+  .social-showcase .social-feed {
+    margin-left: calc(-1 * (clamp(20px, 6vw, 80px) + 56px));
+    padding-left: 0;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 72px);
+    mask-image: linear-gradient(to right, transparent 0, #000 72px);
+  }
+}
 .social-showcase .label { color: #ddb89a; }
 .social-showcase h2 { margin-bottom: clamp(20px, 5%, 48px); }
 .social-feed { overflow: auto hidden; padding: 2px 0 18px; scrollbar-color: #9c7962 #32231b; }

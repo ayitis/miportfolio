@@ -1,3 +1,22 @@
+import { portfolioView } from '../viewport.js';
+
+const root = document.documentElement;
+function sizeCanvas() {
+  const desktop = portfolioView(window, 'villa-tiger') === 'desktop';
+  if (desktop) {
+    const scale = root.clientWidth / 1280;
+    root.dataset.villaScale = scale;
+    root.style.setProperty('--villa-scale', scale);
+  } else {
+    delete root.dataset.villaScale;
+    root.style.removeProperty('--villa-scale');
+  }
+}
+sizeCanvas();
+window.addEventListener('resize', sizeCanvas);
+document.addEventListener('portfolio:villa-canvas-sync', sizeCanvas);
+new ResizeObserver(sizeCanvas).observe(root);
+
 const editing = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 

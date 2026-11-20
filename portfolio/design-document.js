@@ -1,4 +1,5 @@
-import { ayamPage, emptyAyam, mediaPath, validateAyam } from './ayam-document.js';
+import { validVillaField, villaAddedImage, villaImagePath, villaPage } from './villa-design.js';
+import { ayamPage, emptyAyam, validateAyam } from './ayam-document.js';
 import { carnagePage, emptyCarnage, validateCarnage } from './carnage-document.js';
 import { followsNuptiasHeading, nuptiasEditorial } from './nuptias-layout.js';
 import { pages } from './pages.js';
@@ -47,14 +48,20 @@ export function validateDraft(value, page = value?.page) {
       if (!/^[a-z][a-z0-9-]*(\.[a-z0-9-]+)+$/.test(id) || !isRecord(settings)) {
         throw new Error('La copia contiene un ajuste inválido.');
       }
+      const villaKind = page === villaPage
+        ? pages[page].targets.find(([target]) => target === id)?.[3]?.villaKind
+          ?? (villaAddedImage(id) && value.elements?.[id]?.type === 'image' ? 'image' : undefined)
+        : undefined;
       const clean = {};
       for (const [field, setting] of Object.entries(settings)) {
-        const range = page === ayamPage && field === 'height' ? [16, 4000]
+        const range = (page === ayamPage || villaKind === 'image' || villaKind === 'section') && field === 'height' ? [16, 4000]
           : Object.hasOwn(bounds, field) ? bounds[field] : null;
         const valid = view === 'content'
           ? (field === 'text' && typeof setting === 'string' && setting.length <= 2000)
-            || (page === 'villa-tiger' && field === 'source' && pages[page].targets.some(([target, , , options]) => target === id && options?.image) && mediaPath(setting))
+            || (villaKind === 'image' && ((field === 'source' && villaImagePath(setting))
+              || (field === 'alt' && typeof setting === 'string' && setting.length <= 250)))
           : (range && Number.isInteger(setting) && setting >= range[0] && setting <= range[1])
+            || validVillaField(villaKind, field, setting)
             || (field === 'font' && typeof setting === 'string' && Object.hasOwn(fonts, setting))
             || (field === 'align' && alignments.includes(setting))
             || (field === 'independentX' && page === 'nuptias' && view === 'desktop' && followsNuptiasHeading(id) && setting === true)
@@ -79,6 +86,9 @@ export function validateDraft(value, page = value?.page) {
       }
       if (id.startsWith('custom.') && settings.type === 'text') {
         draft.elements[id] = { type: 'text', ...(page === ayamPage && settings.hidden === true && { hidden: true }) };
+      }
+      else if (page === villaPage && villaAddedImage(id) && settings.type === 'image' && villaImagePath(settings.source)) {
+        draft.elements[id] = { type: 'image', source: settings.source };
       }
       else if (settings.hidden === true && !id.startsWith('custom.')) draft.elements[id] = { hidden: true };
       else throw new Error('La copia contiene un elemento inválido.');

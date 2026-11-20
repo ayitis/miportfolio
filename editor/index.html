@@ -251,9 +251,14 @@
         </details>
         <div class="element-actions">
           <button type="button" id="add-text" disabled>Añadir texto</button>
+          <button type="button" id="villa-add-photo" hidden>Añadir imagen</button>
           <button type="button" id="copy-element" disabled>Copiar</button>
           <button type="button" id="paste-element" disabled>Pegar</button>
           <button type="button" id="duplicate-element" disabled>Duplicar</button>
+        </div>
+        <div id="villa-add-tools" hidden>
+          <label>Ruta o URL de la nueva imagen <input id="villa-new-source" type="text" maxlength="2000" placeholder="/portfolio/…/foto.webp"></label>
+          <button type="button" id="villa-insert-photo">Añadir a Brand in Action</button>
         </div>
         <label for="element">Elemento de la página</label>
         <select id="element" disabled><option value="">Selecciona un elemento</option></select>
@@ -261,6 +266,24 @@
         <fieldset id="properties" disabled>
           <legend>Ajustes del texto</legend>
           <label hidden>Ruta o URL de la imagen <input id="villa-image-source" type="text" maxlength="2000" placeholder="/portfolio/…/foto.webp"></label>
+          <div id="villa-image-tools" hidden>
+            <label>Texto alternativo <input id="villa-image-alt" type="text" maxlength="250"></label>
+            <label>Encuadre <select data-villa-field="fit"><option value="">Original</option><option value="contain">Mostrar completa</option><option value="cover">Llenar el marco</option></select></label>
+            <div class="pair">
+              <label>Zoom (%) <input type="number" min="100" max="400" data-villa-field="zoom" placeholder="100"></label>
+              <label>Encuadre X (%) <input type="number" min="0" max="100" data-villa-field="cropX" placeholder="50"></label>
+              <label>Encuadre Y (%) <input type="number" min="0" max="100" data-villa-field="cropY" placeholder="Original"></label>
+            </div>
+            <label><input type="checkbox" data-villa-field="invisible"> Ocultar en esta vista</label>
+          </div>
+          <div id="villa-section-tools" class="pair" hidden>
+            <label>Relleno superior (px) <input type="number" min="0" max="600" data-villa-field="spaceBefore" placeholder="Original"></label>
+            <label>Relleno inferior (px) <input type="number" min="0" max="600" data-villa-field="spaceAfter" placeholder="Original"></label>
+            <label>Margen superior (px) <input type="number" min="0" max="600" data-villa-field="marginBefore" placeholder="Original"></label>
+            <label>Margen inferior (px) <input type="number" min="0" max="600" data-villa-field="marginAfter" placeholder="Original"></label>
+            <label>Separación interna (px) <input type="number" min="0" max="240" data-villa-field="gap" placeholder="Original"></label>
+          </div>
+          <div id="villa-swatch-tools" hidden><label>Color de la muestra <input type="color" data-villa-field="fill"></label></div>
           <label>Contenido <textarea rows="3" maxlength="2000" data-field="text" placeholder="Texto original"></textarea></label>
           <div class="pair">
             <label>Horizontal (px) <input type="number" min="-4000" max="4000" placeholder="0" data-field="x"></label>
@@ -300,6 +323,7 @@
           </div>
           <p id="nuptias-guide-help" hidden>Puedes mover el bloque o el texto hasta el borde derecho de ABOUT. La guía señala ese límite.</p>
           <button type="button" id="nuptias-align-right" hidden>Alinear al margen derecho</button>
+          <button type="button" id="villa-restore-photo" hidden>Restaurar imagen eliminada</button>
           <button type="button" id="delete-element">Eliminar elemento</button>
           <button type="button" id="ayam-hide-text" hidden>Ocultar texto</button>
           <button type="button" id="ayam-restore-text" hidden>Restaurar texto</button>

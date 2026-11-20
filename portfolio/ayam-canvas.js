@@ -7,7 +7,7 @@ export function scheduleCanvasSize(page) {
 }
 
 export function designScale(page) {
-  return Number(page.documentElement.dataset.ayamScale) || 1;
+  return Number(page.documentElement.dataset.ayamScale ?? page.documentElement.dataset.villaScale) || 1;
 }
 
 export function mountAyamCanvas(page) {

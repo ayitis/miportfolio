@@ -1,8 +1,9 @@
+import { villaAddedImage, villaImagePath, villaPage } from '../portfolio/villa-design.js';
 import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { mobileMaxWidth } from '../portfolio/viewport.js';
 import { renderPortfolio } from '../portfolio/render-portfolio.js';
-import { ayamPage, ireFields, mediaPath, notEgoFields } from '../portfolio/ayam-document.js';
+import { ayamPage, ireFields, notEgoFields } from '../portfolio/ayam-document.js';
 import { renderIreSettings, renderNotEgo, syncAyamNodes } from '../portfolio/ayam-layout.js';
 import { setupAyam } from './ayam.js';
 import { carnagePage } from '../portfolio/carnage-document.js';
@@ -31,6 +32,9 @@ const element = find('element');
 const pagePicker = find('page');
 const status = find('status');
 const villaImageSource = find('villa-image-source');
+const villaImageAlt = find('villa-image-alt');
+const villaNewSource = find('villa-new-source');
+const villaInputs = [...document.querySelectorAll('[data-villa-field]')];
 const fields = [...document.querySelectorAll('[data-field]')];
 const viewButtons = [...document.querySelectorAll('[data-view]')];
 let editable = new Map();
@@ -65,7 +69,7 @@ function updateActionButtons() {
   find('undo').disabled = !actions.canUndo;
   find('redo').disabled = !actions.canRedo;
   find('paste-element').disabled = !clipboard || pagePicker.disabled || (clipboard.type === 'photo' && draft.page !== 'nuptias');
-  for (const id of ['copy-element', 'duplicate-element']) find(id).disabled = (!selected && !gallery.hasSelection) || layoutElement(selected) || Boolean(editable.get(selected)?.[0]?.imageSource);
+  for (const id of ['copy-element', 'duplicate-element']) find(id).disabled = (!selected && !gallery.hasSelection) || layoutElement(selected) || Boolean(editable.get(selected)?.[0]?.villaKind);
 }
 
 function markDirty(group) {
@@ -84,13 +88,13 @@ function refreshElements() {
   const labels = new Map(pages[draft.page].targets);
   for (const [id, originals] of editable) {
     const hidden = draft.elements[id]?.hidden;
-    if (hidden && draft.page !== ayamPage) continue;
-    for (const { node } of originals) if (!layoutElement(id)) node.dataset.editorText = id;
+    if (hidden && draft.page !== ayamPage && draft.page !== villaPage) continue;
+    for (const { node } of originals) if (!layoutElement(id) && originals[0].villaKind !== 'section') node.dataset.editorText = id;
     const caption = /^caption(?:-title|-description)?\./.test(id) ? 'Pie · ' + (draft.content[id]?.text ?? originals[0].text).slice(0, 60) : null;
-    const name = labels.get(id) ?? caption ?? (draft.content[id]?.text?.slice(0, 65) || 'Texto nuevo');
+    const name = labels.get(id) ?? (villaAddedImage(id) ? 'Imagen añadida · ' + (draft.content[id]?.alt || originals[0].imageSource.split('/').pop()) : null) ?? caption ?? (draft.content[id]?.text?.slice(0, 65) || 'Texto nuevo');
     element.add(new Option(name + (hidden ? ' · oculto' : ''), id));
   }
-  select(editable.has(current) && (draft.page === ayamPage || !draft.elements[current]?.hidden) ? current : '');
+  select(editable.has(current) && ([ayamPage, villaPage].includes(draft.page) || !draft.elements[current]?.hidden) ? current : '');
 }
 
 function restoreActions(back) {
@@ -117,6 +121,20 @@ function updateFields() {
   const overrides = draft[view][selected] ?? {};
   const original = editable.get(selected)?.[0];
   const image = original?.imageSource;
+  const villaSection = original?.villaKind === 'section';
+  const villaSwatch = original?.villaKind === 'swatch';
+  const villaBlock = image || villaSection || villaSwatch;
+  find('villa-add-photo').hidden = draft.page !== villaPage;
+  find('villa-image-tools').hidden = !image;
+  find('villa-section-tools').hidden = !villaSection;
+  find('villa-swatch-tools').hidden = !villaSwatch;
+  find('villa-restore-photo').hidden = !image || !draft.elements[selected]?.hidden;
+  villaImageAlt.value = image ? draft.content[selected]?.alt ?? original.imageAlt : '';
+  for (const input of villaInputs) {
+    const key = input.dataset.villaField;
+    if (input.type === 'checkbox') input.checked = Boolean(overrides[key]);
+    else input.value = overrides[key] ?? (key === 'fill' ? original?.swatch ?? '#000000' : '');
+  }
   villaImageSource.parentElement.hidden = !image;
   villaImageSource.value = image ? draft.content[selected]?.source ?? image : '';
   villaImageSource.setCustomValidity('');
@@ -125,24 +143,25 @@ function updateFields() {
   find('element-layers').hidden = !selected.startsWith('custom.');
   find('gallery-layout-help').hidden = !groupSizing;
   const hiddenAyamText = draft.page === ayamPage && draft.elements[selected]?.hidden;
-  find('delete-element').hidden = group || Boolean(hiddenAyamText);
+  find('delete-element').hidden = group || villaSection || villaSwatch || Boolean(hiddenAyamText) || Boolean(image && draft.elements[selected]?.hidden);
   find('ayam-restore-text').hidden = !hiddenAyamText;
   find('ayam-hide-text').hidden = draft.page !== ayamPage || Boolean(hiddenAyamText) || !selected;
   const limited = draft.page === 'nuptias' && hasNuptiasDesktopLimit(selected, view);
   find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected);
   find('nuptias-guide-help').hidden = !limited;
-  find('reset').textContent = selected === nuptiasEditorial ? 'Restablecer posición del bloque' : group ? 'Restablecer cinta' : image ? 'Restaurar imagen original' : 'Restaurar ajustes de este texto';
-  find('reset-color').closest('.color-setting').hidden = group || Boolean(image);
+  find('reset').textContent = selected === nuptiasEditorial ? 'Restablecer posición del bloque' : group ? 'Restablecer cinta' : villaBlock ? 'Restablecer ajustes' : 'Restaurar ajustes de este texto';
+  find('reset-color').closest('.color-setting').hidden = group || Boolean(villaBlock);
   for (const input of fields) {
     if (['text', 'size', 'font', 'align', 'spacing', 'height'].includes(input.dataset.field)) {
-      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing && draft.page !== ayamPage : group || Boolean(image);
+      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing && draft.page !== ayamPage && !image && !villaSection : group || Boolean(villaBlock);
     }
   }
-  fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected) || selected === nuptiasEditorial;
-  find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : image ? 'Ajustes de la imagen' : 'Ajustes del texto';
+  fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected) || selected === nuptiasEditorial || villaSection;
+  for (const axis of ['x', 'y']) fields.find(input => input.dataset.field === axis).parentElement.hidden = villaSection;
+  find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : image ? 'Ajustes de la imagen' : villaSection ? 'Espaciado de la sección' : villaSwatch ? 'Muestra de color' : 'Ajustes del texto';
   const height = fields.find(input => input.dataset.field === 'height');
-  height.min = draft.page === ayamPage ? '16' : String(bounds.height[0]);
-  height.max = draft.page === ayamPage ? '4000' : String(bounds.height[1]);
+  height.min = (draft.page === ayamPage || image || villaSection) ? '16' : String(bounds.height[0]);
+  height.max = (draft.page === ayamPage || image || villaSection) ? '4000' : String(bounds.height[1]);
   find('properties').disabled = !original;
   for (const input of fields) {
     const key = input.dataset.field;
@@ -276,7 +295,7 @@ function captureElement() {
     return true;
   }
   const item = editable.get(selected)?.[0];
-  if (!item || item.imageSource || layoutElement(selected)) return false;
+  if (!item || item.villaKind || layoutElement(selected)) return false;
   const win = preview.contentWindow;
   const rect = item.node.getBoundingClientRect();
   const css = win.getComputedStyle(item.node);
@@ -345,8 +364,8 @@ function pasteElement() {
 function deleteSelection() {
   if (workspace.inert || pagePicker.disabled) return false;
   if (!selected) return gallery.removeSelected();
-  if (layoutElement(selected)) return false;
-  if (selected.startsWith('custom.')) {
+  if (layoutElement(selected) || ['section', 'swatch'].includes(editable.get(selected)?.[0]?.villaKind)) return false;
+  if (selected.startsWith('custom.') || (draft.page === villaPage && villaAddedImage(selected))) {
     for (const section of ['elements', 'desktop', 'mobile', 'content']) delete draft[section][selected];
   } else {
     draft.elements[selected] = { hidden: true };
@@ -476,6 +495,7 @@ function sizeCanvas() {
   preview.style.minHeight = height === undefined ? '' : '0';
   showCanvasSize();
   if (draft.page === ayamPage) preview.contentDocument?.dispatchEvent(new Event('portfolio:ayam-canvas-sync'));
+  if (draft.page === villaPage) preview.contentDocument?.dispatchEvent(new Event('portfolio:villa-canvas-sync'));
 }
 
 for (const [field, name] of [[viewportWidth, 'width'], [viewportHeight, 'height']]) {
@@ -819,7 +839,7 @@ villaImageSource.addEventListener('change', () => {
   const original = editable.get(selected)?.[0]?.imageSource;
   if (!original || workspace.inert) return;
   const source = villaImageSource.value.trim();
-  if (source && !mediaPath(source)) {
+  if (source && !villaImagePath(source)) {
     villaImageSource.setCustomValidity('Usa una ruta del portfolio o una URL HTTPS de imagen.');
     villaImageSource.reportValidity();
     return;
@@ -827,6 +847,57 @@ villaImageSource.addEventListener('change', () => {
   updateSetting('content', 'source', source && source !== original ? source : undefined);
   apply(selected);
   updateFields();
+  markDirty();
+});
+
+villaImageAlt.addEventListener('change', () => {
+  const original = editable.get(selected)?.[0];
+  if (!original?.imageSource || workspace.inert) return;
+  updateSetting('content', 'alt', villaImageAlt.value === original.imageAlt ? undefined : villaImageAlt.value);
+  apply(selected);
+  markDirty();
+});
+
+for (const input of villaInputs) {
+  input.addEventListener('input', () => {
+    if (!selected || workspace.inert || !input.validity.valid) return;
+    const value = input.type === 'checkbox' ? input.checked || undefined
+      : input.value === '' ? undefined
+      : input.type === 'number' ? input.valueAsNumber : input.value;
+    updateSetting(view, input.dataset.villaField, value);
+    apply(selected);
+    markDirty(input);
+  });
+  input.addEventListener('blur', () => actions.closeGroup());
+}
+
+find('villa-add-photo').addEventListener('click', () => {
+  find('villa-add-tools').hidden = !find('villa-add-tools').hidden;
+  if (!find('villa-add-tools').hidden) villaNewSource.focus();
+});
+villaNewSource.addEventListener('input', () => villaNewSource.setCustomValidity(''));
+find('villa-insert-photo').addEventListener('click', () => {
+  if (draft.page !== villaPage || workspace.inert) return;
+  const source = villaNewSource.value.trim();
+  if (!villaImagePath(source)) {
+    villaNewSource.setCustomValidity('Usa una ruta del portfolio o una URL HTTPS de imagen.');
+    villaNewSource.reportValidity();
+    return;
+  }
+  const id = `villa-image.added-${crypto.randomUUID()}`;
+  draft.elements[id] = { type: 'image', source };
+  villaNewSource.value = '';
+  find('villa-add-tools').hidden = true;
+  refreshElements();
+  apply(id);
+  select(id, true);
+  markDirty();
+});
+find('villa-restore-photo').addEventListener('click', () => {
+  if (!editable.get(selected)?.[0]?.imageSource || !draft.elements[selected]?.hidden) return;
+  delete draft.elements[selected];
+  apply(selected);
+  refreshElements();
   markDirty();
 });
 
@@ -895,7 +966,7 @@ function runAction(action) {
         ? 'Hay un borrador más reciente. Descarga una copia de tus cambios y recarga el editor.'
         : error.code === 'PGRST202' && draft.page === 'nuptias'
           ? 'Ejecuta primero la migración de NUPTIAS en el proyecto de Supabase de Preview.'
-          : draft.page === 'villa-tiger' && ['PGRST202', '22023', '23514'].includes(error.code)
+          : draft.page === villaPage && ['PGRST202', '22023', '23514'].includes(error.code)
             ? 'Ejecuta la migración de Villa Tiger en Supabase de Preview.'
           : draft.page === ayamPage && ['PGRST202', '22023', '23514'].includes(error.code)
             ? 'Si aún no lo has hecho, ejecuta la migración de AYAM en Supabase de Preview.'
@@ -1020,6 +1091,9 @@ async function showPage(page) {
   guideLayer?.detach();
   guideLayer = undefined;
   pagePicker.value = page;
+  find('villa-add-tools').hidden = true;
+  villaNewSource.value = '';
+  villaNewSource.setCustomValidity('');
   columnStage.value = '0';
   find('column-tools').hidden = true;
   ireTools.hidden = true;
@@ -1048,7 +1122,8 @@ pagePicker.addEventListener('change', runAction(async () => {
 
 async function enterWorkspace() {
   await store.verifyOwner();
-  await showPage('home');
+  const requestedPage = new URLSearchParams(location.search).get('page');
+  await showPage(Object.hasOwn(pages, requestedPage) ? requestedPage : 'home');
   access.hidden = true;
   workspace.hidden = false;
 }

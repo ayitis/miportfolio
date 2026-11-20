@@ -1,9 +1,10 @@
+import { renderVillaElement, villaAddedImage, villaPage } from './villa-design.js';
 import { scheduleCanvasSize } from './ayam-canvas.js';
 import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
 import { hasNuptiasDesktopLimit, isNuptiasPosition, nuptiasDescription, nuptiasLeftCaptions, nuptiasPositionBounds } from './nuptias-layout.js';
 import { fonts } from './design-document.js';
 
-const properties = ['translate', 'font-size', 'font-family', 'text-align', 'width', 'white-space', 'color', 'display', 'letter-spacing', 'z-index', 'height', 'margin-inline', 'max-width'];
+const properties = ['translate', 'font-size', 'font-family', 'text-align', 'width', 'white-space', 'color', 'display', 'letter-spacing', 'z-index', 'height', 'margin-inline', 'max-width', 'max-height'];
 
 export function collectElements(page, targets) {
   const elements = new Map();
@@ -11,7 +12,10 @@ export function collectElements(page, targets) {
     const originals = [...page.querySelectorAll(selector)].map((node) => ({
       node,
       allowText: options?.text !== false,
-      imageSource: options?.image ? node.getAttribute('src') : null,
+      villaKind: options?.villaKind,
+      imageSource: options?.villaKind === 'image' ? node.firstElementChild.getAttribute('src') : null,
+      imageAlt: options?.villaKind === 'image' ? node.firstElementChild.alt : null,
+      swatch: options?.villaKind === 'swatch' ? node.style.getPropertyValue('--swatch') : null,
       gallery: options?.gallery === true,
       inline: options?.inline === true,
       children: [...node.childNodes],
@@ -46,14 +50,28 @@ export function syncCustomElements(page, editable, draft) {
     page.head.append(layers);
   }
   for (const [id, items] of editable) {
-    if (id.startsWith('custom.') && !Object.hasOwn(draft.elements, id)) {
+    if ((id.startsWith('custom.') || (draft.page === villaPage && villaAddedImage(id))) && !Object.hasOwn(draft.elements, id)) {
       items[0].node.remove();
       editable.delete(id);
       scheduleCanvasSize(page);
     }
   }
   for (const [id, item] of Object.entries(draft.elements)) {
-    if (item.type !== 'text' || editable.has(id)) continue;
+    if (editable.has(id)) continue;
+    if (draft.page === villaPage && item.type === 'image') {
+      const node = page.createElement('div');
+      node.className = 'villa-frame application';
+      node.dataset.villaAdded = id;
+      const image = page.createElement('img');
+      image.src = item.source;
+      image.alt = 'Villa Tiger Marrakech';
+      image.loading = 'lazy';
+      node.append(image);
+      page.querySelector('#applications .applications').append(node);
+      editable.set(id, collectElements(page, [[id, '', `[data-villa-added="${id}"]`, { text: false, villaKind: 'image' }]]).get(id));
+      continue;
+    }
+    if (item.type !== 'text') continue;
     const node = page.createElement('div');
     node.dataset.customText = id;
     node.style.cssText = 'position:absolute;inset:0 auto auto 0;overflow-wrap:anywhere;white-space:pre-wrap;z-index:10;max-width:100%;';
@@ -103,7 +121,7 @@ export function applyElement(editable, id, draft, view) {
     color: overrides.color ?? null,
     'letter-spacing': overrides.spacing === undefined ? null : `${overrides.spacing}px`,
     'z-index': overrides.layer ?? null,
-    height: draft.page === 'ayam' && overrides.height !== undefined ? `${overrides.height}px` : null,
+    height: (draft.page === 'ayam' || draft.page === villaPage) && overrides.height !== undefined ? `${overrides.height}px` : null,
     'margin-inline': null,
     'max-width': null,
     width: overrides.width === undefined ? null : `${overrides.width}px`,
@@ -119,24 +137,26 @@ export function applyElement(editable, id, draft, view) {
       'margin-inline': overrides.width !== undefined ? 'auto' : null,
       width: overrides.width === undefined ? null : `min(${overrides.width}px, 100%)`,
       height: overrides.height === undefined ? null : `${overrides.height}px`,
-    } : {};
+    } : original.villaKind === 'image' ? { 'max-height': null } : {};
     if (draft.page === 'home' && id.startsWith('custom.')) {
       const intro = node.ownerDocument.querySelector('.home-scroll > .hero');
       node.toggleAttribute('data-home-below-scene', Boolean(intro && y >= intro.offsetHeight));
     }
+    if (draft.page === villaPage && styles.width !== null) {
+      styles.width = `min(${overrides.width}px, 100%)`;
+    }
+    if (original.villaKind === 'image' && overrides.height !== undefined) adapted['max-height'] = 'none';
+    if (original.villaKind === 'image' && overrides.width !== undefined) adapted['max-width'] = 'none';
     if (id.startsWith('custom.') && styles.width !== null) {
       styles.width = `min(${overrides.width}px, max(24px, calc(100% - ${Math.max(0, x)}px)))`;
     }
-    const display = draft.elements[id]?.hidden ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
+    const display = draft.elements[id]?.hidden || (original.villaKind === 'image' && overrides.invisible) ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
       ? 'inline-block' : null;
-    for (const [property, value] of Object.entries({ ...styles, ...adapted, display })) {
+    for (const [property, value] of Object.entries({ ...styles, ...adapted, ...(original.villaKind === 'section' && { height: null }), display })) {
       if (value === null) node.style.setProperty(property, ...original.styles[property]);
       else node.style.setProperty(property, value);
     }
-    if (original.imageSource) {
-      const source = draft.content[id]?.source ?? original.imageSource;
-      if (node.getAttribute('src') !== source) node.setAttribute('src', source);
-    }
+    if (original.villaKind) renderVillaElement(original, overrides, draft.content[id]);
     applyText(original, content);
     if (id.startsWith('custom.')) scheduleCanvasSize(node.ownerDocument);
     if (nuptias || (draft.page === 'nuptias' && nuptiasLeftCaptions.includes(id))) {

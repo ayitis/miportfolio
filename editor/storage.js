@@ -84,11 +84,30 @@ export async function openEditor() {
         publish_now: publish,
       });
     },
-    async verifyPublication(page, revision) {
+    async verifyPublication(page, revision, expectedDraft) {
       const published = await readPublishedDocument(request, page);
       if (!published || published.revision == null || revision == null
         || String(published.revision) !== String(revision)) {
         throw new Error('La revisión publicada no coincide con el guardado.');
+      }
+      // Revision parity alone cannot prove that deleted branding photos stayed deleted.
+      if (page === 'villa-tiger' && expectedDraft) {
+        const expected = validateDraft(expectedDraft, page);
+        const actual = published.document;
+        for (const [id, item] of Object.entries(expected.elements)) {
+          if (!id.startsWith('villa-image.') || item.hidden !== true) continue;
+          if (actual.elements[id]?.hidden !== true) {
+            throw new Error(`La foto ${id} sigue visible en la versión publicada.`);
+          }
+        }
+        for (const view of ['desktop', 'mobile']) {
+          for (const [id, settings] of Object.entries(expected[view])) {
+            if (!id.startsWith('villa-image.') || settings.invisible !== true) continue;
+            if (actual[view][id]?.invisible !== true) {
+              throw new Error(`La foto ${id} no está oculta en ${view} en la publicación.`);
+            }
+          }
+        }
       }
     },
     async history(page, before) {

@@ -1,4 +1,4 @@
-import { designScale } from './ayam-canvas.js';
+import { designScale, scheduleCanvasSize } from './ayam-canvas.js';
 import { ayamFilm, ayamOrder } from './ayam-document.js';
 import { collectElements } from './render-design.js';
 
@@ -105,34 +105,55 @@ export function renderIreSettings(page, design, view) {
   page.dispatchEvent(new CustomEvent('portfolio:ire-settings', { detail: design.ayam[view].ire ?? {} }));
 }
 
-// Keep the red chapter close to the final row of campaign photos, independently
-// of the original grid rows or user-adjusted image positions. The negative margin
-// pulls NOT EGO and the following magazine up together without moving any photo.
-const notEgoGapListeners = new WeakSet();
-function positionNotEgoAfterPhotos(page) {
-  const section = page.querySelector('.chapter-list');
-  const lastPhotos = [...page.querySelectorAll('.ayam-news :is(.story-g,.story-h,.story-i)')]
-    .filter(node => !node.hidden && node.getClientRects().length);
-  if (!section || !lastPhotos.length) return;
-  // Reset the previous correction before measuring to avoid cumulative offsets.
-  section.style.marginTop = '';
-  const scale = designScale(page);
-  const photoBottom = Math.max(...lastPhotos.map(node => node.getBoundingClientRect().bottom));
-  const naturalGap = section.getBoundingClientRect().top - photoBottom;
-  // Roughly 3 cm of clear space at the desktop reference width.
-  const desiredGap = 113 * scale;
-  const shift = Math.min(0, (desiredGap - naturalGap) / scale);
-  section.style.marginTop = shift ? `${shift}px` : '';
-}
-function scheduleNotEgoGap(page) {
+export function watchAyamCampaign(page) {
+  const campaign = page.querySelector('.campaign');
+  const grid = campaign.querySelector('.ayam-news');
   const win = page.defaultView;
-  win.requestAnimationFrame(() => positionNotEgoAfterPhotos(page));
-}
-function watchNotEgoGap(page) {
-  if (notEgoGapListeners.has(page)) return;
-  notEgoGapListeners.add(page);
-  page.defaultView.addEventListener('resize', () => scheduleNotEgoGap(page));
-  page.querySelector('.ayam-news')?.addEventListener('load', () => scheduleNotEgoGap(page), true);
+  const range = page.createRange();
+  let frame;
+
+  function update() {
+    frame = undefined;
+    const photos = [...grid.querySelectorAll('.story-image')].filter(photo => photo.getClientRects().length);
+    if (!photos.length) {
+      campaign.style.paddingBottom = '';
+      campaign.style.height = '';
+      scheduleCanvasSize(page);
+      return;
+    }
+
+    const photoBottom = Math.max(...photos.map(photo => photo.getBoundingClientRect().bottom));
+    const target = photoBottom + 113;
+    // Preserve any visible captions or editorial text below the photos, even
+    // when a saved translation has taken them outside their original grid row.
+    let bottom = target;
+    const walker = page.createTreeWalker(grid, win.NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (!node.textContent.trim() || win.getComputedStyle(node.parentElement).visibility !== 'visible') continue;
+      range.selectNodeContents(node);
+      for (const rect of range.getClientRects()) bottom = Math.max(bottom, rect.bottom + 16);
+    }
+
+    // Keep the grid's intrinsic tracks so saved offsets retain their original
+    // origin. Only the campaign's height in document flow changes.
+    const top = campaign.getBoundingClientRect().top;
+    campaign.style.paddingBottom = '0';
+    campaign.style.height = `${(bottom - top) / designScale(page)}px`;
+    scheduleCanvasSize(page);
+  }
+
+  function schedule() {
+    frame ??= win.requestAnimationFrame(update);
+  }
+
+  new win.ResizeObserver(schedule).observe(grid);
+  new win.MutationObserver(schedule).observe(grid, {
+    subtree: true, childList: true, characterData: true,
+    attributes: true, attributeFilter: ['style', 'hidden', 'class'],
+  });
+  win.addEventListener('resize', schedule);
+  page.fonts.ready.then(schedule);
+  schedule();
 }
 
 export function renderAyam(page, design, view) {
@@ -177,12 +198,8 @@ export function renderAyam(page, design, view) {
     }
     node.style.translate = '';
   }
-  // Measure the natural gallery height without previously reserved blank space.
-  // Only reserve room if a translated photo actually extends past the gallery.
-  grid.style.paddingBottom = '';
   const galleryBounds = grid.getBoundingClientRect();
   const scale = designScale(page);
-  let reserve = 0;
   for (const [id, { node }] of media) {
     if (node.hidden) continue;
     const film = id === ayamFilm;
@@ -195,9 +212,5 @@ export function renderAyam(page, design, view) {
     node.dataset.ayamX = x;
     node.dataset.ayamY = y;
     if (x || y) node.style.translate = `${x}px ${y}px`;
-    if (!film) reserve = Math.max(reserve, Math.ceil((rect.bottom - galleryBounds.bottom) / scale + y));
   }
-  grid.style.paddingBottom = reserve ? `${reserve}px` : '';
-  watchNotEgoGap(page);
-  scheduleNotEgoGap(page);
 }

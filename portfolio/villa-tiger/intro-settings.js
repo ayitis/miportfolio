@@ -12,7 +12,7 @@ export function readVillaIntro(design, view) {
       scene, src: design?.villaIntro?.sources?.[scene] ?? introAsset(scene),
     })),
     transition: settings?.transition ?? 400,
-    logoSize: settings?.logoSize ?? (view === 'mobile' ? 43 : 18),
+    logoSize: settings?.logoSize ?? (view === 'mobile' ? 39 : 16),
   };
 }
 

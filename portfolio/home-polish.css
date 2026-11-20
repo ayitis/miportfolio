@@ -1,0 +1,35 @@
+/* Editorial light-sweep, intentionally restrained rather than neon. */
+.about .closing-statement {
+  position: relative;
+  background: linear-gradient(108deg,
+    #242127 0%, #242127 29%, #af6975 39%,
+    #fff0ed 46%, #d09aab 52%, #242127 64%, #242127 100%);
+  background-size: 245% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: editorial-letter-shimmer 7.5s ease-in-out infinite;
+}
+.gallery-wrap .card-info strong {
+  background: linear-gradient(106deg,#171717 5%, #171717 31%, #d3a7ae 47%,#fff7f4 50%,#171717 66%);
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: background-position .65s ease;
+}
+.gallery-wrap .project:hover .card-info strong,
+.gallery-wrap .project:focus-visible .card-info strong {
+  background-position: 0 0;
+}
+@keyframes editorial-letter-shimmer {
+  0%, 16% {background-position:100% 0}
+  42%, 67% {background-position:0% 0}
+  100% {background-position:100% 0}
+}
+@media (prefers-reduced-motion:reduce) {
+  .about .closing-statement {animation:none;background:none;-webkit-text-fill-color:currentColor}
+  .gallery-wrap .card-info strong {transition:none;background:none;-webkit-text-fill-color:currentColor}
+}

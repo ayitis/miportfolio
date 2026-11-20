@@ -15,7 +15,20 @@
   html[data-villa-scale] body { width: 1280px; zoom: var(--villa-scale); }
 }
 * { box-sizing: border-box; }
+/* Editor position offsets and moving carousels must never make the full page
+   horizontally scrollable (which exposes a cream strip beside olive sections). */
+html[data-design-page="villa-tiger"],
+html[data-design-page="villa-tiger"] body { max-width: 100%; overflow-x: clip; }
 body { margin: 0; color: var(--ink); background: var(--paper); font: 17px/1.5 Georgia, serif; }
+/* Wait until the published Supabase document has been applied before revealing
+   the project: otherwise the old HTML defaults visibly flash on initial load. */
+html[data-design-page="villa-tiger"]:not([data-villa-ready]) main,
+html[data-design-page="villa-tiger"]:not([data-villa-ready]) .villa-header {
+  visibility: hidden;
+}
+html[data-design-page="villa-tiger"]:not([data-villa-ready]) body {
+  background: var(--olive);
+}
 img { display: block; width: 100%; height: auto; }
 a { color: inherit; text-underline-offset: .3em; }
 figure, ul { margin: 0; padding: 0; }

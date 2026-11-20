@@ -37,36 +37,49 @@ if (!editing && !reducedMotion.matches && 'IntersectionObserver' in window) {
 }
 
 const sketch = document.querySelector('.villa-sketch');
-if (sketch && !editing && !reducedMotion.matches && 'IntersectionObserver' in window
-  && CSS.supports('mask-image', 'url(#villa-sketch-reveal)')) {
-  const defs = document.querySelector('.villa-sketch-defs');
-  const finish = defs.querySelector('.villa-sketch-finish');
-  sketch.dataset.drawing = 'waiting';
+if (sketch && !editing && !reducedMotion.matches && 'IntersectionObserver' in window) {
+  const drawing = sketch.querySelector('.villa-sketch-drawing');
+  const stages = [
+    ['structure', 0, 3200],
+    ['facade', 2800, 4800],
+    ['pool', 7100, 4000],
+    ['detail', 10400, 3700],
+    ['shading', 12800, 3700],
+  ];
+  const animations = [];
+  sketch.dataset.drawing = '';
 
   function complete() {
     delete sketch.dataset.drawing;
-    defs.classList.remove('is-drawing');
     observer.disconnect();
     reducedMotion.removeEventListener('change', reduce);
+    for (const animation of animations) animation.cancel();
   }
 
   function reduce(event) {
     if (event.matches) complete();
   }
 
-  const observer = new IntersectionObserver(async ([entry]) => {
-    if (!entry.isIntersecting) return;
+  const observer = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting || !drawing.getClientRects().length) return;
     observer.disconnect();
-    try {
-      await sketch.querySelector('img').decode();
-    } catch {
-      complete();
-      return;
+    for (const [stage, start, length] of stages) {
+      const paths = [...drawing.querySelectorAll(`.sketch-${stage} path`)];
+      const lengths = paths.map(path => path.getTotalLength());
+      const total = lengths.reduce((sum, value) => sum + value, 0);
+      let delay = start;
+      for (const [index, path] of paths.entries()) {
+        const step = length * (.45 / paths.length + .55 * lengths[index] / total);
+        const duration = Math.min(start + length - delay, step * 1.65);
+        animations.push(path.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
+          delay, duration, fill: 'both', easing: index % 3 === 0 ? 'cubic-bezier(.36,.2,.57,.86)' : 'linear',
+        }));
+        delay += step;
+      }
     }
-    if ('drawing' in sketch.dataset) defs.classList.add('is-drawing');
-  }, { threshold: .15 });
+    Promise.all(animations.map(animation => animation.finished)).then(complete, () => {});
+  }, { threshold: .12 });
 
-  finish.addEventListener('animationend', complete, { once: true });
   reducedMotion.addEventListener('change', reduce);
   observer.observe(sketch);
 }

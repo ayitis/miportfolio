@@ -213,22 +213,20 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 .villa-sketch {
   grid-column: 1 / -1;
   justify-self: center;
-  width: min(94%, 560px);
+  width: 100%;
 }
-.villa-sketch-defs { position: absolute; }
-.villa-sketch img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] {
-  filter: url(#villa-sketch-ink);
+.villa-sketch-drawing { display: none; }
+.villa-sketch img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] { opacity: 0; }
+.villa-sketch img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] + .villa-sketch-drawing {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
-.villa-sketch[data-drawing] img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] {
-  mask: url(#villa-sketch-reveal);
-}
-#villa-sketch-reveal path { stroke-dasharray: 1; stroke-dashoffset: 1; }
-.villa-sketch-finish { opacity: 0; }
-.villa-sketch-defs.is-drawing path {
-  animation: villa-sketch-stroke var(--duration) var(--delay) both linear;
-}
-.villa-sketch-defs.is-drawing .villa-sketch-finish {
-  animation: villa-sketch-finish 2200ms 13800ms both linear;
-}
-@keyframes villa-sketch-stroke { to { stroke-dashoffset: 0; } }
-@keyframes villa-sketch-finish { to { opacity: 1; } }
+.villa-sketch-drawing path { stroke-width: 1.05; }
+.villa-sketch-drawing .sketch-structure path { stroke-width: 1.55; }
+.villa-sketch-drawing .sketch-detail path { stroke-width: .83; opacity: .84; }
+.villa-sketch-drawing .sketch-shading path { stroke-width: .57; opacity: .47; }
+.villa-sketch[data-drawing] path { stroke-dasharray: 1; stroke-dashoffset: 1; }

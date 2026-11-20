@@ -1,6 +1,7 @@
 import { emptyDraft, validateDraft } from '../portfolio/design-document.js';
 import { signGalleryPhotos } from '../portfolio/gallery-storage.js';
 import { galleryBucket, uploadPath } from '../portfolio/gallery-document.js';
+import { readPublishedDocument } from '../portfolio/published-document.js';
 import { connect } from '../portfolio/supabase.js';
 
 const sessionKey = 'miportfolio.editor.session.v1';
@@ -82,6 +83,13 @@ export async function openEditor() {
         expected_revision: revision,
         publish_now: publish,
       });
+    },
+    async verifyPublication(page, revision) {
+      const published = await readPublishedDocument(request, page);
+      if (!published || published.revision == null || revision == null
+        || String(published.revision) !== String(revision)) {
+        throw new Error('La revisión publicada no coincide con el guardado.');
+      }
     },
     async history(page, before) {
       const cursor = before === undefined ? '' : `&revision=lt.${before}`;

@@ -10,6 +10,7 @@ import { pages } from './pages.js';
 import { visibleUploads } from './gallery-document.js';
 import { signGalleryPhotos, photoLinkLifetime } from './gallery-storage.js';
 import { collectGallery, renderGallery } from './render-gallery.js';
+import { readPublishedDocument } from './published-document.js';
 import { connect } from './supabase.js';
 
 const isEditorPreview = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
@@ -35,7 +36,7 @@ async function showPublishedDesign() {
   }
   const { request, published } = snapshot;
 
-  const design = validateDraft(published.document, page);
+  const design = firstPaint ? validateDraft(published.document, page) : published.document;
   const elements = collectElements(document, pages[page].targets);
   const gallery = page === 'nuptias' && collectGallery(document);
   const uploads = visibleUploads(design.gallery);
@@ -74,6 +75,7 @@ async function showPublishedDesign() {
 
   window.addEventListener('resize', render);
   render();
+  if (published.revision != null) document.documentElement.dataset.publishedRevision = String(published.revision);
 
   if (gallery && uploads.length) {
     async function updatePhotos() {
@@ -90,7 +92,7 @@ async function showPublishedDesign() {
 
 async function loadPublished(page) {
   const request = await connect();
-  const [published] = await request(`/rest/v1/portfolio_published?page=eq.${page}&select=document`);
+  const published = await readPublishedDocument(request, page);
   return { request, published };
 }
 

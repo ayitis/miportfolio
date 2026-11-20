@@ -1058,6 +1058,14 @@ async function save(publish) {
   revision = await store.save(draft, revision, publish);
   actions.save(draft);
   dirty = false;
+  if (publish) {
+    status.textContent = 'Verificando la publicación…';
+    try {
+      await store.verifyPublication(draft.page, revision);
+    } catch {
+      throw new Error(`El borrador #${revision} se guardó. No se pudo verificar que esa revisión esté disponible en la web pública. Puedes volver a pulsar Publicar cambios.`);
+    }
+  }
   status.textContent = publish ? 'Cambios publicados.' : 'Borrador guardado de forma privada.';
   // A history read failure must not present a successful write as failed.
   await loadHistory().catch(() => {

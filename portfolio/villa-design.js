@@ -3,7 +3,7 @@ import { mediaPath } from './ayam-document.js';
 export const villaPage = 'villa-tiger';
 export const villaAddedImage = id => /^villa-image\.added-[a-f0-9-]{36}$/.test(id);
 export const villaFields = {
-  image: { zoom: [100, 400], cropX: [0, 100], cropY: [0, 100], fit: ['contain', 'cover'], invisible: true },
+  image: { zoom: [50, 400], cropX: [0, 100], cropY: [0, 100], fit: ['contain', 'cover'], invisible: true },
   section: { spaceBefore: [0, 600], spaceAfter: [0, 600], marginBefore: [0, 600], marginAfter: [0, 600], gap: [0, 240] },
   swatch: { fill: 'color' },
 };

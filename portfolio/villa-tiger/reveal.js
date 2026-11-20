@@ -47,11 +47,14 @@ if (sketch && !editing && !reducedMotion.matches && 'IntersectionObserver' in wi
     ['shading', 5050, 1450],
   ];
   const animations = [];
+  const visibleFraction = .3;
   sketch.dataset.drawing = '';
 
   function complete() {
     delete sketch.dataset.drawing;
     observer.disconnect();
+    window.removeEventListener('pageshow', waitForScroll);
+    window.removeEventListener('scroll', observeAfterScroll);
     reducedMotion.removeEventListener('change', reduce);
     for (const animation of animations) animation.cancel();
   }
@@ -61,7 +64,7 @@ if (sketch && !editing && !reducedMotion.matches && 'IntersectionObserver' in wi
   }
 
   const observer = new IntersectionObserver(([entry]) => {
-    if (!entry.isIntersecting || !drawing.getClientRects().length) return;
+    if (entry.intersectionRatio < visibleFraction || !drawing.getClientRects().length) return;
     observer.disconnect();
     for (const [stage, start, length] of stages) {
       const paths = [...drawing.querySelectorAll(`.sketch-${stage} path`)];
@@ -78,8 +81,20 @@ if (sketch && !editing && !reducedMotion.matches && 'IntersectionObserver' in wi
       }
     }
     Promise.all(animations.map(animation => animation.finished)).then(complete, () => {});
-  }, { threshold: .12 });
+  }, { threshold: visibleFraction });
+
+  let initialScroll;
+  function observeAfterScroll() {
+    if (window.scrollY === initialScroll) return;
+    window.removeEventListener('scroll', observeAfterScroll);
+    observer.observe(sketch);
+  }
+
+  function waitForScroll() {
+    initialScroll = window.scrollY;
+    window.addEventListener('scroll', observeAfterScroll, { passive: true });
+  }
 
   reducedMotion.addEventListener('change', reduce);
-  observer.observe(sketch);
+  window.addEventListener('pageshow', waitForScroll, { once: true });
 }

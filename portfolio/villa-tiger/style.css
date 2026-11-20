@@ -315,3 +315,18 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   .social-feed { scroll-snap-type: x proximity; }
   .social-post { scroll-snap-align: start; }
 }
+
+/* Real Villa Tiger social posts, including the sunset reel, keep a 4:5 feed crop. */
+.social-profile-grid img, .social-profile-grid video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.social-post-video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

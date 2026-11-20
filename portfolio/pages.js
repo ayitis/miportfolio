@@ -103,6 +103,21 @@ export const pages = {
       ...['villa', 'brand', 'identity', 'palette', 'type', 'action', 'closing']
         .map(key => [`villa-section.${key}`, `Sección · ${key}`, `[data-villa-section="${key}"]`, { text: false, villaKind: 'section' }]),
       ...Array.from({ length: 6 }, (_, i) => [`villa-swatch.color-${i + 1}`, `Paleta · Muestra ${i + 1}`, `[data-villa-swatch="${i + 1}"]`, { text: false, villaKind: 'swatch' }]),
+      // Decorative groups, color blocks and divider-like containers can be selected,
+      // hidden and restored without changing the hard-coded source artwork.
+      ...[
+        ['hero-mark', 'Recuadro del logo · portada', '.hero-mark'],
+        ['brand-images', 'Recuadro · fotografías de la marca', '.brand-images'],
+        ['identity-feature', 'Bloque · identidad visual', '.identity-feature'],
+        ['identity-monogram', 'Recuadro · monograma', '.identity-feature > .monogram'],
+        ['logo-variants', 'Recuadros · versiones del logo', '.variants'],
+        ['color-grid', 'Cuadrícula · colores', '.swatches'],
+        ['type-board', 'Recuadro · tipografía', '.type-board'],
+        ['type-specimens', 'Bloques · muestras tipográficas', '.specimens'],
+        ['applications-grid', 'Cuadrícula · aplicaciones', '.applications'],
+        ['closing-grid', 'Bloque · cierre', '.closing-grid'],
+        ['header-rule', 'Línea · debajo del menú', '.villa-header'],
+      ].map(([id, label, selector]) => [`villa-decoration.${id}`, label, selector, { text: false, villaKind: 'decoration' }]),
     ],
   },
 };

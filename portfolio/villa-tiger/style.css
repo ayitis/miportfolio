@@ -357,7 +357,6 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 /* Dedicated 9:16 stories runway, reserved until real story assets are uploaded. */
 .social-stories {
   padding-block: clamp(48px, 7vw, 100px) clamp(28px, 5vw, 70px);
-  border-top: 1px solid #e9c6a32c;
 }
 .social-stories-heading {
   display: flex;

@@ -94,8 +94,16 @@ async function loadPublished(page) {
   return { request, published };
 }
 
-showPublishedDesign().catch(() => {
-  // The original page remains usable when data or configuration is unavailable.
+showPublishedDesign().catch((error) => {
+  // Never hide a failed publish read as if the site were displaying the saved design.
+  console.error('[Portfolio] Failed to load or render published design:', error);
+  if (document.documentElement.dataset.designPage === 'villa-tiger') {
+    const warning = document.createElement('div');
+    warning.setAttribute('role', 'alert');
+    warning.style.cssText = 'position:fixed;bottom:16px;left:16px;right:16px;z-index:99999;max-width:600px;margin:auto;padding:12px 16px;background:#fff8e9;color:#3a2517;border:1px solid #a5440d;box-shadow:0 4px 24px #0002;font:14px/1.45 Arial,sans-serif';
+    warning.textContent = 'Villa Tiger: no se pudo cargar la versión publicada desde Supabase. Esta página puede mostrar el diseño original. Recarga e inténtalo de nuevo.';
+    document.body.append(warning);
+  }
 }).finally(() => {
   window.nuptiasFirstPaint?.done();
   if (document.documentElement.dataset.designPage === ayamPage && !isEditorPreview) {

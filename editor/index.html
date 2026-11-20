@@ -47,16 +47,16 @@
           </optgroup>
         </select>
         <details id="villa-intro-tools" hidden>
-          <summary>Portada animada de Villa Tiger</summary>
+          <summary>Portada animada · tamaño del logo y fotografías</summary>
           <label>Jardín floral <input type="text" data-villa-intro-source="garden" maxlength="2000"></label>
           <label>Verde oliva <input type="text" data-villa-intro-source="olive" maxlength="2000"></label>
           <label>Terracota y piscina <input type="text" data-villa-intro-source="pool" maxlength="2000"></label>
           <div class="pair">
-            <label>Tamaño del logo (%) <input type="number" id="villa-intro-logo" min="12" max="72"></label>
+            <label>Tamaño del logo (%) <input type="number" id="villa-intro-logo" min="12" max="72" step="1"></label>
             <label>Fundido (ms) <input type="number" id="villa-intro-duration" min="250" max="2500"></label>
           </div>
           <label>Orden de las escenas <select id="villa-intro-order"></select></label>
-          <p>Las imágenes se comparten entre vistas. El orden, el tamaño y el fundido se ajustan por separado en Escritorio y Móvil.</p>
+          <p>Reduce «Tamaño del logo» para hacerlo más pequeño sobre las fotografías. Los cambios se ven en la vista previa y se publican al pulsar «Publicar cambios». Las opciones se ajustan por separado en Escritorio y Móvil.</p>
         </details>
         <details id="viewport-tools">
           <summary>Tamaño de la vista previa</summary>
@@ -336,7 +336,8 @@
           <p id="nuptias-guide-help" hidden>Puedes mover el bloque o el texto hasta el borde derecho de ABOUT. La guía señala ese límite.</p>
           <button type="button" id="nuptias-align-right" hidden>Alinear al margen derecho</button>
           <button type="button" id="villa-restore-photo" hidden>Restaurar imagen eliminada</button>
-          <button type="button" id="delete-element">Eliminar elemento</button>
+          <button type="button" id="villa-restore-decoration" hidden>Restaurar recuadro, línea o color</button>
+          <button type="button" id="delete-element">Ocultar / eliminar elemento</button>
           <button type="button" id="ayam-hide-text" hidden>Ocultar texto</button>
           <button type="button" id="ayam-restore-text" hidden>Restaurar texto</button>
           <button type="button" id="reset">Restaurar ajustes de este texto</button>

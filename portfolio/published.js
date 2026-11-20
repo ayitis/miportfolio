@@ -1,5 +1,5 @@
 import { ayamPage } from './ayam-document.js';
-import { renderAyam, renderIreSettings, syncAyamNodes } from './ayam-layout.js';
+import { renderAyam, renderIreSettings, renderNotEgo, syncAyamNodes } from './ayam-layout.js';
 import { carnagePage } from './carnage-document.js';
 import { applyNuptiasLayout } from './nuptias-layout.js';
 import { validateDraft } from './design-document.js';
@@ -51,6 +51,7 @@ async function showPublishedDesign() {
         }
         if (page === ayamPage) {
           renderAyam(document, design, view);
+          renderNotEgo(document, design, view);
           renderIreSettings(document, design, view);
         }
         if (gallery) renderGallery(gallery, design.gallery, view, urls);

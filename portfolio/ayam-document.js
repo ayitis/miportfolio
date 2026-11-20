@@ -9,6 +9,9 @@ export const ireFields = {
   duration: [65, 170, 115], intensity: [25, 115, 100], spacing: [65, 115, 100],
   background: '#f1efe9', color: '#171513',
 };
+export const notEgoFields = {
+  height: [0, 1600], top: [0, 400], bottom: [0, 400], alignment: [0, 100], background: '#d81622',
+};
 export const emptyAyam = () => ({ assets: {}, desktop: {}, mobile: {} });
 const record = value => value && typeof value === 'object' && !Array.isArray(value);
 const photoId = id => /^photo-(?:\d{2}|[a-f0-9-]{36})$/.test(id);
@@ -39,17 +42,18 @@ export function validateAyam(value) {
           new Set(layout.order).size !== layout.order.length) invalid();
       draft[view].order = [...layout.order];
     }
-    if (layout.ire !== undefined) {
-      if (!record(layout.ire)) invalid();
+    for (const [section, fields] of [['ire', ireFields], ['notEgo', notEgoFields]]) {
+      if (layout[section] === undefined) continue;
+      if (!record(layout[section])) invalid();
       const clean = {};
-      for (const [key, value] of Object.entries(layout.ire)) {
-        if (!Object.hasOwn(ireFields, key)) invalid();
-        const field = ireFields[key];
+      for (const [key, value] of Object.entries(layout[section])) {
+        if (!Object.hasOwn(fields, key)) invalid();
+        const field = fields[key];
         if (Array.isArray(field) ? !Number.isInteger(value) || value < field[0] || value > field[1]
           : typeof value !== 'string' || !/^#[0-9a-f]{6}$/i.test(value)) invalid();
         clean[key] = value;
       }
-      if (Object.keys(clean).length) draft[view].ire = clean;
+      if (Object.keys(clean).length) draft[view][section] = clean;
     }
     const items = layout.media ?? {};
     if (!record(items) || Object.keys(items).length > 200) invalid();

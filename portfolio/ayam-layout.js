@@ -88,6 +88,19 @@ export function renderAyamCrop(image, saved) {
   image.style.transform = zoom === 100 ? '' : `scale(${zoom / 100})`;
 }
 
+export function renderNotEgo(page, design, view) {
+  const section = page.querySelector('.chapter-list');
+  const { height, top, bottom, alignment, background } = design.ayam[view].notEgo ?? {};
+  section.toggleAttribute('data-not-ego-compact', [height, top, bottom].some(value => value !== undefined));
+  section.toggleAttribute('data-not-ego-aligned', alignment !== undefined);
+  for (const [name, value] of [['height', height], ['top', top], ['bottom', bottom]]) {
+    section.style.setProperty(`--not-ego-${name}`, value === undefined ? '' : `${value}px`);
+  }
+  section.style.setProperty('--not-ego-before', alignment === undefined ? '' : `${alignment}fr`);
+  section.style.setProperty('--not-ego-after', alignment === undefined ? '' : `${100 - alignment}fr`);
+  section.style.backgroundColor = background ?? '';
+}
+
 export function renderIreSettings(page, design, view) {
   page.dispatchEvent(new CustomEvent('portfolio:ire-settings', { detail: design.ayam[view].ire ?? {} }));
 }

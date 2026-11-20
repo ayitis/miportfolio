@@ -191,6 +191,10 @@
         </details>
         <details id="ire-tools" hidden>
           <summary>IRE Magazine</summary>
+          <div class="photo-actions">
+            <button type="button" data-ire-text="ire.title">Editar título</button>
+            <button type="button" data-ire-text="ire.description">Editar subtítulo</button>
+          </div>
           <button type="button" id="ire-show">Ir a la revista</button>
           <label><input type="checkbox" id="ire-preview"> Previsualizar la animación con scroll</label>
           <div class="pair">
@@ -206,6 +210,19 @@
             <label>Texto <input type="color" data-ire-field="color"></label>
           </div>
           <button type="button" id="ire-reset">Restablecer revista</button>
+        </details>
+        <details id="not-ego-tools" hidden>
+          <summary>NOT EGO — Fondo y dimensiones</summary>
+          <button type="button" id="not-ego-show">Ver NOT EGO</button>
+          <div class="pair">
+            <label>Altura (px) <input type="number" data-not-ego-field="height" placeholder="Original"></label>
+            <label>Posición vertical (%) <input type="number" data-not-ego-field="alignment" placeholder="50"></label>
+            <label>Espacio superior (px) <input type="number" data-not-ego-field="top" placeholder="Original"></label>
+            <label>Espacio inferior (px) <input type="number" data-not-ego-field="bottom" placeholder="Original"></label>
+          </div>
+          <label>Fondo <input type="color" data-not-ego-field="background"></label>
+          <p>El bloque conserva el espacio necesario para el texto y los márgenes que indiques. El 0 % coloca el texto arriba y el 100 %, abajo.</p>
+          <button type="button" id="not-ego-reset">Restablecer fondo y dimensiones</button>
         </details>
         <details class="column-tools" id="column-tools" hidden>
           <summary>Previsualizar transición de Home</summary>

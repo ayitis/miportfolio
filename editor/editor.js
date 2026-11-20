@@ -2,8 +2,8 @@ import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { mobileMaxWidth } from '../portfolio/viewport.js';
 import { renderPortfolio } from '../portfolio/render-portfolio.js';
-import { ayamPage, ireFields } from '../portfolio/ayam-document.js';
-import { renderIreSettings, syncAyamNodes } from '../portfolio/ayam-layout.js';
+import { ayamPage, ireFields, notEgoFields } from '../portfolio/ayam-document.js';
+import { renderIreSettings, renderNotEgo, syncAyamNodes } from '../portfolio/ayam-layout.js';
 import { setupAyam } from './ayam.js';
 import { carnagePage } from '../portfolio/carnage-document.js';
 import { setupCarnage } from './carnage.js';
@@ -531,6 +531,51 @@ find('ire-reset').addEventListener('click', () => {
   markDirty();
 });
 
+for (const button of ireTools.querySelectorAll('[data-ire-text]')) {
+  button.addEventListener('click', () => select(button.dataset.ireText, true));
+}
+
+const notEgoTools = find('not-ego-tools');
+const notEgoInputs = [...notEgoTools.querySelectorAll('[data-not-ego-field]')];
+
+function updateNotEgoTools() {
+  notEgoTools.hidden = draft.page !== ayamPage;
+  if (notEgoTools.hidden) return;
+  const saved = draft.ayam[view].notEgo ?? {};
+  for (const input of notEgoInputs) {
+    const key = input.dataset.notEgoField;
+    const field = notEgoFields[key];
+    input.value = saved[key] ?? (Array.isArray(field) ? '' : field);
+  }
+  renderNotEgo(preview.contentDocument, draft, view);
+}
+
+for (const input of notEgoInputs) {
+  const key = input.dataset.notEgoField;
+  const field = notEgoFields[key];
+  if (Array.isArray(field)) [input.min, input.max] = field;
+  input.addEventListener('change', () => {
+    if (draft.page !== ayamPage || workspace.inert) return;
+    if (!input.validity.valid) { updateNotEgoTools(); return; }
+    const settings = draft.ayam[view].notEgo ??= {};
+    if (input.value === '') delete settings[key];
+    else settings[key] = Array.isArray(field) ? input.valueAsNumber : input.value;
+    if (!Object.keys(settings).length) delete draft.ayam[view].notEgo;
+    updateNotEgoTools();
+    markDirty();
+  });
+}
+
+find('not-ego-show').addEventListener('click', () => {
+  preview.contentDocument.getElementById('project')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+});
+find('not-ego-reset').addEventListener('click', () => {
+  if (draft.page !== ayamPage || workspace.inert) return;
+  delete draft.ayam[view].notEgo;
+  updateNotEgoTools();
+  markDirty();
+});
+
 function applyView(next) {
   finishDrag();
   view = next;
@@ -545,6 +590,7 @@ function applyView(next) {
     },
     renderHome: syncColumn,
   });
+  updateNotEgoTools();
   updateIreTools();
   updateFields();
   syncRulers();
@@ -954,6 +1000,7 @@ async function showPage(page) {
   columnStage.value = '0';
   find('column-tools').hidden = true;
   ireTools.hidden = true;
+  notEgoTools.hidden = true;
   irePreview.checked = false;
   dirty = false;
   select('');

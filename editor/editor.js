@@ -128,6 +128,7 @@ function updateFields() {
   const villaBlock = image || villaSection || villaSwatch || villaDecoration;
   find('villa-add-photo').hidden = draft.page !== villaPage;
   find('villa-image-tools').hidden = !image;
+  find('villa-sketch-tools').hidden = selected !== 'villa-image.croquis';
   find('villa-section-tools').hidden = !villaSection;
   find('villa-swatch-tools').hidden = !villaSwatch;
   find('villa-restore-photo').hidden = !image || !draft.elements[selected]?.hidden;
@@ -136,7 +137,11 @@ function updateFields() {
   for (const input of villaInputs) {
     const key = input.dataset.villaField;
     if (input.type === 'checkbox') input.checked = Boolean(overrides[key]);
-    else input.value = overrides[key] ?? (key === 'fill' ? original?.swatch ?? '#000000' : '');
+    else input.value = overrides[key] ?? (key === 'fill' ? original?.swatch ?? '#000000'
+      : ['stretchX', 'stretchY'].includes(key) ? 100 : key === 'shift' ? 0 : '');
+    if (key === 'stretchX') find('villa-sketch-x-value').textContent = `${input.value} %`;
+    if (key === 'stretchY') find('villa-sketch-y-value').textContent = `${input.value} %`;
+    if (key === 'shift') find('villa-section-shift-value').textContent = `${input.value} px`;
   }
   villaImageSource.parentElement.hidden = !image;
   villaImageSource.value = image ? draft.content[selected]?.source ?? image : '';
@@ -934,6 +939,9 @@ for (const input of villaInputs) {
       : input.value === '' ? undefined
       : input.type === 'number' ? input.valueAsNumber : input.value;
     updateSetting(view, input.dataset.villaField, value);
+    if (input.dataset.villaField === 'stretchX') find('villa-sketch-x-value').textContent = `${value ?? 100} %`;
+    if (input.dataset.villaField === 'stretchY') find('villa-sketch-y-value').textContent = `${value ?? 100} %`;
+    if (input.dataset.villaField === 'shift') find('villa-section-shift-value').textContent = `${value ?? 0} px`;
     apply(selected);
     markDirty(input);
   });

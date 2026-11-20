@@ -2,7 +2,7 @@ import { designScale } from '../portfolio/ayam-canvas.js';
 import { frameUpdate } from './frame-update.js';
 import { mobileMaxWidth } from '../portfolio/viewport.js';
 import { renderPortfolio } from '../portfolio/render-portfolio.js';
-import { ayamPage, ireFields, notEgoFields } from '../portfolio/ayam-document.js';
+import { ayamPage, ireFields, mediaPath, notEgoFields } from '../portfolio/ayam-document.js';
 import { renderIreSettings, renderNotEgo, syncAyamNodes } from '../portfolio/ayam-layout.js';
 import { setupAyam } from './ayam.js';
 import { carnagePage } from '../portfolio/carnage-document.js';
@@ -30,6 +30,7 @@ const canvasKey = () => `${draft.page}:${view}`;
 const element = find('element');
 const pagePicker = find('page');
 const status = find('status');
+const villaImageSource = find('villa-image-source');
 const fields = [...document.querySelectorAll('[data-field]')];
 const viewButtons = [...document.querySelectorAll('[data-view]')];
 let editable = new Map();
@@ -64,7 +65,7 @@ function updateActionButtons() {
   find('undo').disabled = !actions.canUndo;
   find('redo').disabled = !actions.canRedo;
   find('paste-element').disabled = !clipboard || pagePicker.disabled || (clipboard.type === 'photo' && draft.page !== 'nuptias');
-  for (const id of ['copy-element', 'duplicate-element']) find(id).disabled = (!selected && !gallery.hasSelection) || layoutElement(selected);
+  for (const id of ['copy-element', 'duplicate-element']) find(id).disabled = (!selected && !gallery.hasSelection) || layoutElement(selected) || Boolean(editable.get(selected)?.[0]?.imageSource);
 }
 
 function markDirty(group) {
@@ -115,6 +116,10 @@ function apply(id) {
 function updateFields() {
   const overrides = draft[view][selected] ?? {};
   const original = editable.get(selected)?.[0];
+  const image = original?.imageSource;
+  villaImageSource.parentElement.hidden = !image;
+  villaImageSource.value = image ? draft.content[selected]?.source ?? image : '';
+  villaImageSource.setCustomValidity('');
   const group = layoutElement(selected);
   const groupSizing = selected === groupTarget;
   find('element-layers').hidden = !selected.startsWith('custom.');
@@ -126,15 +131,15 @@ function updateFields() {
   const limited = draft.page === 'nuptias' && hasNuptiasDesktopLimit(selected, view);
   find('nuptias-align-right').hidden = draft.page !== 'nuptias' || !isNuptiasPosition(selected);
   find('nuptias-guide-help').hidden = !limited;
-  find('reset').textContent = selected === nuptiasEditorial ? 'Restablecer posición del bloque' : group ? 'Restablecer cinta' : 'Restaurar ajustes de este texto';
-  find('reset-color').closest('.color-setting').hidden = group;
+  find('reset').textContent = selected === nuptiasEditorial ? 'Restablecer posición del bloque' : group ? 'Restablecer cinta' : image ? 'Restaurar imagen original' : 'Restaurar ajustes de este texto';
+  find('reset-color').closest('.color-setting').hidden = group || Boolean(image);
   for (const input of fields) {
     if (['text', 'size', 'font', 'align', 'spacing', 'height'].includes(input.dataset.field)) {
-      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing && draft.page !== ayamPage : group;
+      input.parentElement.hidden = input.dataset.field === 'height' ? !groupSizing && draft.page !== ayamPage : group || Boolean(image);
     }
   }
   fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected) || selected === nuptiasEditorial;
-  find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : 'Ajustes del texto';
+  find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : image ? 'Ajustes de la imagen' : 'Ajustes del texto';
   const height = fields.find(input => input.dataset.field === 'height');
   height.min = draft.page === ayamPage ? '16' : String(bounds.height[0]);
   height.max = draft.page === ayamPage ? '4000' : String(bounds.height[1]);
@@ -271,7 +276,7 @@ function captureElement() {
     return true;
   }
   const item = editable.get(selected)?.[0];
-  if (!item || layoutElement(selected)) return false;
+  if (!item || item.imageSource || layoutElement(selected)) return false;
   const win = preview.contentWindow;
   const rect = item.node.getBoundingClientRect();
   const css = win.getComputedStyle(item.node);
@@ -809,6 +814,22 @@ for (const input of fields) {
   });
 }
 
+villaImageSource.addEventListener('input', () => villaImageSource.setCustomValidity(''));
+villaImageSource.addEventListener('change', () => {
+  const original = editable.get(selected)?.[0]?.imageSource;
+  if (!original || workspace.inert) return;
+  const source = villaImageSource.value.trim();
+  if (source && !mediaPath(source)) {
+    villaImageSource.setCustomValidity('Usa una ruta del portfolio o una URL HTTPS de imagen.');
+    villaImageSource.reportValidity();
+    return;
+  }
+  updateSetting('content', 'source', source && source !== original ? source : undefined);
+  apply(selected);
+  updateFields();
+  markDirty();
+});
+
 find('reset-color').addEventListener('click', () => {
   updateSetting(view, 'color', undefined);
   apply(selected);
@@ -874,6 +895,8 @@ function runAction(action) {
         ? 'Hay un borrador más reciente. Descarga una copia de tus cambios y recarga el editor.'
         : error.code === 'PGRST202' && draft.page === 'nuptias'
           ? 'Ejecuta primero la migración de NUPTIAS en el proyecto de Supabase de Preview.'
+          : draft.page === 'villa-tiger' && ['PGRST202', '22023', '23514'].includes(error.code)
+            ? 'Ejecuta la migración de Villa Tiger en Supabase de Preview.'
           : draft.page === ayamPage && ['PGRST202', '22023', '23514'].includes(error.code)
             ? 'Si aún no lo has hecho, ejecuta la migración de AYAM en Supabase de Preview.'
             : draft.page === carnagePage && ['PGRST202', '22023', '23514'].includes(error.code)

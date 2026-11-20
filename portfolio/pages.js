@@ -91,4 +91,15 @@ export const pages = {
       ['footer.home', 'Pie · Back to Home', 'footer a'],
     ],
   },
+
+  'villa-tiger': {
+    label: 'Villa Tiger Marrakech',
+    path: '/villa-tiger.html',
+    targets: [
+      ...['index', 'title', 'subtitle', 'brand-label', 'brand-title', 'brand-copy', 'scope', 'identity-label', 'identity-title', 'identity-copy', 'monogram', 'palette-label', 'palette-title', 'color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'type-label', 'type-title', 'display-name', 'display-copy', 'serif-name', 'serif-copy', 'type-note', 'action-label', 'action-title', 'suite', 'food', 'stories', 'menu', 'review', 'closing-label', 'closing-title', 'back', 'next']
+        .map(key => [`villa.${key}`, `Texto · ${key.replaceAll('-', ' ')}`, `[data-villa-text="${key}"]`]),
+      ...['cover', 'primary', 'interior', 'balloon', 'pool', 'monogram', 'olive', 'orange', 'dark', 'cream', 'suite', 'terrace', 'food', 'camel', 'menu', 'review', 'closing']
+        .map(key => [`villa-image.${key}`, `Imagen · ${key}`, `[data-villa-image="${key}"]`, { text: false, image: true }]),
+    ],
+  },
 };

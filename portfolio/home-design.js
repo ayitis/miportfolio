@@ -29,7 +29,7 @@ for (const [project, name, href] of [
   ['carnage', 'Maison Carnage', 'project.html?name=carnage'],
   ['ayam', 'AYAM', 'ayam.html'],
   ['yves', 'Yves Rocher', 'project.html?name=yves'],
-  ['villa', 'Villa Tiger', 'project.html?name=villa'],
+  ['villa', 'Villa Tiger', 'villa-tiger.html'],
 ]) {
   const card = `.project[href="${href}"] .card-info`;
   targets.push(

@@ -11,6 +11,7 @@ export function collectElements(page, targets) {
     const originals = [...page.querySelectorAll(selector)].map((node) => ({
       node,
       allowText: options?.text !== false,
+      imageSource: options?.image ? node.getAttribute('src') : null,
       gallery: options?.gallery === true,
       inline: options?.inline === true,
       children: [...node.childNodes],
@@ -131,6 +132,10 @@ export function applyElement(editable, id, draft, view) {
     for (const [property, value] of Object.entries({ ...styles, ...adapted, display })) {
       if (value === null) node.style.setProperty(property, ...original.styles[property]);
       else node.style.setProperty(property, value);
+    }
+    if (original.imageSource) {
+      const source = draft.content[id]?.source ?? original.imageSource;
+      if (node.getAttribute('src') !== source) node.setAttribute('src', source);
     }
     applyText(original, content);
     if (id.startsWith('custom.')) scheduleCanvasSize(node.ownerDocument);

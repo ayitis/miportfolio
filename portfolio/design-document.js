@@ -1,4 +1,4 @@
-import { ayamPage, emptyAyam, validateAyam } from './ayam-document.js';
+import { ayamPage, emptyAyam, mediaPath, validateAyam } from './ayam-document.js';
 import { carnagePage, emptyCarnage, validateCarnage } from './carnage-document.js';
 import { followsNuptiasHeading, nuptiasEditorial } from './nuptias-layout.js';
 import { pages } from './pages.js';
@@ -52,7 +52,8 @@ export function validateDraft(value, page = value?.page) {
         const range = page === ayamPage && field === 'height' ? [16, 4000]
           : Object.hasOwn(bounds, field) ? bounds[field] : null;
         const valid = view === 'content'
-          ? field === 'text' && typeof setting === 'string' && setting.length <= 2000
+          ? (field === 'text' && typeof setting === 'string' && setting.length <= 2000)
+            || (page === 'villa-tiger' && field === 'source' && pages[page].targets.some(([target, , , options]) => target === id && options?.image) && mediaPath(setting))
           : (range && Number.isInteger(setting) && setting >= range[0] && setting <= range[1])
             || (field === 'font' && typeof setting === 'string' && Object.hasOwn(fonts, setting))
             || (field === 'align' && alignments.includes(setting))

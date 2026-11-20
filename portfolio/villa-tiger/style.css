@@ -320,8 +320,6 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 }
 .social-post img { object-fit: cover; }
 .social-post:nth-of-type(even) { margin-top: 6px; }
-.social-archive { margin-top: 36px; }
-.social-archive summary { width: fit-content; cursor: pointer; color: #ddb89a; font-size: .88rem; }
 @media (max-width: 760px) {
   .social-layout { --social-join-gap: 12px; --social-overlap: 16px; }
   .social-phone { width: min(42%, 226px); padding: 3px; border-radius: 22px; }
@@ -359,6 +357,8 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   padding-block: clamp(48px, 7vw, 100px) clamp(28px, 5vw, 70px);
 }
 .social-stories-heading {
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: end;
@@ -367,6 +367,8 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 }
 .social-stories-heading .label { color: #ddb89a; }
 .social-stories-heading h3 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
   margin: 8px 0 0;
   font-family: var(--display);
   font-weight: normal;
@@ -418,6 +420,7 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 .social-story-placeholder small { font: 600 .65rem/1.4 Arial,sans-serif; letter-spacing: .28em; }
 @media (max-width: 760px) {
   .social-stories-heading { display: block; }
+  .social-stories-heading h3 { font-size: clamp(1.6rem, 7.5vw, 3rem); }
   .social-stories-note { text-align: left; margin-top: 14px; }
   .social-story, .social-story-placeholder { width: clamp(145px, 45vw, 210px); border-radius: 12px; }
   .social-stories-feed { scroll-snap-type: x proximity; }

@@ -124,7 +124,7 @@ function updateFields() {
   const image = original?.imageSource;
   const villaSection = original?.villaKind === 'section';
   const villaSwatch = original?.villaKind === 'swatch';
-  const villaDecoration = original?.villaKind === 'decoration';
+  const villaDecoration = ['decoration', 'rule'].includes(original?.villaKind);
   const villaBlock = image || villaSection || villaSwatch || villaDecoration;
   find('villa-add-photo').hidden = draft.page !== villaPage;
   find('villa-image-tools').hidden = !image;
@@ -963,7 +963,7 @@ find('villa-insert-photo').addEventListener('click', () => {
   markDirty();
 });
 find('villa-restore-decoration').addEventListener('click', () => {
-  if (draft.page !== villaPage || !['swatch', 'decoration'].includes(editable.get(selected)?.[0]?.villaKind)
+  if (draft.page !== villaPage || !['swatch', 'decoration', 'rule'].includes(editable.get(selected)?.[0]?.villaKind)
       || !draft.elements[selected]?.hidden) return;
   delete draft.elements[selected];
   apply(selected);

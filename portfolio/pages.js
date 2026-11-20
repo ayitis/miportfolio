@@ -118,6 +118,7 @@ export const pages = {
       ['yves.phone', 'Instagram · Teléfono completo', '.mobile', { text: false }],
       ['yves.phone-name', 'Instagram · Usuario del móvil', '.mobile-title'],
       ['yves.phone-tiles', 'Instagram · Posts del móvil', '.mobile .ig-grid', { text: false }],
+      ['yves.phone-grid-image', 'Instagram · Cuadrícula real subida a GitHub', '.mobile .uploaded-instagram-grid', { text: false }],
       ...Array.from({ length: 9 }, (_, i) => [
         ['yves.instagram-post-' + (i + 1), 'Instagram · Post ' + (i + 1), '.ig-profile .ig-tile:nth-child(' + (i + 1) + ')'],
         ['yves.mobile-post-' + (i + 1), 'Móvil · Post ' + (i + 1), '.mobile .ig-tile:nth-child(' + (i + 1) + ')'],

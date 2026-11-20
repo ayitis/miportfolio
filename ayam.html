@@ -214,24 +214,19 @@ footer{background:#111;color:#fff;border-top:1px solid #555;padding:22px var(--s
             <div class="ire-book" tabindex="0" aria-label="Magazine pages. Use the left and right arrow keys to turn pages.">
               <img class="ire-left" src="/portfolio/ire/preview-01.webp" alt="IRE Magazine cover" loading="lazy" width="450" height="318">
               <img class="ire-right" alt="" width="450" height="318" hidden>
+              <div class="ire-leaf" aria-hidden="true" hidden>
+                <img class="ire-face ire-front" alt="">
+                <img class="ire-face ire-back" alt="">
+              </div>
             </div>
           </div>
         </div>
         <p class="ire-scroll">SCROLL TO EXPLORE ↓</p>
-        <div class="ire-controls" hidden>
-          <button type="button" data-ire-prev aria-label="Previous page">←</button>
-          <output class="ire-count" aria-live="polite"></output>
-          <button type="button" data-ire-next aria-label="Next page">→</button>
-          <button type="button" data-ire-zoom>Zoom</button>
-          <a href="/AYAMS.TUDIO%20-%20separated.pdf" target="_blank" rel="noopener">Open PDF ↗</a>
-        </div>
+        <output class="ire-assistive ire-count" aria-live="polite"></output>
+        <a class="ire-assistive ire-pdf" href="/AYAMS.TUDIO%20-%20separated.pdf" target="_blank" rel="noopener">Open IRE Magazine PDF ↗</a>
         <noscript><p><a href="/AYAMS.TUDIO%20-%20separated.pdf">Open IRE Magazine (PDF)</a></p></noscript>
       </div>
     </div>
-    <dialog class="ire-lightbox" aria-label="Enlarged magazine pages">
-      <form method="dialog"><button type="submit">Close ×</button></form>
-      <div class="ire-zoom-pages"></div>
-    </dialog>
   </section>
 </main>
 <footer><span>AYAM / AYA ARBAOUI</span><a href="/">BACK TO HOME ↑</a></footer>

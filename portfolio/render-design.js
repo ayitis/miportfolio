@@ -155,10 +155,17 @@ export function applyElement(editable, id, draft, view) {
     // Keep removals identical in the editor and published surface, even if a
     // decorative CSS rule supplies display:grid/flex or the viewport changes.
     if (draft.page === villaPage && original.villaKind) {
-      node.hidden = hidden;
-      node.toggleAttribute('data-villa-removed', hidden);
+      // Removing a rule must not remove its entire functional container.
+      if (original.villaKind === 'rule') {
+        const property = id === 'villa-rule.header' ? 'border-bottom' : 'border-top';
+        if (hidden) node.style.setProperty(property, 'none');
+        else node.style.removeProperty(property);
+      } else {
+        node.hidden = hidden;
+        node.toggleAttribute('data-villa-removed', hidden);
+      }
     }
-    const display = hidden ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
+    const display = hidden && original.villaKind !== 'rule' ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
       ? 'inline-block' : null;
     for (const [property, value] of Object.entries({ ...styles, ...adapted, ...(original.villaKind === 'section' && { height: null }), display })) {
       if (value === null) node.style.setProperty(property, ...original.styles[property]);

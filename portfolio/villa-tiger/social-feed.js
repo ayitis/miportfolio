@@ -44,7 +44,9 @@ if (!editing) {
     feed.scrollLeft = 0;
     feed.dataset.looping = '';
     const duration = 1000 * Number(getComputedStyle(section).getPropertyValue('--social-seconds'));
-    motion = track.animate([{ transform: 'translateX(0)' }, { transform: `translateX(-${length}px)` }], {
+    // Move from the right side of the phone outward: every card travels left-to-right.
+    // The repeated strips keep the motion seamless across loop boundaries.
+    motion = track.animate([{ transform: `translateX(-${length}px)` }, { transform: 'translateX(0)' }], {
       duration, iterations: Infinity, easing: 'linear',
     });
     motion.currentTime = progress * duration;

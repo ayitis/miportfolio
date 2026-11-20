@@ -4,7 +4,7 @@ import { introAsset, readVillaIntro } from './intro-settings.js';
 const stage = document.querySelector('.villa-intro');
 const backgrounds = stage.querySelector('.villa-intro-scenes');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const hold = 3000;
+const hold = 1800;
 let slides = [];
 let settings;
 let signature;

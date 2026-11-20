@@ -67,6 +67,11 @@
   height: 100%;
   max-height: none;
   object-fit: fill;
+  object-position: center;
+  /* The uploaded screenshot includes white padding: crop only that empty
+     surround so its profile and all nine original posts fill the phone. */
+  transform: scale(1.40, 1.16);
+  transform-origin: center;
 }
 @media (max-width: 560px) {
   .mobile.mobile-full-grid { aspect-ratio: 9 / 16; }
@@ -74,7 +79,7 @@
   .mobile.mobile-full-grid .ig-grid-uploaded .uploaded-instagram-grid { height: 100%; }
 }
 @media (max-width:768px) {
-  .mobile.mobile-full-grid .ig-grid-uploaded .uploaded-instagram-grid { object-fit: contain; object-position: top center; }
+  .mobile.mobile-full-grid .ig-grid-uploaded .uploaded-instagram-grid { object-fit: fill; object-position: center; }
   [data-yves-in-view] { animation-duration: .55s; }
 }
 </style>

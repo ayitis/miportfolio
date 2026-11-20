@@ -152,9 +152,9 @@ export function applyElement(editable, id, draft, view) {
     }
     const hidden = draft.elements[id]?.hidden === true
       || (original.villaKind === 'image' && overrides.invisible === true);
-    // Mark Villa Tiger image frames as truly hidden on BOTH the editor and public page.
-    // A DOM hidden attribute avoids CSS layout/reveal rules resurrecting removed photos.
-    if (draft.page === villaPage && original.villaKind === 'image') {
+    // Keep removals identical in the editor and published surface, even if a
+    // decorative CSS rule supplies display:grid/flex or the viewport changes.
+    if (draft.page === villaPage && original.villaKind) {
       node.hidden = hidden;
       node.toggleAttribute('data-villa-removed', hidden);
     }

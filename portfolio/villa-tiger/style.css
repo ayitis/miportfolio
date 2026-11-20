@@ -199,7 +199,7 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   display: none !important;
 }
 /* Remove otherwise empty photo groups and application cards to avoid blank holes. */
-.brand-images:not(:has(> .villa-frame:not([hidden]))),
+.brand-images:not(:has(> .villa-frame:not([hidden]))):not([hidden]),
 .variants:not(:has(> .villa-frame:not([hidden]))),
 .application-images:not(:has(> .villa-frame:not([hidden]))),
 .application:has(> .application-images:not(:has(> .villa-frame:not([hidden])))) {

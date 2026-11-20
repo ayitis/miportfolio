@@ -63,7 +63,8 @@ function configure() {
     return;
   }
   const heroHeight = hero.offsetHeight;
-  travel = Math.round(Math.min(heroHeight, innerHeight) * (narrow.matches ? 1.7 : 1.6));
+  // The editorial column forms within a single comfortable downward scroll.
+  travel = Math.round(Math.min(heroHeight, innerHeight) * (narrow.matches ? 1.2 : 1.05));
   scene.style.setProperty('--hero-height', `${heroHeight}px`);
   root.style.setProperty('--hero-travel', `${travel}px`);
   needsMeasure = true;
@@ -155,8 +156,8 @@ function tick(progress, timestamp) {
     lastTick = null;
     return;
   }
-  const paused = document.hidden || active.entries.some(({ card }) =>
-    (canHover.matches && card.matches(':hover')) || card.matches(':focus-within'));
+  // Once aligned, the vertical runway keeps moving automatically even on hover.
+  const paused = document.hidden || active.entries.some(({ card }) => card.matches(':focus-within'));
   if (lastTick !== null && !paused) {
     distance += Math.min(timestamp - lastTick, 50) * pixelsPerSecond / 1000;
   }
@@ -292,6 +293,25 @@ if (inEditor) {
   });
   if (lastHash === '#about') goToAbout();
   configure();
+  // A single downward wheel gesture guides desktop visitors into the upright,
+  // self-moving project column instead of requiring repeated scrolls.
+  // Touch scrolling is preserved and can be tuned independently for mobile.
+  let snappingToColumn = false;
+  let snapRelease;
+  window.addEventListener('wheel', event => {
+    if (event.deltaY <= 0 || event.ctrlKey || narrow.matches || motion.matches ||
+        root.hasAttribute('data-about-direct') || !root.hasAttribute('data-home-scroll') ||
+        !scene.contains(event.target) || !travel) return;
+    const sceneTop = scene.getBoundingClientRect().top + window.scrollY;
+    const formationY = sceneTop + travel * (formedAt + .025);
+    if (window.scrollY >= formationY - 12) return;
+    event.preventDefault();
+    if (snappingToColumn) return;
+    snappingToColumn = true;
+    window.scrollTo({ top: formationY, behavior: 'smooth' });
+    window.clearTimeout(snapRelease);
+    snapRelease = window.setTimeout(() => { snappingToColumn = false; }, 850);
+  }, { passive: false });
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', configure);
   window.addEventListener('hashchange', navigateHash);

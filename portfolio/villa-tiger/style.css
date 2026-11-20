@@ -365,8 +365,10 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   gap: 22px;
   margin-bottom: clamp(22px, 3vw, 42px);
 }
+.social-stories-heading > div { flex: 1 1 auto; min-width: 0; max-width: 100%; }
 .social-stories-heading .label { color: #ddb89a; }
 .social-stories-heading h3 {
+  width: min(100%, 100%);
   max-width: 100%;
   overflow-wrap: anywhere;
   margin: 8px 0 0;

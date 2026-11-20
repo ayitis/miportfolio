@@ -150,7 +150,11 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 [data-villa-section] :is(.hero-board, .brand-images, .section-heading, .identity-feature, .variants, .swatches, .specimens, .applications, .closing-grid) {
   gap: var(--villa-section-gap, var(--villa-default-gap, var(--gap)));
 }
-[data-villa-section="brand"] { gap: var(--villa-section-gap, var(--gap)); }
+[data-villa-section="brand"] {
+  row-gap: var(--villa-section-gap, clamp(12px, calc(1.4 * var(--villa-vw)), 18px));
+  column-gap: var(--villa-section-gap, var(--gap));
+  padding-block-end: clamp(12px, calc(1.35 * var(--villa-vw)), 18px);
+}
 [data-villa-section] :is(.hero-board, .swatches) { --villa-default-gap: 0px; }
 [data-villa-section] .applications { --villa-default-gap: clamp(18px, calc(3 * var(--villa-vw)), 42px) var(--gap); }
 
@@ -206,9 +210,10 @@ a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
   display: none !important;
 }
 
-.villa-sketch { width: min(82%, 455px); }
-@media (width > 760px) {
-  .villa-sketch { grid-column: 1; grid-row: 2; }
+.villa-sketch {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(94%, 560px);
 }
 .villa-sketch-defs { position: absolute; }
 .villa-sketch img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] {

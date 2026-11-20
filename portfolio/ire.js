@@ -8,13 +8,14 @@ const artwork = section.querySelector('.ire-artwork');
 const stack = [...section.querySelectorAll('.ire-stack img')];
 const reader = section.querySelector('.ire-reader');
 const book = section.querySelector('.ire-book');
-const [left, right] = book.querySelectorAll('img');
+const [currentLayer, nextLayer] = book.querySelectorAll('.ire-spread');
 const count = section.querySelector('.ire-count');
 const hint = section.querySelector('.ire-scroll');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const editing = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
 const mobile = () => portfolioView(window, 'ayam') === 'mobile';
 const total = 56;
+const spreads = 29;
 const clamp = value => Math.max(0, Math.min(1, value));
 const ease = value => { value = clamp(value); return value * value * (3 - 2 * value); };
 const mix = (a, b, value) => a + (b - a) * value;
@@ -50,30 +51,41 @@ function warm(number) {
   new Image().src = imagePath(number);
 }
 
-function drawImage(position) {
-  const current = Math.floor(position) + 1;
+function pagesAt(index) {
+  if (index === 0) return [1];
+  if (index === spreads - 1) return [total];
+  return [index * 2, index * 2 + 1];
+}
+
+function setSpread(layer, pages) {
+  [...layer.children].forEach((image, i) => setImage(image, pages[i]));
+}
+
+function drawSpread(position) {
+  const current = Math.floor(position);
   const fraction = position % 1;
   const shift = reduced.matches ? 0 : ease((fraction - .32) / .48);
-  const selected = fraction >= .56 ? Math.min(current + 1, total) : current;
-  const label = `${selected} / ${total}`;
+  const next = pagesAt(Math.min(current + 1, spreads - 1));
+  const selected = fraction >= .56 ? next : pagesAt(current);
+  const label = `${selected.join('–')} / ${total}`;
   if (count.value !== label) count.value = label;
-  setImage(left, reduced.matches ? selected : current);
-  setImage(right, fraction && !reduced.matches ? current + 1 : 0);
-  left.setAttribute('aria-hidden', String(shift >= .5));
-  right.setAttribute('aria-hidden', String(shift < .5));
-  right.style.opacity = shift;
-  warm(current + 1);
+  setSpread(currentLayer, reduced.matches ? selected : pagesAt(current));
+  setSpread(nextLayer, fraction && !reduced.matches ? next : []);
+  currentLayer.setAttribute('aria-hidden', String(shift >= .5));
+  nextLayer.setAttribute('aria-hidden', String(shift < .5));
+  nextLayer.style.opacity = shift;
+  next.forEach(warm);
 }
 
 book.addEventListener('keydown', event => {
   const direction = {ArrowLeft: -1, ArrowRight: 1}[event.key];
   if (!direction) return;
   event.preventDefault();
-  const index = Math.max(0, Math.min(total - 1, Math.round(bookPosition) + direction));
+  const index = Math.max(0, Math.min(spreads - 1, Math.round(bookPosition) + direction));
   if (!motion) {
     manualIndex = index;
     bookPosition = index;
-    drawImage(index);
+    drawSpread(index);
     return;
   }
   const scale = designScale(document);
@@ -88,10 +100,10 @@ function draw() {
   lastDrawn = distance;
   const p = motion && introTravel ? clamp(distance / introTravel) : 1;
   bookPosition = motion ? Math.max(0, (distance - introTravel) / turnDistance) : manualIndex;
-  bookPosition = Math.min(total - 1, bookPosition);
+  bookPosition = Math.min(spreads - 1, bookPosition);
   reader.inert = p < .88;
   hint.hidden = p >= .88;
-  drawImage(bookPosition);
+  drawSpread(bookPosition);
   if (!motion) {
     reader.style.opacity = '';
     return;
@@ -148,12 +160,12 @@ function size() {
   introTravel = reduced.matches ? 0 : height * (settings.duration ?? 115) / 100;
   // Use native scrolling, with a short distance per editorial reveal.
   turnDistance = Math.max(105, Math.min(185, height * .16));
-  travel = introTravel + (total - 1) * turnDistance;
+  travel = introTravel + (spreads - 1) * turnDistance;
   section.style.setProperty('--ire-stage', `${height}px`);
   section.style.setProperty('--ire-travel', `${travel}px`);
   const visibleHeight = artwork.clientHeight;
   const bookScale = (settings.size ?? 100) / 100;
-  const allowableWidth = visibleHeight * 1.414 * bookScale;
+  const allowableWidth = visibleHeight * 2.828 * bookScale;
   section.style.setProperty('--ire-max', `${Math.round(allowableWidth)}px`);
   schedule();
 }
@@ -173,7 +185,7 @@ function apply(next = {}) {
   section.style.setProperty('--ire-x', `${settings.x ?? 0}px`);
   section.style.setProperty('--ire-y', `${settings.y ?? 0}px`);
   const scale = (settings.size ?? 100) / 100;
-  section.style.setProperty('--ire-book', `${(mobile() ? 88 : 41) * scale}%`);
+  section.style.setProperty('--ire-book', `${(mobile() ? 100 : 82) * scale}%`);
   section.style.setProperty('--ire-card', `${(mobile() ? 46 : 24) * scale}%`);
   size();
 }

@@ -14,10 +14,10 @@ const cards = [...track.querySelectorAll('.project')];
 const about = document.getElementById('about');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const narrow = matchMedia('(max-width: 700px)');
-const canHover = matchMedia('(hover: hover)');
 const formedAt = verticalStage / 100;
 const exitAt = .76;
 const pixelsPerSecond = 52;
+const formationDuration = 780;
 const inEditor = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const mix = (a, b, t) => a + (b - a) * t;
@@ -29,6 +29,10 @@ let travel = 0;
 let needsMeasure = true;
 let distance = 0;
 let lastTick = null;
+let previousScrollProgress = 0;
+let displayedProgress = 0;
+let formationStart = null;
+let returnAnchor = null;
 
 function clearCards() {
   for (const card of cards) {
@@ -38,6 +42,10 @@ function clearCards() {
 }
 
 function stop() {
+  previousScrollProgress = 0;
+  displayedProgress = 0;
+  formationStart = null;
+  returnAnchor = null;
   distance = 0;
   lastTick = null;
   const region = hero.querySelector('[data-column-region]');
@@ -225,6 +233,39 @@ function draw(progress, timestamp) {
   }
 }
 
+// Guide the artwork while leaving the browser in control of the actual scroll.
+function guidedProgress(progress, timestamp) {
+  const previous = previousScrollProgress;
+  previousScrollProgress = progress;
+
+  if (progress < previous && formationStart) {
+    if (!returnAnchor) returnAnchor = { scroll: previous, visual: displayedProgress };
+    formationStart = null;
+  } else if (progress > previous && returnAnchor) {
+    // Pick up from the current visible position if the visitor changes direction again.
+    formationStart = { time: timestamp, visual: displayedProgress };
+    returnAnchor = null;
+  } else if (!previous && progress < exitAt) {
+    formationStart = { time: timestamp, visual: 0 };
+  }
+
+  if (progress >= exitAt) {
+    formationStart = null;
+    returnAnchor = null;
+  }
+  if (returnAnchor) {
+    return returnAnchor.visual * progress / returnAnchor.scroll;
+  }
+  if (!formationStart) return progress;
+
+  const time = clamp((timestamp - formationStart.time) / formationDuration, 0, 1);
+  // Natural scrolling can exit the scene at any time, even during formation.
+  const target = Math.max(formedAt, progress);
+  if (time < 1) schedule();
+  else if (progress >= formedAt) formationStart = null;
+  return mix(formationStart.visual, target, smooth(time));
+}
+
 function update(timestamp) {
   pending = 0;
   if (!root.hasAttribute('data-home-scroll') || root.hasAttribute('data-about-direct')) {
@@ -236,7 +277,8 @@ function update(timestamp) {
     stop();
     return;
   }
-  draw(progress, timestamp);
+  displayedProgress = guidedProgress(progress, timestamp);
+  draw(displayedProgress, timestamp);
 }
 
 function schedule() {
@@ -293,25 +335,6 @@ if (inEditor) {
   });
   if (lastHash === '#about') goToAbout();
   configure();
-  // A single downward wheel gesture guides desktop visitors into the upright,
-  // self-moving project column instead of requiring repeated scrolls.
-  // Touch scrolling is preserved and can be tuned independently for mobile.
-  let snappingToColumn = false;
-  let snapRelease;
-  window.addEventListener('wheel', event => {
-    if (event.deltaY <= 0 || event.ctrlKey || narrow.matches || motion.matches ||
-        root.hasAttribute('data-about-direct') || !root.hasAttribute('data-home-scroll') ||
-        !scene.contains(event.target) || !travel) return;
-    const sceneTop = scene.getBoundingClientRect().top + window.scrollY;
-    const formationY = sceneTop + travel * (formedAt + .025);
-    if (window.scrollY >= formationY - 12) return;
-    event.preventDefault();
-    if (snappingToColumn) return;
-    snappingToColumn = true;
-    window.scrollTo({ top: formationY, behavior: 'smooth' });
-    window.clearTimeout(snapRelease);
-    snapRelease = window.setTimeout(() => { snappingToColumn = false; }, 850);
-  }, { passive: false });
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', configure);
   window.addEventListener('hashchange', navigateHash);

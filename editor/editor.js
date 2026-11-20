@@ -124,12 +124,14 @@ function updateFields() {
   const image = original?.imageSource;
   const villaSection = original?.villaKind === 'section';
   const villaSwatch = original?.villaKind === 'swatch';
-  const villaBlock = image || villaSection || villaSwatch;
+  const villaDecoration = original?.villaKind === 'decoration';
+  const villaBlock = image || villaSection || villaSwatch || villaDecoration;
   find('villa-add-photo').hidden = draft.page !== villaPage;
   find('villa-image-tools').hidden = !image;
   find('villa-section-tools').hidden = !villaSection;
   find('villa-swatch-tools').hidden = !villaSwatch;
   find('villa-restore-photo').hidden = !image || !draft.elements[selected]?.hidden;
+  find('villa-restore-decoration').hidden = !((villaSwatch || villaDecoration) && draft.elements[selected]?.hidden);
   villaImageAlt.value = image ? draft.content[selected]?.alt ?? original.imageAlt : '';
   for (const input of villaInputs) {
     const key = input.dataset.villaField;
@@ -144,7 +146,7 @@ function updateFields() {
   find('element-layers').hidden = !selected.startsWith('custom.');
   find('gallery-layout-help').hidden = !groupSizing;
   const hiddenAyamText = draft.page === ayamPage && draft.elements[selected]?.hidden;
-  find('delete-element').hidden = group || villaSection || villaSwatch || Boolean(hiddenAyamText) || Boolean(image && draft.elements[selected]?.hidden);
+  find('delete-element').hidden = group || villaSection || Boolean(hiddenAyamText) || Boolean((image || villaSwatch || villaDecoration) && draft.elements[selected]?.hidden);
   find('ayam-restore-text').hidden = !hiddenAyamText;
   find('ayam-hide-text').hidden = draft.page !== ayamPage || Boolean(hiddenAyamText) || !selected;
   const limited = draft.page === 'nuptias' && hasNuptiasDesktopLimit(selected, view);
@@ -159,7 +161,7 @@ function updateFields() {
   }
   fields.find(input => input.dataset.field === 'width').parentElement.hidden = homeGallery(selected) || selected === nuptiasEditorial || villaSection;
   for (const axis of ['x', 'y']) fields.find(input => input.dataset.field === axis).parentElement.hidden = villaSection;
-  find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : image ? 'Ajustes de la imagen' : villaSection ? 'Espaciado de la sección' : villaSwatch ? 'Muestra de color' : 'Ajustes del texto';
+  find('properties').querySelector('legend').textContent = selected === nuptiasEditorial ? 'Posición del bloque' : group ? 'Posición de la galería' : image ? 'Ajustes de la imagen' : villaSection ? 'Espaciado de la sección' : villaSwatch ? 'Muestra de color' : villaDecoration ? 'Recuadro o línea decorativa' : 'Ajustes del texto';
   const height = fields.find(input => input.dataset.field === 'height');
   height.min = (draft.page === ayamPage || image || villaSection) ? '16' : String(bounds.height[0]);
   height.max = (draft.page === ayamPage || image || villaSection) ? '4000' : String(bounds.height[1]);
@@ -365,7 +367,7 @@ function pasteElement() {
 function deleteSelection() {
   if (workspace.inert || pagePicker.disabled) return false;
   if (!selected) return gallery.removeSelected();
-  if (layoutElement(selected) || ['section', 'swatch'].includes(editable.get(selected)?.[0]?.villaKind)) return false;
+  if (layoutElement(selected) || editable.get(selected)?.[0]?.villaKind === 'section') return false;
   if (selected.startsWith('custom.') || (draft.page === villaPage && villaAddedImage(selected))) {
     for (const section of ['elements', 'desktop', 'mobile', 'content']) delete draft[section][selected];
   } else {
@@ -958,6 +960,14 @@ find('villa-insert-photo').addEventListener('click', () => {
   refreshElements();
   apply(id);
   select(id, true);
+  markDirty();
+});
+find('villa-restore-decoration').addEventListener('click', () => {
+  if (draft.page !== villaPage || !['swatch', 'decoration'].includes(editable.get(selected)?.[0]?.villaKind)
+      || !draft.elements[selected]?.hidden) return;
+  delete draft.elements[selected];
+  apply(selected);
+  refreshElements();
   markDirty();
 });
 find('villa-restore-photo').addEventListener('click', () => {

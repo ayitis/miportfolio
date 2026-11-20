@@ -150,7 +150,15 @@ export function applyElement(editable, id, draft, view) {
     if (id.startsWith('custom.') && styles.width !== null) {
       styles.width = `min(${overrides.width}px, max(24px, calc(100% - ${Math.max(0, x)}px)))`;
     }
-    const display = draft.elements[id]?.hidden || (original.villaKind === 'image' && overrides.invisible) ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
+    const hidden = draft.elements[id]?.hidden === true
+      || (original.villaKind === 'image' && overrides.invisible === true);
+    // Mark Villa Tiger image frames as truly hidden on BOTH the editor and public page.
+    // A DOM hidden attribute avoids CSS layout/reveal rules resurrecting removed photos.
+    if (draft.page === villaPage && original.villaKind === 'image') {
+      node.hidden = hidden;
+      node.toggleAttribute('data-villa-removed', hidden);
+    }
+    const display = hidden ? 'none' : original.inline && (styles.translate || styles.width || styles.height || styles['text-align'])
       ? 'inline-block' : null;
     for (const [property, value] of Object.entries({ ...styles, ...adapted, ...(original.villaKind === 'section' && { height: null }), display })) {
       if (value === null) node.style.setProperty(property, ...original.styles[property]);

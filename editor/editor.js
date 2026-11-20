@@ -1061,7 +1061,7 @@ async function save(publish) {
   if (publish) {
     status.textContent = 'Verificando la publicación…';
     try {
-      await store.verifyPublication(draft.page, revision);
+      await store.verifyPublication(draft.page, revision, draft);
     } catch {
       throw new Error(`El borrador #${revision} se guardó. No se pudo verificar que esa revisión esté disponible en la web pública. Puedes volver a pulsar Publicar cambios.`);
     }

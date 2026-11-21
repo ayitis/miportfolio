@@ -54,7 +54,7 @@ function stop() {
   active.disciplines.reset();
   active = null;
   clearCards();
-  hero.classList.remove('home-scrubbing', 'home-photo-panning');
+  hero.classList.remove('home-scrubbing', 'home-photo-panning', 'home-mobile-vertical');
   group.style.removeProperty('pointer-events');
   group.inert = false;
   heading.style.removeProperty('opacity');
@@ -183,7 +183,7 @@ function draw(progress, timestamp) {
     needsMeasure = false;
   }
   if (!active) {
-    hero.classList.remove('home-scrubbing', 'home-photo-panning');
+    hero.classList.remove('home-scrubbing', 'home-photo-panning', 'home-mobile-vertical');
     return;
   }
 
@@ -200,6 +200,9 @@ function draw(progress, timestamp) {
   hero.style.setProperty('--photo-x', `${mix(active.photoX, active.offsetX, reform)}px`);
   hero.style.setProperty('--photo-y', `${mix(active.photoY, active.offsetY, reform)}px`);
   hero.classList.add('home-photo-panning');
+  // Keep the cover copy at the start, then clear it once the mobile cards
+  // become a vertical column (including the editor's 48% stage preview).
+  hero.classList.toggle('home-mobile-vertical', narrow.matches && progress >= formedAt);
   const ended = progress >= 1;
   group.inert = ended;
   group.style.pointerEvents = ended ? 'none' : '';

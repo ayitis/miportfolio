@@ -80,7 +80,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:20px;pa
 .photo{margin:0;width:clamp(150px,13.6vw,270px);height:clamp(165px,21.5vh,280px);flex:0 0 auto;overflow:hidden;background:#e8e6e2}
 .photo img{display:block;width:100%;height:100%;object-fit:cover}
 @keyframes travel{to{transform:translateX(-50%)}}
-.marquee:hover .marquee-track,.marquee:focus-within .marquee-track{animation-play-state:paused}
+/* Hover speed is managed by nuptias-hover-speed.js; never pause the photos. */
 .editorial-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:0;text-align:center;padding:clamp(50px,9vh,125px) var(--gutter) clamp(40px,5vh,68px)}
 .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.18em;margin:0 0 15px}
 h1{font:800 clamp(82px,14vw,232px)/.83 Arial,Helvetica,sans-serif;letter-spacing:-.105em;white-space:nowrap;margin:0 0 19px}
@@ -179,7 +179,7 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:12p
   from{opacity:.78;transform:translateY(7px) scaleX(.985)}
   to{opacity:1;transform:translateY(0) scaleX(1)}
 }
-</style><link rel="stylesheet" href="/portfolio/brand.css"><link rel="stylesheet" href="/portfolio/project-home-return.css"></head>
+</style><link rel="stylesheet" href="/portfolio/brand.css"><link rel="stylesheet" href="/portfolio/project-home-return.css"><link rel="stylesheet" href="/portfolio/project-next.css"></head>
 <body><div class="page">
 <header><a class="brand site-brand site-wordmark" href="/" aria-label="Aya Arbaoui — Home"><span class="wordmark-art"><img class="brand-logo" src="/portfolio/wordmark-black.png" width="2172" height="724" alt=""></span></a><nav class="links" aria-label="Main navigation"><a href="./index.html">← BACK HOME</a><a href="./index.html#work">WORK</a><a href="/#about">ABOUT</a></nav></header>
 <main style="flex:1;display:flex;flex-direction:column;min-height:0">
@@ -193,6 +193,14 @@ footer{display:flex;justify-content:space-between;align-items:center;padding:12p
 <div class="concept"><h2><span data-design-part="form">FORM</span> <em>&amp;</em> <span data-design-part="feeling">FEELING.</span></h2><p>Where structure meets emotion. A bridal story of love and connection, balancing the architectural purity of Impuribus with natural surroundings, intimacy and spontaneous gestures.</p></div></div>
 </section>
 </main>
+<section class="project-next" aria-label="Next project">
+  <p class="project-next-kicker"><span>NEXT PROJECT</span><span>02 / SELECTED WORK</span></p>
+  <a class="project-next-link" href="/maison-carnage.html" aria-label="Next project: MAISON CARNAGE">
+    <span class="project-next-title">MAISON CARNAGE</span><span class="project-next-arrow" aria-hidden="true">↗</span>
+  </a>
+  <span class="project-next-category">Creative campaign</span>
+</section>
+
 <footer><span>AYA ARBAOUI © 2026</span><span>IMAGES IN MOTION ←</span></footer>
 <div class="project-home-return" role="navigation" aria-label="Return to portfolio home"><a href="/">GO BACK HOME ↗</a></div>
-</div><script type="module" src="/portfolio/published.js"></script></body></html>
+</div><script type="module" src="/portfolio/published.js"></script><script type="module" src="/portfolio/nuptias-hover-speed.js"></script></body></html>

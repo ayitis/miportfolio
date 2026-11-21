@@ -17,7 +17,7 @@ const narrow = matchMedia('(max-width: 700px)');
 const formedAt = verticalStage / 100;
 const exitAt = .76;
 const touchLayout = matchMedia('(max-width: 768px) and (pointer: coarse)');
-const formationDuration = 780;
+const formationDuration = 1080;
 const inEditor = window.parent !== window && new URLSearchParams(location.search).has('editor-preview');
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const mix = (a, b, t) => a + (b - a) * t;
@@ -72,7 +72,7 @@ function configure() {
   }
   const heroHeight = hero.offsetHeight;
   // The editorial column forms within a single comfortable downward scroll.
-  travel = Math.round(Math.min(heroHeight, innerHeight) * (narrow.matches ? 1.2 : 1.05));
+  travel = Math.round(Math.min(heroHeight, innerHeight) * (narrow.matches ? 1.75 : 1.65));
   scene.style.setProperty('--hero-height', `${heroHeight}px`);
   root.style.setProperty('--hero-travel', `${travel}px`);
   needsMeasure = true;
@@ -285,17 +285,17 @@ function schedule() {
   if (!pending) pending = requestAnimationFrame(update);
 }
 
-function goToAbout() {
+function goToAbout(targetId = 'about') {
   root.setAttribute('data-about-direct', '');
   stop();
-  about.scrollIntoView({ block: 'start', behavior: 'instant' });
+  document.getElementById(targetId)?.scrollIntoView({ block: 'start', behavior: 'instant' });
 }
 
 let lastHash = location.hash;
 function navigateHash() {
   if (lastHash === location.hash) return;
   lastHash = location.hash;
-  if (lastHash === '#about') goToAbout();
+  if (lastHash === '#about' || lastHash === '#contact') goToAbout(lastHash.slice(1));
   else {
     root.removeAttribute('data-about-direct');
     const previous = history.state?.portfolioScroll;
@@ -333,7 +333,7 @@ if (inEditor) {
     needsMeasure = true;
     schedule();
   });
-  if (lastHash === '#about') goToAbout();
+  if (lastHash === '#about' || lastHash === '#contact') goToAbout(lastHash.slice(1));
   configure();
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', configure);
@@ -345,16 +345,18 @@ if (inEditor) {
     schedule();
   }).observe(track);
   document.addEventListener('click', event => {
-    const link = event.target.closest('a[href="#about"]');
+    const link = event.target.closest('a[href="#about"], a[href="#contact"]');
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    if (location.hash !== '#about') {
+    const destination = link.getAttribute('href');
+    if (location.hash !== destination) {
       history.replaceState({ ...history.state, portfolioScroll: window.scrollY }, '');
-      history.pushState(null, '', '#about');
+      history.pushState(null, '', destination);
     }
-    lastHash = '#about';
-    goToAbout();
-    about.setAttribute('tabindex', '-1');
-    about.focus({ preventScroll: true });
+    lastHash = destination;
+    goToAbout(destination.slice(1));
+    const target = document.getElementById(destination.slice(1));
+    target?.setAttribute('tabindex', '-1');
+    target?.focus({ preventScroll: true });
   });
 }

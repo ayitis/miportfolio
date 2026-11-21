@@ -7,7 +7,7 @@ export const targets = [
   [verticalGallery, 'Galería de proyectos — Cinta vertical', '[data-column-region]', { text: false }],
   ['nav.work', 'Menú · Work', '.menu a[href="#work"]'],
   ['nav.about', 'Menú · About', '.menu a[href="#about"]'],
-  ['nav.contact', 'Menú · Contact', '.menu a[href^="mailto:"]'],
+  ['nav.contact', 'Menú · Contact', '.menu a[href="#contact"]'],
   ['hero.title', 'Título principal', '.heading h1'],
   ['hero.subtitle', 'Subtítulo', '.hero-subtitle'],
   ['gallery.title', 'Carrusel · encabezado', '.gallery-header span:first-child'],

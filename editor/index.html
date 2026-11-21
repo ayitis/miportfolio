@@ -257,7 +257,17 @@
               <label>Horizontal (px) <input type="number" id="mobile-scroll-x" min="-4000" max="4000" step="1" value="0"></label>
               <label>Vertical (px) <input type="number" id="mobile-scroll-y" min="-4000" max="4000" step="1" value="0"></label>
             </div>
-            <button type="button" id="mobile-scroll-reset">Centrar ajustes de este texto</button>
+            <label for="mobile-scroll-content">Contenido del texto seleccionado
+              <textarea id="mobile-scroll-content" rows="2" maxlength="2000"></textarea>
+            </label>
+            <div class="mobile-scroll-nudge" aria-label="Mover el texto seleccionado">
+              <button type="button" data-mobile-scroll-nudge="up">↑ Subir</button>
+              <button type="button" data-mobile-scroll-nudge="left">← Izquierda</button>
+              <button type="button" data-mobile-scroll-nudge="down">↓ Bajar</button>
+              <button type="button" data-mobile-scroll-nudge="right">→ Derecha</button>
+            </div>
+            <p>Los botones mueven el texto 10 píxeles por pulsación. También puedes usar las coordenadas X/Y o arrastrar el texto en la vista previa.</p>
+            <button type="button" id="mobile-scroll-reset">Restablecer posición de este texto</button>
           </div>
         </details>
         <details class="alignment-tools">

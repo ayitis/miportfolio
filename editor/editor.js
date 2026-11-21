@@ -453,12 +453,41 @@ function nudge(event) {
 }
 
 const columnStage = find('column-stage');
+const mobileScrollText = find('mobile-scroll-text');
+const mobileScrollX = find('mobile-scroll-x');
+const mobileScrollY = find('mobile-scroll-y');
+let mobileScrollDrag = null;
+
+function syncMobileScrollFields() {
+  const enabled = draft.page === 'home' && view === 'mobile';
+  find('mobile-scroll-reset').disabled = !enabled;
+  mobileScrollX.disabled = !enabled;
+  mobileScrollY.disabled = !enabled;
+  const settings = draft.mobile[mobileScrollText.value] ?? {};
+  mobileScrollX.value = settings.x ?? 0;
+  mobileScrollY.value = settings.y ?? 0;
+}
+
+function updateMobileScrollPosition(id, x, y, group) {
+  const cleanX = Math.round(Math.max(bounds.x[0], Math.min(bounds.x[1], x)));
+  const cleanY = Math.round(Math.max(bounds.y[0], Math.min(bounds.y[1], y)));
+  if (cleanX || cleanY) draft.mobile[id] = {
+    ...(cleanX ? { x: cleanX } : {}),
+    ...(cleanY ? { y: cleanY } : {}),
+  };
+  else delete draft.mobile[id];
+  syncMobileScrollFields();
+  syncColumn();
+  markDirty(group);
+}
+
 const columnButtons = [...document.querySelectorAll('[data-column-stage]')];
 
 function syncColumn() {
   const home = draft.page === 'home';
   find('column-tools').hidden = !home;
   if (!home) return;
+  syncMobileScrollFields();
   const frame = preview.contentDocument;
   if (!frame?.querySelector('.hero')) return;
   const progress = Number(columnStage.value);
@@ -490,6 +519,30 @@ for (const button of columnButtons) button.addEventListener('click', () => {
   changeColumnStage(choice === 'vertical' ? verticalStage : Number(choice));
 });
 columnStage.addEventListener('input', () => changeColumnStage(Number(columnStage.value)));
+
+find('mobile-scroll-mode').addEventListener('click', () => {
+  if (draft.page !== 'home') return;
+  applyView('mobile');
+  find('column-tools').open = true;
+  changeColumnStage(24);
+  preview.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+});
+mobileScrollText.addEventListener('change', syncMobileScrollFields);
+for (const [input, axis] of [[mobileScrollX, 'x'], [mobileScrollY, 'y']]) {
+  input.addEventListener('input', () => {
+    if (workspace.inert || view !== 'mobile' || draft.page !== 'home' || !input.validity.valid) return;
+    const settings = draft.mobile[mobileScrollText.value] ?? {};
+    updateMobileScrollPosition(mobileScrollText.value,
+      axis === 'x' ? Number(input.value || 0) : settings.x ?? 0,
+      axis === 'y' ? Number(input.value || 0) : settings.y ?? 0, input);
+  });
+  input.addEventListener('blur', () => actions.closeGroup());
+}
+find('mobile-scroll-reset').addEventListener('click', () => {
+  if (view !== 'mobile' || draft.page !== 'home') return;
+  updateMobileScrollPosition(mobileScrollText.value, 0, 0);
+});
+
 
 function showCanvasSize() {
   const { clientWidth, clientHeight } = preview;
@@ -813,6 +866,44 @@ function attach() {
   page.addEventListener('click', (event) => {
     if (event.target.closest('a')) event.preventDefault();
   }, true);
+
+  // Drag the two heading labels independently during a mobile scroll preview.
+  page.addEventListener('pointerdown', event => {
+    if (workspace.inert || draft.page !== 'home' || view !== 'mobile' ||
+        Number(columnStage.value) <= 0 || Number(columnStage.value) >= 76 ||
+        event.button !== 0 || !event.isPrimary) return;
+    const header = event.target.closest('.gallery-header');
+    const node = header && event.target.closest('span');
+    const index = node ? [...header.children].indexOf(node) : -1;
+    if (index < 0 || index > 1) return;
+    const id = index === 0 ? 'gallery.scroll-title' : 'gallery.scroll-instructions';
+    mobileScrollText.value = id;
+    const settings = draft.mobile[id] ?? {};
+    mobileScrollDrag = {
+      id, node, pointer: event.pointerId, x: settings.x ?? 0, y: settings.y ?? 0,
+      startX: event.clientX, startY: event.clientY,
+    };
+    syncMobileScrollFields();
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    node.setPointerCapture(event.pointerId);
+  }, true);
+  page.addEventListener('pointermove', event => {
+    if (!mobileScrollDrag || mobileScrollDrag.pointer !== event.pointerId) return;
+    const move = mobileScrollDrag;
+    const scale = designScale(page);
+    updateMobileScrollPosition(move.id,
+      move.x + (event.clientX - move.startX) / scale,
+      move.y + (event.clientY - move.startY) / scale, move);
+    event.preventDefault();
+  }, true);
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    page.addEventListener(type, event => {
+      if (mobileScrollDrag?.pointer !== event.pointerId) return;
+      mobileScrollDrag = null;
+      actions.closeGroup();
+    }, true);
+  }
 
   page.addEventListener('pointerdown', (event) => {
     if (workspace.inert) return;
@@ -1235,6 +1326,10 @@ function initializePreview() {
   if (draft.page === carnagePage) carnage.attach(preview.contentDocument);
   if (draft.page === ayamPage) ayam.attach(preview.contentDocument);
   applyView(view);
+  if (new URLSearchParams(location.search).has('mobile-scroll') && draft.page === 'home') {
+    changeColumnStage(24);
+    find('column-tools').open = true;
+  }
   status.textContent = `Editando ${pages[draft.page].label}.`;
   for (const id of pageControls) find(id).disabled = false;
   updateActionButtons();
@@ -1255,6 +1350,7 @@ async function showPage(page) {
   villaNewSource.value = '';
   villaNewSource.setCustomValidity('');
   columnStage.value = '0';
+  mobileScrollDrag = null;
   find('column-tools').hidden = true;
   ireTools.hidden = true;
   notEgoTools.hidden = true;
@@ -1282,7 +1378,12 @@ pagePicker.addEventListener('change', runAction(async () => {
 
 async function enterWorkspace() {
   await store.verifyOwner();
-  const requestedPage = new URLSearchParams(location.search).get('page');
+  const query = new URLSearchParams(location.search);
+  const requestedPage = query.get('page');
+  if (query.has('mobile-scroll')) {
+    view = 'mobile';
+    find('column-tools').open = true;
+  }
   await showPage(Object.hasOwn(pages, requestedPage) ? requestedPage : 'home');
   access.hidden = true;
   workspace.hidden = false;

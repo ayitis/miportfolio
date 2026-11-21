@@ -72,7 +72,7 @@ function configure() {
   }
   const heroHeight = hero.offsetHeight;
   // The editorial column forms within a single comfortable downward scroll.
-  travel = Math.round(Math.min(heroHeight, innerHeight) * (narrow.matches ? 1.75 : 1.65));
+  travel = Math.round(Math.min(heroHeight, innerHeight) * (narrow.matches ? 1.48 : 1.65));
   scene.style.setProperty('--hero-height', `${heroHeight}px`);
   root.style.setProperty('--hero-travel', `${travel}px`);
   needsMeasure = true;
@@ -125,7 +125,11 @@ function measure() {
   // Keep the existing offset plus another 19 CSS px at desktop reference size.
   const rightShift = Math.min(105, rect.width * .073) + Math.min(19, rect.width * .0132);
   const baseX = offsetX + size * fingertip.x + rightShift;
-  const columnX = clamp(baseX + offset, gutter, rect.width - gutter);
+  // On narrow screens the saved editor offset may push the cards against the
+  // screen edge. Center the finished stack while preserving desktop artwork.
+  const columnX = narrow.matches
+    ? clamp(rect.width / 2, gutter, rect.width - gutter)
+    : clamp(baseX + offset, gutter, rect.width - gutter);
   const baseY = clamp(offsetY + size * fingertip.y + 25, 28, rect.height * .68);
   const verticalOffset = Number(hero.dataset.columnOffsetY ?? 0) || 0;
   let nextY = clamp(baseY + verticalOffset, -entries[0].height / 2, rect.height - 60);
@@ -277,7 +281,9 @@ function update(timestamp) {
     stop();
     return;
   }
-  displayedProgress = guidedProgress(progress, timestamp);
+  // Mobile must follow the finger exactly. A timed formation caused the
+  // artwork to lag behind native scrolling and appear stuck at the handoff.
+  displayedProgress = narrow.matches ? progress : guidedProgress(progress, timestamp);
   draw(displayedProgress, timestamp);
 }
 

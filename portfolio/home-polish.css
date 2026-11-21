@@ -1,0 +1,40 @@
+.about .closing-statement {
+  line-height: 1.12;
+  padding-block-end: .1em;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .gallery-wrap .project:is(:hover, :focus-visible, [data-shimmer-visible]) .card-info strong {
+      --shimmer-duration: 4.8s;
+      background-image: linear-gradient(105deg,
+        currentColor 43%, #716970 47%, #b9a9b0 49%,
+        #cdc6c8 50%, #9e8d94 51%, #70676d 53%, currentColor 57%);
+      background-size: 280% 100%;
+      background-position: 100% 0;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: editorial-letter-shimmer var(--shimmer-duration) linear var(--shimmer-delay, 0s) infinite;
+    }
+
+    @media (hover: none) {
+      .gallery-wrap .project[data-shimmer-visible] .card-info strong {
+        --shimmer-duration: 5.4s;
+      }
+      .gallery-wrap .project:nth-child(3n + 2) { --shimmer-delay: .35s; }
+      .gallery-wrap .project:nth-child(3n) { --shimmer-delay: .65s; }
+    }
+  }
+
+  @keyframes editorial-letter-shimmer {
+    0% { background-position: 100% 0; }
+    52%, 100% { background-position: 0% 0; }
+  }
+}
+
+/* Fit the original wordmark to the narrow composition, including tablet portrait. */
+@media (max-width: 768px) {
+  .heading h1 { transform: none; }
+}

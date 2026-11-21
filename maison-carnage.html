@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en" data-design-page="maison-carnage">
+<head>
+<!-- Avoid flashing the unhydrated, older HTML while the live portfolio design loads. -->
+<script>
+(function () {
+  if (window.parent !== window && new URLSearchParams(location.search).has('editor-preview')) return;
+  var root = document.documentElement;
+  root.setAttribute('data-portfolio-boot', '');
+  var release = function () { root.removeAttribute('data-portfolio-boot'); };
+  window.portfolioRelease = release;
+  // Fail open if the API or a script is slow/blocked. Navigation never stays locked.
+  window.setTimeout(release, 2200);
+  window.addEventListener('pageshow', function (event) { if (event.persisted) release(); });
+})();
+</script>
+<style>
+html[data-portfolio-boot] { background: #f5f2eb; }
+html[data-portfolio-boot] body { visibility: hidden; }
+html[data-portfolio-boot]::after {
+  content: 'AYA ARBAOUI  /  SELECTED WORK';
+  position: fixed; inset: 0; z-index: 2147483647;
+  display: grid; place-items: center;
+  color: #171717; background: #f5f2eb;
+  font: 600 11px/1.5 Helvetica, Arial, sans-serif;
+  letter-spacing: .21em; text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-portfolio-boot]::after { animation: none; }
+}
+</style>
+<link rel="modulepreload" href="/portfolio/published.js">
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Maison Carnage — digital visual direction, campaign photography, video and social content for a Casablanca fashion label. Selected work by Aya Arbaoui.">
+<title>Maison Carnage — Aya Arbaoui</title>
+<link rel="stylesheet" href="/portfolio/brand.css">
+<link rel="stylesheet" href="/portfolio/carnage-archive.css">
+<style>
+:root{--ink:#111;--paper:#f6f5f1;--gutter:clamp(20px,4.3vw,76px)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+img{max-width:100%;display:block}
+header{display:flex;justify-content:space-between;align-items:center;gap:22px;padding:25px var(--gutter) 10px;position:relative;z-index:5}
+header .brand{display:inline-flex;align-items:center;min-width:150px;max-width:230px}
+header .brand img{width:100%;height:auto;object-fit:contain}
+.nav-links{display:flex;gap:clamp(12px,2vw,30px);align-items:center;font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700}
+.nav-links a:hover,.nav-links a:focus-visible{text-decoration:underline}
+main{overflow:clip}
+.intro{isolation:isolate;min-height:calc(100svh - 99px);padding:clamp(12px,2.5vh,28px) var(--gutter) 32px;display:flex;flex-direction:column}
+.meta{font-size:10px;letter-spacing:.18em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px}
+.masthead{display:flex;align-items:baseline;justify-content:space-between;gap:1vw;margin:clamp(14px,3vh,32px) 0 clamp(18px,2.4vh,30px);line-height:.82}
+.masthead span{font-weight:900;font-size:clamp(54px,10.6vw,190px);letter-spacing:-.098em;white-space:nowrap}
+.masthead .second{text-align:right}
+.intro-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px, min(30vw,350px)) minmax(0,1fr);gap:clamp(18px,3.5vw,70px);align-items:center;flex:1}
+.intro-copy{max-width:330px;align-self:center}
+.kicker{font-size:10px;text-transform:uppercase;letter-spacing:.15em;font-weight:700;margin:0 0 22px}
+.copy-large{font-size:clamp(15px,1.25vw,20px);letter-spacing:-.015em;line-height:1.45;margin:0;text-align:justify;text-align-last:left;hyphens:auto}.copy-large strong{display:block;text-align:left;line-height:1.18}
+.details{justify-self:end;max-width:290px}
+.details p{font-size:clamp(13px,1vw,17px);line-height:1.5;margin:0 0 20px}
+.details .label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+.reel-frame{width:100%;aspect-ratio:9/19;position:relative;z-index:2;transform:translateY(var(--reel-lift, 0px));background:#1f1f1f;overflow:hidden;color:#fff}
+.reel-frame video,.reel-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.reel-frame video{object-fit:contain;object-position:center center}
+.reel-frame video{opacity:0;transition:opacity .25s ease;z-index:2}
+.reel-frame.is-playing video{opacity:1}
+.reel-effects{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;visibility:hidden}
+.reel-frame[data-effect="tracking"] .reel-effects{visibility:visible}
+.reel-frame[data-effect="red"] video{filter:brightness(var(--reel-exposure, 1)) grayscale(1) contrast(1.18) url(#reel-red)}
+.reel-frame[data-effect="contrast"] video{filter:brightness(var(--reel-exposure, 1)) contrast(1.36) saturate(.82)}
+.reel-frame[data-effect="tracking"] video{filter:url(#reel-rgb);transform:translate(-2px, 2px) scale(1.025)}
+.reel-frame[data-effect="tracking"]::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,#0005 0 1px,transparent 1px 4px)}
+.reel-fallback{background:#242424;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start}
+.reel-fallback img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6)}
+.reel-caption{z-index:1;position:relative;padding:20px;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;text-shadow:0 1px 8px #000b}
+.reel-status{display:block;font-size:10px;letter-spacing:.09em;margin-top:8px;color:#ddd;font-weight:400;text-transform:none}
+.reel-frame.has-media .intro-footer{display:flex;justify-content:space-between;gap:20px;margin-top:clamp(20px,4vh,50px);font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+.intro-footer a{border-bottom:1px solid currentColor}
+@media(max-width:900px){
+  .masthead span{font-size:clamp(48px,10.5vw,110px)}
+  .intro-grid{grid-template-columns:minmax(0,1fr) minmax(220px,34vw);align-items:start}
+  .details{grid-column:1;grid-row:2;justify-self:start}
+  .intro-copy{align-self:center}
+  .reel-frame{grid-column:2;grid-row:1 / span 2}
+}
+@media(max-width:650px){
+  header{padding-top:18px}
+  header .brand{min-width:100px;max-width:155px}
+  .nav-links{font-size:9px;gap:10px}
+  .intro{min-height:0;padding-bottom:30px}
+  .masthead{gap:2px;flex-direction:column;margin:28px 0 26px}
+  .masthead span{font-size:clamp(64px,16vw,110px)}
+  .masthead .second{align-self:flex-end}
+  .intro-grid{grid-template-columns:1fr 1fr;gap:25px 18px}
+  .intro-copy{grid-column:1 / -1;max-width:100%}
+  .copy-large{font-size:17px;max-width:400px}
+  .reel-frame{grid-column:1 / -1;grid-row:2;max-width:390px;justify-self:center}
+  .details{grid-column:1 / -1;grid-row:3;max-width:100%}
+  .details p{font-size:14px}
+  .intro-footer{margin-top:25px}
+
+}
+@media(max-width:650px){
+  .reel-frame[data-effect="tracking"] video{filter:none;transform:translateX(-1px) scale(1.012)}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reel-frame,.reel-frame[data-effect] video{transform:none;filter:none;transition:none}
+  .reel-frame[data-effect] .reel-effects,.reel-frame[data-effect]::after{visibility:hidden}
+}
+.campaign-intro{max-width:550px;margin:0 var(--gutter) clamp(32px,6vw,72px);font-size:clamp(14px,1.3vw,19px);line-height:1.5;color:#e7e7e7}.campaign-intro strong{display:inline-block;margin-bottom:7px;color:#fff}
+@media (max-width:430px){
+  .nav-links a{display:inline-flex;align-items:center;min-height:44px}
+  .masthead span{font-size:clamp(50px,17vw,72px)}
+  .copy-large{text-align:start}
+  .reel-frame{width:min(100%,calc(78svh * 9 / 19))}
+}
+</style>
+<link rel="stylesheet" href="/portfolio/project-home-return.css"></head>
+<body>
+<header>
+  <a class="brand site-brand site-wordmark" href="/" aria-label="Aya Arbaoui — Home">
+    <span class="wordmark-art"><img class="brand-logo" src="/portfolio/wordmark-black.png" width="2172" height="724" alt=""></span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="/">← BACK HOME</a><a href="/#work">WORK</a><a href="/#about">ABOUT</a>
+  </nav>
+</header>
+<main>
+<section class="intro" aria-labelledby="carnage-title">
+  <div class="meta"><span>002 / SELECTED WORK</span><span>DIGITAL VISUAL UNIVERSE</span></div>
+  <h1 class="masthead" id="carnage-title"><span>MAISON</span><span class="second">CARNAGE</span></h1>
+  <div class="intro-grid">
+    <div class="intro-copy">
+      <p class="kicker">DIGITAL ART DIRECTION / CONTENT CREATION</p>
+      <p class="copy-large"><strong>A DIGITAL UNIVERSE FOR AN UNDERGROUND FASHION LABEL.</strong><br><br><span class="intro-body">Based in Casablanca, Morocco, Maison Carnage is an underground fashion label with a distinctive creative identity. My work focused on translating its universe into a cohesive digital presence through photography, video and visual storytelling.</span></p>
+    </div>
+    <div class="reel-frame" aria-label="Maison Carnage campaign video">
+      <div class="reel-fallback">
+        <img src="/CARNAGE%20COCHE.jpg" alt="Maison Carnage campaign photograph">
+        <div class="reel-caption">CAMPAIGN FILM <span class="reel-status">Campaign film · Maison Carnage</span></div>
+      </div>
+      <video id="carnage-reel" muted loop playsinline preload="metadata" poster="/CARNAGE%20COCHE.jpg">
+        <source src="/0930.mp4" type="video/mp4">
+      </video>
+      <canvas class="reel-effects" aria-hidden="true"></canvas>
+      <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+        <filter id="reel-red" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values="1.12 0 0 0 .06  .12 0 0 0 0  .15 0 0 0 0  0 0 0 1 0"/>
+        </filter>
+        <filter id="reel-rgb" color-interpolation-filters="sRGB">
+          <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feOffset dx="4" result="red"/>
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+          <feOffset dy="1" result="green"/>
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+          <feOffset dx="-3"/>
+          <feBlend in2="green" mode="screen"/>
+          <feBlend in2="red" mode="screen"/>
+        </filter>
+      </svg>
+      </div>
+    <div class="details">
+      <p class="label">ABOUT THE PROJECT</p>
+      <p>From campaign imagery to everyday digital content, the project brought Maison Carnage's visual world to life across social media and e-commerce.</p>
+      <p class="label">MY ROLE</p>
+      <p>Digital Art Direction · Campaign Photography · Content Creation · Social Media · Product Photography · Video Content</p>
+    </div>
+  </div>
+  <div class="intro-footer"><span>AYA ARBAOUI / SELECTED WORK</span><a href="#campaign">EXPLORE THE CAMPAIGN ↓</a></div>
+</section>
+<section id="campaign" class="archive" aria-labelledby="campaign-title">
+  <div class="archive-header"><h2 id="campaign-title">THE<br>CAMPAIGN.</h2><span>002 / CAMPAIGN ARCHIVE</span></div>
+  <p class="campaign-intro"><strong>Beyond the product, a visual attitude.</strong><br><span class="campaign-body">A series of images exploring Maison Carnage’s underground character through fashion, atmosphere and visual experimentation.</span></p>
+  <div class="archive-runway">
+    <div class="archive-stage">
+      <!-- Maison Carnage manifest, ordered from dark tones to soft highlights. -->
+      <figure data-photo="02" data-original="rati carnage.jpg"><img src="/portfolio/carnage-archive/02.webp" width="691" height="920" alt="Model wearing red sunglasses and a campaign shirt" loading="eager" decoding="async"></figure>
+      <figure data-photo="09" data-original="IMG_0887_VSCO.jpg"><img src="/portfolio/carnage-archive/09.webp" width="920" height="872" alt="Model in white sunglasses against a black backdrop" loading="lazy" decoding="async"></figure>
+      <figure data-photo="03" data-original="CARNAGE COCHE.jpg"><img src="/portfolio/carnage-archive/03.webp" width="736" height="920" alt="Carnage graphic shirt lit in red" loading="lazy" decoding="async"></figure>
+      <figure data-photo="01" data-original="13CD8380-9850-40B1-BB49-32D5C0C74DDC.jpg"><img src="/portfolio/carnage-archive/01.webp" width="920" height="613" alt="Folded Carnage shirt surrounded by smoke" loading="lazy" decoding="async"></figure>
+      <figure data-photo="04" data-original="IMG_0885_VSCO.JPG"><img src="/portfolio/carnage-archive/04.webp" width="691" height="920" alt="Hooded model against a blue backdrop" loading="lazy" decoding="async"></figure>
+      <figure data-photo="13" data-original="IMG_1076.jpg"><img src="/portfolio/carnage-archive/13.webp" width="752" height="920" alt="Model smiling in a black Carnage hoodie" loading="lazy" decoding="async"></figure>
+      <figure data-photo="08" data-original="IMG_1077.jpg"><img src="/portfolio/carnage-archive/08.webp" width="736" height="920" alt="Black Carnage shirt seen from behind" loading="lazy" decoding="async"></figure>
+      <figure data-photo="11" data-original="IMG_1075.jpg"><img src="/portfolio/carnage-archive/11.webp" width="731" height="920" alt="Two models wearing Carnage streetwear" loading="lazy" decoding="async"></figure>
+      <figure data-photo="15" data-original="instories_4872E8FC-F7BC-45E3-9884-608674F480A5.jpg"><img src="/portfolio/carnage-archive/15.webp" width="736" height="920" alt="Seated model in black outside a wooden doorway" loading="lazy" decoding="async"></figure>
+      <figure data-photo="07" data-original="instories_63533FA7-CAFB-41FD-A46B-0B6674352272.jpg"><img src="/portfolio/carnage-archive/07.webp" width="736" height="920" alt="Model in a black Carnage hoodie in the street" loading="lazy" decoding="async"></figure>
+      <figure data-photo="16" data-original="instories_AC2D6A78-9499-47DA-AD1A-221D47CD5F0A.jpg"><img src="/portfolio/carnage-archive/16.webp" width="736" height="920" alt="Dog wearing a white Carnage shirt outside a wooden doorway" loading="lazy" decoding="async"></figure>
+      <figure data-photo="12" data-original="saute saute.jpg"><img src="/portfolio/carnage-archive/12.webp" width="611" height="920" alt="Model in a dark graphic shirt mid-jump" loading="lazy" decoding="async"></figure>
+      <figure data-photo="14" data-original="nesnes.jpg"><img src="/portfolio/carnage-archive/14.webp" width="690" height="920" alt="Two Carnage shirts laid side by side" loading="lazy" decoding="async"></figure>
+      <figure data-photo="10" data-original="ChatGPT Image 29 avr. 2026, 21_18_58.jpg"><img src="/portfolio/carnage-archive/10.webp" width="920" height="733" alt="Cream Carnage graphic T-shirt" loading="lazy" decoding="async"></figure>
+      <figure data-photo="06" data-original="IMG_0873_VSCO 2.JPG"><img src="/portfolio/carnage-archive/06.webp" width="798" height="920" alt="Close-up of the Carnage shirt illustration" loading="lazy" decoding="async"></figure>
+      <figure data-photo="05" data-original="carnage tshirt.jpg"><img src="/portfolio/carnage-archive/05.webp" width="690" height="920" alt="Overhead view of a model with printed shirts" loading="lazy" decoding="async"></figure>
+    </div>
+  </div>
+  <div class="endnote"><span>MAISON CARNAGE / CAMPAIGN ARCHIVE</span><a href="/">BACK TO SELECTED WORK ↑</a></div>
+</section>
+</main>
+<div class="project-home-return" role="navigation" aria-label="Project navigation"><a href="/">GO BACK HOME ↗</a><a href="/ayam.html" aria-label="Next project: AYAM" title="AYAM">NEXT PROJECT ↗</a></div>
+<script type="module" src="/portfolio/carnage-reel.js"></script>
+<script type="module" src="/portfolio/carnage-archive.js"></script>
+<script type="module" src="/portfolio/published.js"></script>
+</body>
+</html>

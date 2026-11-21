@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en" data-design-page="villa-tiger">
+<head>
+<!-- Avoid flashing the unhydrated, older HTML while the live portfolio design loads. -->
+<script>
+(function () {
+  if (window.parent !== window && new URLSearchParams(location.search).has('editor-preview')) return;
+  var root = document.documentElement;
+  root.setAttribute('data-portfolio-boot', '');
+  var release = function () { root.removeAttribute('data-portfolio-boot'); };
+  window.portfolioRelease = release;
+  // Fail open if the API or a script is slow/blocked. Navigation never stays locked.
+  window.setTimeout(release, 2200);
+  window.addEventListener('pageshow', function (event) { if (event.persisted) release(); });
+})();
+</script>
+<style>
+html[data-portfolio-boot] { background: #f5f2eb; }
+html[data-portfolio-boot] body { visibility: hidden; }
+html[data-portfolio-boot]::after {
+  content: 'AYA ARBAOUI  /  SELECTED WORK';
+  position: fixed; inset: 0; z-index: 2147483647;
+  display: grid; place-items: center;
+  color: #171717; background: #f5f2eb;
+  font: 600 11px/1.5 Helvetica, Arial, sans-serif;
+  letter-spacing: .21em; text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-portfolio-boot]::after { animation: none; }
+}
+</style>
+<link rel="modulepreload" href="/portfolio/published.js">
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Villa Tiger Marrakech — brand identity, art direction and social media by Aya Arbaoui.">
+  <title>Villa Tiger Marrakech — Aya Arbaoui</title>
+  <link rel="stylesheet" href="/portfolio/brand.css">
+  <link rel="stylesheet" href="/portfolio/villa-tiger/style.css">
+<link rel="stylesheet" href="/portfolio/project-home-return.css"></head>
+<body>
+  <header class="villa-header shell">
+    <a href="/" class="site-brand site-wordmark" aria-label="Back to Home"><span class="wordmark-art"><img src="/portfolio/wordmark-black.png" width="2172" height="724" alt="Aya Arbaoui"></span></a>
+    <nav aria-label="Project navigation"><a href="/#work" data-villa-text="nav-work">Selected work</a><a href="/#about" data-villa-text="nav-about">About</a></nav>
+  </header>
+  <main>
+    <section class="villa-intro" aria-label="Villa Tiger Marrakech">
+      <div class="villa-intro-scenes" aria-hidden="true">
+        <img data-scene="garden" src="/portfolio/villa-tiger/intro-garden.png" width="1672" height="941" alt="" fetchpriority="high">
+      </div>
+      <img class="villa-intro-logo" src="/portfolio/villa-tiger/intro-mark.png" width="1199" height="1312" alt="Villa Tiger Marrakech">
+    </section>
+    <section data-villa-section="villa" class="hero shell" aria-labelledby="villa-title">
+      <div class="hero-heading">
+        <p class="label" data-villa-text="index">05 / Selected work</p>
+        <h1 id="villa-title" data-villa-text="title">VILLA TIGER</h1>
+        <p class="label subtitle" data-villa-text="subtitle">MARRAKECH — BRAND IDENTITY &amp; VISUAL COMMUNICATION</p>
+      </div>
+      <div class="hero-board">
+        <div class="villa-frame" data-villa-image="cover" style="--villa-ratio:1080 / 1350"><img src="/portfolio/villa-tiger/cover.webp" width="1080" height="1350" alt="Villa Tiger campaign cover with the villa’s courtyard and original wordmark" loading="lazy" decoding="async"></div>
+        <div class="hero-mark"><div class="villa-frame" data-villa-image="primary" style="--villa-ratio:679 / 960"><img src="/portfolio/villa-tiger/primary.webp" width="679" height="960" alt="Original Villa Tiger logo in burnt orange and cream" loading="lazy" decoding="async"></div></div>
+      </div>
+    </section>
+    <section data-villa-section="brand" class="shell chapter brand" aria-labelledby="brand-title">
+      <div class="brand-copy" data-reveal>
+        <p class="label" data-villa-text="brand-label">01 / The brand</p>
+        <h2 id="brand-title" data-villa-text="brand-title">A PRIVATE STAY,<br>DESIGNED AS A BRAND.</h2>
+        <p data-villa-text="brand-copy">Villa Tiger is a private hospitality experience in Marrakech, transformed into a distinctive visual identity that brings together contemporary comfort, Moroccan warmth and an editorial approach to communication.</p>
+        <p class="label scope" data-villa-text="scope">Brand Identity · Logo System · Art Direction · Social Media · Editorial Content</p>
+      </div>
+      <div class="brand-images" data-reveal><div class="villa-frame" data-villa-image="interior" style="--villa-ratio:768 / 960"><img src="/portfolio/villa-tiger/interior.webp" width="768" height="960" alt="Private corner with a lounge chair and warm light" loading="lazy" decoding="async"></div><div class="villa-frame" data-villa-image="balloon" style="--villa-ratio:540 / 960"><img src="/portfolio/villa-tiger/balloon.webp" width="540" height="960" alt="Illustrated hot-air balloon story template" loading="lazy" decoding="async"></div></div>
+      <div class="villa-frame villa-sketch" data-villa-image="croquis" style="--villa-ratio:780 / 500">
+        <img src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png" width="1448" height="1086" alt="Architectural pencil sketch of Villa Tiger, its garden and pool" loading="lazy" decoding="async">
+        <svg class="villa-sketch-drawing" viewBox="0 25 780 500" preserveAspectRatio="none" aria-hidden="true">
+          <g fill="none" stroke="#4E4C37" stroke-linecap="round" stroke-linejoin="round">
+          <g class="sketch-structure">
+            <path pathLength="1" d="M101 238 Q96 127 104 40 Q225 61 399 112 L529 154"/>
+            <path pathLength="1" d="M106 45 Q232 68 392 114 L522 156"/>
+            <path pathLength="1" d="M399 255 L400 200 Q569 126 767 53"/>
+            <path pathLength="1" d="M105 235 Q239 249 393 258 L774 160"/>
+            <path pathLength="1" d="M110 240 Q270 253 394 263 L773 168"/>
+            <path pathLength="1" d="M396 258 L396 396"/>
+          </g>
+          <g class="sketch-facade">
+            <path pathLength="1" d="M144 239 L144 89 L446 156 L445 181"/>
+            <path pathLength="1" d="M148 94 L442 159"/>
+            <path pathLength="1" d="M148 198 L394 234 L777 97"/>
+            <path pathLength="1" d="M153 204 L401 241 L778 106"/>
+            <path pathLength="1" d="M147 218 L399 234 L775 84"/>
+            <path pathLength="1" d="M145 208 L398 226 L774 72"/>
+            <path pathLength="1" d="M145 201 L397 217 L773 62"/>
+            <path pathLength="1" d="M150 227 L394 243 L772 119"/>
+            <path pathLength="1" d="M150 126 L150 194 L198 202 L198 133 Z"/>
+            <path pathLength="1" d="M202 137 L202 204 L244 211 L245 147 Z"/>
+            <path pathLength="1" d="M248 144 L377 166 L377 212 L248 188 Z"/>
+            <path pathLength="1" d="M251 151 L374 171"/>
+            <path pathLength="1" d="M250 158 L374 179"/>
+            <path pathLength="1" d="M277 164 L277 194"/>
+            <path pathLength="1" d="M329 170 L329 203"/>
+            <path pathLength="1" d="M146 166 L147 218"/>
+            <path pathLength="1" d="M209 176 L209 229"/>
+            <path pathLength="1" d="M384 198 L384 238"/>
+            <path pathLength="1" d="M457 166 L457 219"/>
+            <path pathLength="1" d="M514 142 L514 199"/>
+            <path pathLength="1" d="M581 118 L581 176"/>
+            <path pathLength="1" d="M644 89 L644 154"/>
+            <path pathLength="1" d="M708 69 L708 128"/>
+            <path pathLength="1" d="M218 381 L219 285 L380 290 L377 384"/>
+            <path pathLength="1" d="M224 289 L374 294"/>
+            <path pathLength="1" d="M264 291 L263 374"/>
+            <path pathLength="1" d="M303 293 L302 369"/>
+            <path pathLength="1" d="M343 295 L343 366"/>
+            <path pathLength="1" d="M436 356 L438 284 L516 274 L517 373"/>
+            <path pathLength="1" d="M443 286 L510 278"/>
+            <path pathLength="1" d="M470 285 L469 370"/>
+            <path pathLength="1" d="M524 248 L522 395 L542 398 L546 240"/>
+            <path pathLength="1" d="M538 247 L535 389"/>
+            <path pathLength="1" d="M549 242 L546 381"/>
+            <path pathLength="1" d="M631 225 L635 404 L650 409 L649 221"/>
+            <path pathLength="1" d="M638 227 L642 400"/>
+            <path pathLength="1" d="M653 220 L656 393"/>
+            <path pathLength="1" d="M579 277 L605 272 L605 330 L580 336 Z"/>
+            <path pathLength="1" d="M584 280 L600 277 L600 327 L585 331 Z"/>
+            <path pathLength="1" d="M700 255 L751 245 L749 276"/>
+            <path pathLength="1" d="M704 258 L701 287"/>
+            <path pathLength="1" d="M411 373 Q473 377 525 396 Q648 407 755 426"/>
+            <path pathLength="1" d="M26 379 L86 362 L130 364"/>
+            <path pathLength="1" d="M173 380 L205 377"/>
+            <path pathLength="1" d="M208 382 L221 350 L250 351 L264 381"/>
+            <path pathLength="1" d="M219 355 L222 382"/>
+            <path pathLength="1" d="M252 354 L255 378"/>
+            <path pathLength="1" d="M264 378 L273 352 L315 350 L335 377"/>
+            <path pathLength="1" d="M280 357 L311 356 L322 373"/>
+            <path pathLength="1" d="M339 375 L343 350 L372 348 L383 373"/>
+            <path pathLength="1" d="M347 355 L369 353"/>
+            <path pathLength="1" d="M437 377 L434 359 L455 356 L460 377"/>
+            <path pathLength="1" d="M466 376 L467 360 L487 360 L493 383"/>
+          </g>
+          <g class="sketch-pool">
+            <path pathLength="1" d="M92 405 Q176 420 257 402 Q334 394 408 392 L758 470"/>
+            <path pathLength="1" d="M261 407 L460 561"/>
+            <path pathLength="1" d="M408 400 L751 476 L635 533 L492 566"/>
+            <path pathLength="1" d="M274 412 L398 407 L730 479 L635 527 L495 557 Z"/>
+            <path pathLength="1" d="M99 405 L75 430 L211 474 L272 468 L243 442"/>
+            <path pathLength="1" d="M86 438 L66 463 L233 510 L311 499 L282 467"/>
+            <path pathLength="1" d="M72 473 L50 496 L257 547 L351 524 L323 495"/>
+            <path pathLength="1" d="M72 499 L42 519 L220 551"/>
+            <path pathLength="1" d="M98 421 L226 460 L254 455"/>
+            <path pathLength="1" d="M107 404 L96 416 L205 453"/>
+            <path pathLength="1" d="M72 459 L219 502 L291 492"/>
+            <path pathLength="1" d="M210 420 Q217 405 233 409 L248 415 Q254 424 240 429 L218 424 Z"/>
+            <path pathLength="1" d="M233 413 Q225 417 233 423 Q242 423 239 416"/>
+            <path pathLength="1" d="M233 452 Q238 439 254 444 L270 450 Q279 459 264 464 L239 459 Z"/>
+            <path pathLength="1" d="M270 502 Q285 488 299 496 L321 506 Q328 516 311 521 L282 513 Z"/>
+            <path pathLength="1" d="M127 390 Q196 392 247 401"/>
+            <path pathLength="1" d="M422 390 L726 451 L778 467"/>
+            <path pathLength="1" d="M349 415 Q416 411 440 421"/>
+            <path pathLength="1" d="M439 434 L491 435"/>
+            <path pathLength="1" d="M488 459 L578 465"/>
+            <path pathLength="1" d="M533 492 L632 502"/>
+            <path pathLength="1" d="M454 530 L533 545"/>
+            <path pathLength="1" d="M501 433 L505 478"/>
+            <path pathLength="1" d="M518 445 L509 486"/>
+            <path pathLength="1" d="M583 443 L589 501"/>
+            <path pathLength="1" d="M631 462 L640 510"/>
+            <path pathLength="1" d="M668 471 L663 492"/>
+          </g>
+          <g class="sketch-detail">
+            <path pathLength="1" d="M547 137 Q555 111 554 70 Q540 38 520 39 Q481 40 459 81"/>
+            <path pathLength="1" d="M553 74 Q536 39 505 57 Q477 73 466 104"/>
+            <path pathLength="1" d="M551 73 Q525 69 510 107"/>
+            <path pathLength="1" d="M547 64 Q517 53 485 91"/>
+            <path pathLength="1" d="M555 73 Q553 19 583 9"/>
+            <path pathLength="1" d="M555 72 Q565 22 593 25"/>
+            <path pathLength="1" d="M555 73 Q588 11 621 31 Q646 34 661 61"/>
+            <path pathLength="1" d="M559 73 Q593 31 631 43 L655 79"/>
+            <path pathLength="1" d="M556 74 Q579 57 593 57 Q603 57 626 95"/>
+            <path pathLength="1" d="M564 71 Q610 13 644 24 Q686 24 705 64"/>
+            <path pathLength="1" d="M561 76 Q580 82 576 112"/>
+            <path pathLength="1" d="M554 74 Q535 83 530 123"/>
+            <path pathLength="1" d="M565 83 Q556 106 557 135"/>
+            <path pathLength="1" d="M557 95 Q570 95 579 93"/>
+            <path pathLength="1" d="M142 387 Q143 323 133 268 Q116 239 93 231"/>
+            <path pathLength="1" d="M148 381 Q159 335 139 267 Q100 241 77 272"/>
+            <path pathLength="1" d="M138 267 Q104 270 91 318"/>
+            <path pathLength="1" d="M137 272 Q119 297 112 329"/>
+            <path pathLength="1" d="M141 266 Q144 234 123 225"/>
+            <path pathLength="1" d="M141 264 Q158 243 174 247"/>
+            <path pathLength="1" d="M141 272 Q174 263 191 297"/>
+            <path pathLength="1" d="M145 269 Q162 277 171 315"/>
+            <path pathLength="1" d="M195 379 Q181 325 192 280 Q206 258 216 237"/>
+            <path pathLength="1" d="M192 283 Q166 252 150 248"/>
+            <path pathLength="1" d="M195 282 Q221 254 235 271"/>
+            <path pathLength="1" d="M190 287 Q211 280 221 311"/>
+            <path pathLength="1" d="M190 286 Q175 297 178 327"/>
+            <path pathLength="1" d="M57 377 Q65 329 45 289 Q23 257 7 253"/>
+            <path pathLength="1" d="M54 330 Q38 318 22 325"/>
+            <path pathLength="1" d="M53 306 Q51 267 75 262"/>
+            <path pathLength="1" d="M23 284 Q51 269 68 285"/>
+            <path pathLength="1" d="M12 221 Q30 185 60 205"/>
+            <path pathLength="1" d="M22 215 Q48 215 77 242"/>
+            <path pathLength="1" d="M22 388 Q44 372 66 370"/>
+            <path pathLength="1" d="M8 384 Q35 365 51 364"/>
+            <path pathLength="1" d="M473 364 Q469 336 462 308 Q441 297 439 319 Q462 323 473 340"/>
+            <path pathLength="1" d="M474 353 Q480 318 491 285 Q507 276 511 286 Q490 308 477 331"/>
+            <path pathLength="1" d="M477 352 Q495 336 512 344 Q501 355 479 356"/>
+            <path pathLength="1" d="M464 361 L494 360 L488 381 Q476 388 468 381 Z"/>
+            <path pathLength="1" d="M746 435 Q724 401 718 349 Q711 314 695 295"/>
+            <path pathLength="1" d="M721 377 Q687 331 672 329 Q686 364 714 366"/>
+            <path pathLength="1" d="M725 396 Q743 351 772 350 Q756 376 728 381"/>
+            <path pathLength="1" d="M727 414 Q748 391 768 400 Q757 420 737 425"/>
+            <path pathLength="1" d="M716 355 Q736 326 755 324 Q750 346 719 351"/>
+            <path pathLength="1" d="M697 324 Q687 291 666 285 Q668 307 697 324"/>
+            <path pathLength="1" d="M731 437 Q750 438 765 467"/>
+            <path pathLength="1" d="M12 512 Q39 475 43 444 Q55 407 71 423 Q70 450 47 458"/>
+            <path pathLength="1" d="M753 486 Q720 507 698 533"/>
+            <path pathLength="1" d="M77 523 Q52 549 29 552"/>
+          </g>
+          <g class="sketch-shading">
+            <path pathLength="1" d="M254 153 l118 20"/>
+            <path pathLength="1" d="M254 157 l118 20"/>
+            <path pathLength="1" d="M254 161 l118 20"/>
+            <path pathLength="1" d="M254 165 l118 20"/>
+            <path pathLength="1" d="M254 169 l118 20"/>
+            <path pathLength="1" d="M254 173 l118 20"/>
+            <path pathLength="1" d="M254 177 l118 20"/>
+            <path pathLength="1" d="M254 181 l118 20"/>
+            <path pathLength="1" d="M151 92.0 l4 43"/>
+            <path pathLength="1" d="M168 95.7 l4 43"/>
+            <path pathLength="1" d="M185 99.5 l4 43"/>
+            <path pathLength="1" d="M202 103.2 l4 43"/>
+            <path pathLength="1" d="M219 107.0 l4 43"/>
+            <path pathLength="1" d="M236 110.7 l4 43"/>
+            <path pathLength="1" d="M253 114.4 l4 43"/>
+            <path pathLength="1" d="M270 118.2 l4 43"/>
+            <path pathLength="1" d="M287 121.9 l4 43"/>
+            <path pathLength="1" d="M304 125.7 l4 43"/>
+            <path pathLength="1" d="M321 129.4 l4 43"/>
+            <path pathLength="1" d="M338 133.1 l4 43"/>
+            <path pathLength="1" d="M355 136.9 l4 43"/>
+            <path pathLength="1" d="M372 140.6 l4 43"/>
+            <path pathLength="1" d="M278 416.0 l26 12"/>
+            <path pathLength="1" d="M308 419.5 l26 12"/>
+            <path pathLength="1" d="M338 423.0 l26 12"/>
+            <path pathLength="1" d="M368 426.5 l26 12"/>
+            <path pathLength="1" d="M398 430.0 l26 12"/>
+            <path pathLength="1" d="M428 433.6 l26 12"/>
+            <path pathLength="1" d="M458 437.1 l26 12"/>
+            <path pathLength="1" d="M488 440.6 l26 12"/>
+            <path pathLength="1" d="M518 444.1 l26 12"/>
+            <path pathLength="1" d="M548 447.6 l26 12"/>
+            <path pathLength="1" d="M578 451.1 l26 12"/>
+            <path pathLength="1" d="M315 435.0 l42 16"/>
+            <path pathLength="1" d="M345 438.6 l42 16"/>
+            <path pathLength="1" d="M375 442.2 l42 16"/>
+            <path pathLength="1" d="M405 445.8 l42 16"/>
+            <path pathLength="1" d="M435 449.4 l42 16"/>
+            <path pathLength="1" d="M465 453.0 l42 16"/>
+            <path pathLength="1" d="M495 456.6 l42 16"/>
+            <path pathLength="1" d="M525 460.2 l42 16"/>
+            <path pathLength="1" d="M555 463.8 l42 16"/>
+            <path pathLength="1" d="M585 467.4 l42 16"/>
+            <path pathLength="1" d="M615 471.0 l42 16"/>
+            <path pathLength="1" d="M102 490.0 l23 5"/>
+            <path pathLength="1" d="M125 495.5 l23 5"/>
+            <path pathLength="1" d="M148 501.0 l23 5"/>
+            <path pathLength="1" d="M171 506.6 l23 5"/>
+            <path pathLength="1" d="M194 512.1 l23 5"/>
+            <path pathLength="1" d="M217 517.6 l23 5"/>
+            <path pathLength="1" d="M240 523.1 l23 5"/>
+            <path pathLength="1" d="M263 528.6 l23 5"/>
+            <path pathLength="1" d="M286 534.2 l23 5"/>
+            <path pathLength="1" d="M309 539.7 l23 5"/>
+            <path pathLength="1" d="M531 47.9 q-9 11 -18 25"/>
+            <path pathLength="1" d="M548 42.8 q-9 11 -18 25"/>
+            <path pathLength="1" d="M565 37.7 q-9 11 -18 25"/>
+            <path pathLength="1" d="M582 32.6 q-9 11 -18 25"/>
+            <path pathLength="1" d="M599 36.5 q-9 11 -18 25"/>
+            <path pathLength="1" d="M616 41.6 q-9 11 -18 25"/>
+            <path pathLength="1" d="M633 46.7 q-9 11 -18 25"/>
+          </g>
+          </g>
+        </svg>
+      </div>
+    </section>
+    <section data-villa-section="identity" class="identity chapter" id="identity" aria-labelledby="identity-title">
+      <div class="shell">
+        <div class="section-heading" data-reveal>
+          <div><p class="label" data-villa-text="identity-label">02 / Logo system</p><h2 id="identity-title" data-villa-text="identity-title">THE VISUAL IDENTITY</h2></div>
+          <p data-villa-text="identity-copy">The arch evokes Marrakech’s architecture and the feeling of arrival. The letter T gives the brand a strong monogram, while the illustrated tiger brings character to its geometric frame.</p>
+        </div>
+        <div class="identity-feature" data-reveal>
+          <div class="villa-frame" data-villa-image="pool" style="--villa-ratio:768 / 960"><img src="/portfolio/villa-tiger/pool.webp" width="768" height="960" alt="Lunch served beside the Villa Tiger pool" loading="lazy" decoding="async"></div>
+          <figure class="monogram"><div class="villa-frame" data-villa-image="monogram" style="--villa-ratio:676 / 960"><img src="/portfolio/villa-tiger/monogram.webp" width="676" height="960" alt="Olive Villa Tiger mark with the architectural T and tiger" loading="lazy" decoding="async"></div><figcaption class="label" data-villa-text="monogram">The arch / The T / The tiger</figcaption></figure>
+        </div>
+        <div class="variants" data-reveal>
+          <div class="villa-frame" data-villa-image="olive" style="--villa-ratio:960 / 960"><img src="/portfolio/villa-tiger/6.png" width="960" height="960" alt="Cream logo on deep olive" loading="lazy" decoding="async"></div><div class="villa-frame" data-villa-image="orange" style="--villa-ratio:960 / 960"><img src="/portfolio/villa-tiger/orange.webp" width="960" height="960" alt="Cream logo on burnt orange" loading="lazy" decoding="async"></div><div class="villa-frame" data-villa-image="dark" style="--villa-ratio:960 / 960"><img src="/portfolio/villa-tiger/dark.webp" width="960" height="960" alt="Cream logo on charcoal" loading="lazy" decoding="async"></div><div class="villa-frame" data-villa-image="cream" style="--villa-ratio:960 / 960"><img src="/portfolio/villa-tiger/cream.webp" width="960" height="960" alt="Charcoal logo on cream" loading="lazy" decoding="async"></div>
+        </div>
+      </div>
+    </section>
+    <section data-villa-section="palette" class="shell chapter" aria-labelledby="palette-title">
+      <p class="label" data-villa-text="palette-label">03 / Color system</p>
+      <h2 id="palette-title" data-villa-text="palette-title" data-reveal>COLOR PALETTE</h2>
+      <ul class="swatches" data-reveal>
+        <li data-villa-swatch="1" style="--swatch:#A5440D" class="light-type"><span data-villa-text="color-1">Burnt Orange</span><code>#A5440D</code></li>
+        <li data-villa-swatch="2" style="--swatch:#4E4C37" class="light-type"><span data-villa-text="color-2">Deep Olive</span><code>#4E4C37</code></li>
+        <li data-villa-swatch="3" style="--swatch:#ECE0D0"><span data-villa-text="color-3">Warm Cream</span><code>#ECE0D0</code></li>
+        <li data-villa-swatch="4" style="--swatch:#11100E" class="light-type"><span data-villa-text="color-4">Charcoal</span><code>#11100E</code></li>
+        <li data-villa-swatch="5" style="--swatch:#CDBA9C"><span data-villa-text="color-5">Sand</span><code>#CDBA9C</code></li>
+        <li data-villa-swatch="6" style="--swatch:#F7F0E6"><span data-villa-text="color-6">Soft White</span><code>#F7F0E6</code></li>
+      </ul>
+    </section>
+    <section data-villa-section="type" class="shell type chapter" aria-labelledby="type-title">
+      <div class="type-board">
+        <p class="label" data-villa-text="type-label">04 / Type system</p>
+        <h2 id="type-title" data-villa-text="type-title" data-reveal>TYPOGRAPHY</h2>
+        <div class="specimens" data-reveal>
+          <article><p class="letters display" data-villa-text="display-sample" aria-hidden="true">Aa</p><div><h3 data-villa-text="display-name">TAN PARAISO</h3><p data-villa-text="display-copy">Display typography for headlines, suite names and editorial statements.</p></div></article>
+          <article><p class="letters serif" data-villa-text="serif-sample" aria-hidden="true">Aa</p><div><h3 data-villa-text="serif-name">EB Garamond</h3><p data-villa-text="serif-copy">An editorial serif for descriptions, menus and guest testimonials.</p></div></article>
+        </div>
+        <p class="label" data-villa-text="type-note">Web specimens shown in Palatino and Georgia</p>
+      </div>
+    </section>
+    <section data-villa-section="action" class="chapter social-action" id="applications" aria-labelledby="action-title">
+      <div class="shell social-layout">
+        <div class="social-phone" aria-label="Villa Tiger Marrakech profile preview">
+          <div class="social-screen">
+            <a class="social-account" href="https://www.instagram.com/villatigermarrakech/">@villatigermarrakech</a>
+            <div class="social-profile">
+              <img src="/portfolio/villa-tiger/orange.webp" alt="Villa Tiger" loading="lazy">
+              <strong>Villa Tiger Marrakech</strong>
+            </div>
+            <p>A private escape in Marrakech<br>6 bedrooms · Pool · Rooftop<br>Moroccan dining &amp; daily housekeeping</p>
+            <div class="social-highlights" aria-label="Highlights">
+              <span><img src="/portfolio/villa-tiger/menu.webp" alt="" loading="lazy">Menu</span>
+              <span><img src="/portfolio/villa-tiger/suite.webp" alt="" loading="lazy">Stay</span>
+              <span><img src="/portfolio/villa-tiger/cover.webp" alt="" loading="lazy">Info</span>
+              <span><img src="/portfolio/villa-tiger/camel.webp" alt="" loading="lazy">Activities</span>
+            </div>
+            <div class="social-profile-grid" aria-hidden="true"><img src="/portfolio/villa-tiger/posts/private-corners.png" alt="Private corners" loading="lazy" decoding="async"><img src="/portfolio/villa-tiger/posts/garden-moments.png" alt="Garden moments" loading="lazy" decoding="async"><img src="/portfolio/villa-tiger/posts/moroccan-soul.png" alt="Moroccan soul, modern comfort" loading="lazy" decoding="async"><img src="/portfolio/villa-tiger/posts/breakfast-to-dinner.png" alt="From breakfast to dinner" loading="lazy" decoding="async"><img src="/portfolio/villa-tiger/cover.webp" alt="Six suites — Villa Tiger" loading="lazy" decoding="async"><img src="/portfolio/villa-tiger/posts/post-two.png" alt="Warm textures" loading="lazy" decoding="async"><img src="/portfolio/villa-tiger/posts/post-one.png" alt="Slow mornings by the pool" loading="lazy" decoding="async"><video src="/portfolio/villa-tiger/posts/sunset.mp4" aria-label="Ending the day in gold" muted loop playsinline preload="metadata"></video><img src="/portfolio/villa-tiger/posts/poolside-breakfast.png" alt="Slow mornings, poolside breakfast" loading="lazy" decoding="async"></div>
+          </div>
+        </div>
+        <div class="social-showcase">
+          <p class="label" data-villa-text="action-label">05 / Art direction &amp; applications</p>
+          <h2 id="action-title" data-villa-text="action-title">BRAND IN ACTION</h2>
+          <div class="social-feed" role="region" aria-label="Villa Tiger posts" tabindex="0">
+            <div class="social-strip">
+              <div class="villa-frame social-post" style="--social-default-order: 1" data-post-index="1" data-villa-image="post-interior"><img src="/portfolio/villa-tiger/posts/private-corners.png" alt="Private corners" loading="lazy" decoding="async"></div>
+              <div class="villa-frame social-post" style="--social-default-order: 2" data-post-index="2" data-villa-image="post-pool"><img src="/portfolio/villa-tiger/posts/garden-moments.png" alt="Garden moments" loading="lazy" decoding="async"></div>
+              <div class="villa-frame social-post" style="--social-default-order: 3" data-post-index="3" data-villa-image="post-suite"><img src="/portfolio/villa-tiger/posts/moroccan-soul.png" alt="Moroccan soul, modern comfort" loading="lazy" decoding="async"></div>
+              <div class="villa-frame social-post" style="--social-default-order: 4" data-post-index="4" data-villa-image="post-food"><img src="/portfolio/villa-tiger/posts/breakfast-to-dinner.png" alt="From breakfast to dinner" loading="lazy" decoding="async"></div>
+              <div class="villa-frame social-post" style="--social-default-order: 5" data-post-index="5" data-villa-image="post-cover"><img src="/portfolio/villa-tiger/cover.webp" alt="Six suites — Villa Tiger" loading="lazy" decoding="async"></div>
+              <div class="villa-frame social-post" style="--social-default-order: 6" data-post-index="6" data-villa-image="post-orange"><img src="/portfolio/villa-tiger/posts/post-two.png" alt="Warm textures" loading="lazy" decoding="async"></div>
+              <div class="villa-frame social-post" style="--social-default-order: 7" data-post-index="7" data-villa-image="post-camel"><img src="/portfolio/villa-tiger/posts/post-one.png" alt="Slow mornings by the pool" loading="lazy" decoding="async"></div>
+              <div class="villa-frame social-post social-post-video" style="--social-default-order: 8" data-post-index="8" ><video src="/portfolio/villa-tiger/posts/sunset.mp4" aria-label="Ending the day in gold" muted loop playsinline preload="metadata"></video></div>
+              <div class="villa-frame social-post" style="--social-default-order: 9" data-post-index="9" data-villa-image="post-textures"><img src="/portfolio/villa-tiger/posts/poolside-breakfast.png" alt="Slow mornings, poolside breakfast" loading="lazy" decoding="async"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shell social-stories" aria-labelledby="social-stories-title">
+        <div class="social-stories-heading">
+          <div>
+            <p class="label" data-villa-text="stories-label">06 / Digital storytelling</p>
+            <h3 id="social-stories-title" data-villa-text="stories-title">STORIES IN MOTION</h3>
+          </div>
+          <p class="social-stories-note" data-villa-text="stories-note">Moments from Villa Tiger, one story at a time.</p>
+        </div>
+        <div class="social-stories-feed" role="region" aria-label="Villa Tiger Instagram stories" tabindex="0">
+          <div class="social-stories-strip">
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-01.png" alt="Information · Welcome" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-02.png" alt="Information · Villa Tiger" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-03.png" alt="Activities · Marrakech" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-04.png" alt="Activities · Discover" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-05.png" alt="Activities · Experiences" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-07.png" alt="Facilities · Villa" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-08.png" alt="Facilities · Comfort" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-09.png" alt="Menu · Dining" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-10.png" alt="Menu · Moroccan cuisine" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-11.png" alt="Menu · Breakfast" loading="lazy" decoding="async"></figure>
+            <figure class="social-story"><img src="/portfolio/villa-tiger/stories/story-13.png" alt="Menu · Flavours" loading="lazy" decoding="async"></figure>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <section data-villa-section="closing" class="closing chapter" aria-labelledby="closing-title">
+      <div class="shell closing-grid">
+        <div data-reveal><p class="label" data-villa-text="closing-label">Villa Tiger / Marrakech</p><h2 id="closing-title" data-villa-text="closing-title">MOROCCAN WARMTH.<br>A DISTINCTIVE IDENTITY.</h2></div>
+        <div data-reveal><div class="villa-frame" data-villa-image="closing" style="--villa-ratio:1080 / 1350"><img src="/portfolio/villa-tiger/closing.webp" width="1080" height="1350" alt="Twin suite at Villa Tiger in warm natural light" loading="lazy" decoding="async"></div></div>
+      </div>
+    </section>
+  </main>
+  <footer class="shell villa-footer">
+    <a href="/#work" data-villa-text="back">← Back to selected work</a>
+    <a href="/nuptias.html" data-villa-text="next">Next project / 01 NUPTIAS ↗</a>
+  </footer>
+  <div class="project-home-return" role="navigation" aria-label="Return to portfolio home"><a href="/">GO BACK HOME ↗</a></div>
+<script type="module" src="/portfolio/villa-tiger/reveal.js"></script>
+  <script type="module" src="/portfolio/villa-tiger/intro.js"></script>
+  <script type="module" src="/portfolio/villa-tiger/social-feed.js"></script>
+  <script type="module" src="/portfolio/published.js"></script>
+</body>
+</html>

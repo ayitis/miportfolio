@@ -1,0 +1,70 @@
+.archive {
+  background: #0b0b0b;
+  color: #f6f5f1;
+  padding: clamp(60px, 8vw, 125px) var(--gutter) clamp(70px, 10vw, 145px);
+}
+.archive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+}
+.archive-header h2 {
+  margin: 0;
+  font-size: clamp(45px, 9vw, 145px);
+  line-height: .8;
+  letter-spacing: -.095em;
+  font-weight: 900;
+}
+.archive-header span, .endnote {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.archive-header span { color: #b6b6b6; }
+.archive-stage {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: clamp(160px, 29vw, 420px);
+  padding-block: clamp(50px, 10vh, 125px);
+}
+.archive-stage figure { grid-column: span 2; margin: 0; overflow: hidden; }
+.archive-stage figure:nth-child(4n + 1) { grid-column: span 5; }
+.archive-stage figure:nth-child(4n + 3) { grid-column: span 3; }
+.archive-stage img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.endnote { display: flex; justify-content: space-between; margin-top: 65px; gap: 12px; }
+
+.archive { --archive-window: 100svh; }
+.archive.is-scrubbed .archive-runway { height: calc(var(--archive-window) + var(--archive-distance)); }
+.archive.is-scrubbed .archive-stage {
+  position: sticky;
+  top: 0;
+  display: block;
+  padding: 0;
+  height: var(--archive-window);
+  overflow: clip;
+}
+.archive.is-previewing .archive-runway { height: var(--archive-window); }
+.archive.is-previewing .archive-stage { position: relative; }
+.archive.is-scrubbed.is-unfolded .archive-stage { overflow: visible; }
+.archive:is(.is-scrubbed,.is-static) figure {
+  position: absolute;
+  inset: 0 auto auto 0;
+  contain: layout paint;
+}
+.archive.is-static .archive-stage {
+  display: block;
+  position: relative;
+  padding: 0;
+  height: var(--archive-window);
+}
+.archive.is-static .endnote { margin-top: calc(65px + var(--archive-tail, 0px)); }
+.archive.is-scrubbed .endnote { margin-top: calc(65px + var(--archive-tail, 0px)); }
+
+@media (max-width: 650px) {
+  .archive-header { display: block; }
+  .archive-header span { display: block; margin-top: 18px; }
+  .archive-stage { grid-auto-rows: 62vw; }
+  .archive-stage figure:nth-child(odd) { grid-column: span 7; }
+  .archive-stage figure:nth-child(even) { grid-column: span 5; }
+}

@@ -1,0 +1,35 @@
+/* Shared closing navigation for every portfolio project. */
+.project-home-return {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 100%;
+  min-height: 78px;
+  padding: 26px clamp(20px, 5vw, 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #171717;
+  color: #f5f2eb;
+  box-sizing: border-box;
+}
+.project-home-return a {
+  display: inline-block;
+  padding: 10px 16px;
+  font: 700 clamp(10px, 1.1vw, 12px)/1.3 Arial, Helvetica, sans-serif;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: color .2s ease, border-color .2s ease;
+}
+.project-home-return a:hover,
+.project-home-return a:focus-visible { color: #f6bcc2; }
+.project-home-return a:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+@media (prefers-reduced-motion: reduce) {
+  .project-home-return a { transition: none; }
+}
+
+/* Both closing actions share the same understated treatment; no additional section. */
+.project-home-return { gap: clamp(8px, 4vw, 65px); flex-wrap: wrap; }

@@ -1,0 +1,70 @@
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  height: 1lh;
+  white-space: nowrap;
+}
+
+.site-brand .brand-logo {
+  display: block;
+  flex: none;
+  width: 104px;
+  height: auto;
+  aspect-ratio: 1922 / 818;
+  object-fit: contain;
+}
+
+.site-brand .brand-name {
+  position: relative;
+  display: inline-block;
+}
+
+@media (max-width: 700px) {
+  .site-brand { gap: 7px; }
+  .site-brand .brand-logo { width: clamp(52px, 17vw, 80px); }
+}
+
+@media (max-width: 360px) {
+  .site-brand { gap: 5px; }
+  .site-brand .brand-logo { width: 52px; }
+}
+
+.site-wordmark .brand-logo {
+  width: clamp(116px, 34vw, 174px);
+  aspect-ratio: 2172 / 724;
+}
+
+@media (max-width: 480px) {
+  .site-wordmark .brand-logo { width: clamp(108px, 32vw, 145px); }
+}
+
+/* The overlay shares the PNG's canvas and never affects the logo underneath. */
+.wordmark-art {
+  position: relative;
+  display: block;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (mask-image: url("wordmark-arabic-mask.png")) {
+    .wordmark-art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mask: url("wordmark-arabic-mask.png") center / 100% 100% no-repeat;
+      background: url("wordmark-brush.svg") center / 100% 100% no-repeat;
+    }
+  }
+}
+
+.site-wordmark:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+}
+
+@media (min-width: 701px) and (max-height: 610px) {
+  header .site-wordmark .brand-logo { width: 140px; }
+}

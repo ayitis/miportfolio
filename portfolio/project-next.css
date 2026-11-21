@@ -1,0 +1,46 @@
+/* Shared next-project section, separate from editable project content. */
+.project-next {
+  box-sizing: border-box;
+  padding: clamp(48px, 8vw, 110px) clamp(20px, 5vw, 86px);
+  background: #171717;
+  color: #f6f3ed;
+  font-family: Helvetica, Arial, sans-serif;
+  position: relative;
+  isolation: isolate;
+}
+.project-next * { box-sizing: border-box; }
+.project-next .project-next-kicker {
+  display: flex; justify-content: space-between; align-items: center; gap: 18px;
+  font-size: 11px; line-height: 1.4; letter-spacing: .16em;
+  text-transform: uppercase; font-weight: 600; margin: 0 0 clamp(27px, 5vw, 76px);
+}
+.project-next .project-next-link {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: clamp(18px, 4vw, 70px); width: 100%; text-decoration: none; color: inherit;
+  padding-bottom: clamp(16px, 2vw, 30px); border-bottom: 1px solid rgba(255,255,255,.4);
+}
+.project-next .project-next-title {
+  display: block; font-size: clamp(38px, 7.5vw, 132px);
+  line-height: .94; letter-spacing: -.075em; font-weight: 800;
+  overflow-wrap: anywhere; transition: transform .45s cubic-bezier(.22,1,.36,1);
+}
+.project-next .project-next-arrow {
+  flex: none; font-size: clamp(42px, 7vw, 112px); line-height: .8;
+  font-weight: 300; transition: transform .45s cubic-bezier(.22,1,.36,1);
+}
+.project-next .project-next-category {
+  display: block; margin-top: 18px; font-size: clamp(11px, 1.25vw, 16px);
+  line-height: 1.4; letter-spacing: .02em; opacity: .76;
+}
+.project-next .project-next-link:is(:hover,:focus-visible) .project-next-title { transform: translateX(9px); }
+.project-next .project-next-link:is(:hover,:focus-visible) .project-next-arrow { transform: translate(7px,-7px); }
+.project-next .project-next-link:focus-visible { outline: 2px solid currentColor; outline-offset: 8px; }
+@media (max-width: 650px) {
+  .project-next { padding: 54px 5vw 62px; }
+  .project-next .project-next-link { align-items: flex-start; }
+  .project-next .project-next-title { font-size: clamp(39px, 11vw, 74px); }
+  .project-next .project-next-arrow { font-size: 50px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-next .project-next-arrow,.project-next .project-next-title { transition: none; }
+}

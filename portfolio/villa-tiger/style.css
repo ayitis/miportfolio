@@ -1,0 +1,443 @@
+:root {
+  --villa-vw: 1vw;
+  --cream: #ece0d0;
+  --paper: #f7f0e6;
+  --sand: #cdba9c;
+  --olive: #4e4c37;
+  --orange: #a5440d;
+  --ink: #11100e;
+  --gutter: clamp(18px, calc(5 * var(--villa-vw)), 88px);
+  --gap: clamp(12px, calc(2 * var(--villa-vw)), 30px);
+  --display: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+}
+@media (width > 760px) {
+  html[data-villa-scale] { --villa-vw: 12.8px; }
+  html[data-villa-scale] body { width: 1280px; zoom: var(--villa-scale); }
+}
+* { box-sizing: border-box; }
+/* Editor position offsets and moving carousels must never make the full page
+   horizontally scrollable (which exposes a cream strip beside olive sections). */
+html[data-design-page="villa-tiger"],
+html[data-design-page="villa-tiger"] body { overflow-x: clip; }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 17px/1.5 Georgia, serif; }
+/* Wait until the published Supabase document has been applied before revealing
+   the project: otherwise the old HTML defaults visibly flash on initial load. */
+html[data-design-page="villa-tiger"]:not([data-villa-ready]) main,
+html[data-design-page="villa-tiger"]:not([data-villa-ready]) .villa-header {
+  visibility: hidden;
+}
+html[data-design-page="villa-tiger"]:not([data-villa-ready]) body {
+  background: var(--olive);
+}
+img { display: block; width: 100%; height: auto; }
+a { color: inherit; text-underline-offset: .3em; }
+figure, ul { margin: 0; padding: 0; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-family: var(--display); font-weight: 400; line-height: .97; overflow-wrap: anywhere; }
+h2 { font-size: clamp(2.15rem, calc(5 * var(--villa-vw)), 5.1rem); letter-spacing: -.045em; }
+.shell { width: min(100% - 2 * var(--gutter), 1440px); margin-inline: auto; }
+.chapter { padding-block: clamp(52px, calc(8 * var(--villa-vw)), 125px); }
+.label, nav, footer, figcaption, .swatches {
+  font: 600 .71rem/1.5 Arial, sans-serif;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.label { margin-bottom: 14px; }
+.villa-header, .villa-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-block: 24px;
+}
+.villa-header { border-bottom: 1px solid var(--sand); }
+.villa-header .site-brand { display: block; width: clamp(113px, calc(12 * var(--villa-vw)), 174px); height: auto; }
+.villa-header nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.hero { padding-top: clamp(28px, calc(5 * var(--villa-vw)), 72px); }
+.hero-heading { margin-bottom: var(--gap); }
+.hero h1 { font-size: clamp(3rem, calc(12 * var(--villa-vw)), 12rem); letter-spacing: -.075em; }
+.subtitle { margin: 14px 0 0; }
+.hero-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  background: var(--olive);
+  align-items: stretch;
+}
+.hero-board > .villa-frame { max-height: 720px; }
+.hero-board > .villa-frame img { object-fit: cover; object-position: 50% 52%; }
+.hero-mark, .monogram { display: grid; place-items: center; padding: clamp(14px, calc(5 * var(--villa-vw)), 100px); background: var(--cream); }
+.hero-mark .villa-frame { max-width: 435px; }
+.brand, .section-heading, .identity-feature, .closing-grid, .specimens {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap);
+}
+.brand { align-items: center; }
+.brand-copy > p:not(.label), .section-heading > p { max-width: 42ch; }
+.brand-copy h2 { margin-bottom: 20px; }
+.scope { margin: 22px 0 0; color: var(--orange); }
+.brand-images { --villa-default-gap: 10px; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 10px; align-items: center; }
+.identity { background: var(--olive); color: var(--paper); }
+.section-heading { align-items: end; margin-bottom: var(--gap); }
+.identity-feature { --villa-default-gap: 0px; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 0; }
+.identity-feature > .villa-frame { max-height: 640px; }
+.identity-feature > .villa-frame img { object-fit: cover; }
+.monogram { color: var(--ink); align-content: center; gap: 16px; text-align: center; }
+.monogram .villa-frame { max-width: 320px; }
+.monogram figcaption { margin: 0; }
+.variants { --villa-default-gap: 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.variants .villa-frame { aspect-ratio: 1; }
+.swatches {
+  margin-top: var(--gap);
+  list-style: none;
+  border: 1px solid var(--sand);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.swatches li {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  gap: 5px;
+  min-height: clamp(110px, calc(14 * var(--villa-vw)), 200px);
+  padding: clamp(9px, calc(1.8 * var(--villa-vw)), 24px);
+  background: var(--swatch);
+  letter-spacing: .04em;
+}
+.swatches .light-type { color: var(--paper); }
+.swatches code { font-size: .83rem; }
+.type { padding-top: 0; padding-bottom: 0; }
+.type-board { padding: clamp(20px, calc(5 * var(--villa-vw)), 60px); background: var(--cream); }
+.specimens { margin: var(--gap) 0; }
+.specimens article { border-top: 1px solid var(--sand); padding-top: 16px; }
+.specimens h3 { font-size: clamp(1.2rem, calc(2.4 * var(--villa-vw)), 2rem); margin-bottom: 8px; }
+.letters { font-size: clamp(4.2rem, calc(12 * var(--villa-vw)), 11rem); letter-spacing: -.075em; line-height: 1; margin-bottom: 12px; }
+.letters.display { font-family: var(--display); color: var(--orange); }
+.type-board > .label:last-child { margin-bottom: 0; }
+.applications {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(18px, calc(3 * var(--villa-vw)), 42px) var(--gap);
+  align-items: start;
+  margin-top: var(--gap);
+}
+.application { grid-column: span 4; }
+.application.suite { grid-column: span 8; }
+.application-images { display: grid; gap: 8px; }
+.suite .application-images { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.application figcaption { margin-top: 10px; }
+.closing { background: var(--cream); color: var(--olive); }
+.closing-grid { align-items: center; }
+.closing-grid .villa-frame { max-height: 500px; }
+.closing-grid .villa-frame img { object-fit: cover; }
+[data-villa-text] { white-space: pre-line; }
+a:focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
+
+@media (max-width: 760px) {
+  .brand, .section-heading, .closing-grid { grid-template-columns: 1fr; }
+  .swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .section-heading { align-items: start; }
+  .application.suite { grid-column: 1 / -1; }
+  .application { grid-column: span 6; }
+}
+@media (max-width: 430px) {
+  .variants { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .villa-header nav, .villa-footer { font-size: .62rem; }
+  .swatches li { padding-inline: 7px; }
+}
+
+/* Frame geometry and crop share the same CSS in the iframe and public page. */
+.villa-frame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: var(--villa-ratio, 4 / 5);
+}
+.villa-frame img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  object-fit: contain;
+}
+[data-villa-section] :is(.hero-board, .brand-images, .section-heading, .identity-feature, .variants, .swatches, .specimens, .applications, .closing-grid) {
+  gap: var(--villa-section-gap, var(--villa-default-gap, var(--gap)));
+}
+[data-villa-section="brand"] {
+  row-gap: var(--villa-section-gap, clamp(12px, calc(1.4 * var(--villa-vw)), 18px));
+  column-gap: var(--villa-section-gap, var(--gap));
+  padding-block-end: clamp(12px, calc(1.35 * var(--villa-vw)), 18px);
+}
+[data-villa-section] :is(.hero-board, .swatches) { --villa-default-gap: 0px; }
+[data-villa-section] .applications { --villa-default-gap: clamp(18px, calc(3 * var(--villa-vw)), 42px) var(--gap); }
+
+.villa-intro {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--olive);
+  --villa-intro-logo-size: 23%;
+}
+@media (width > 760px) {
+  html[data-villa-scale] .villa-intro { min-height: calc(100svh / var(--villa-scale)); }
+}
+@media (max-width: 760px) {
+  .villa-intro { --villa-intro-logo-size: 53%; }
+}
+.villa-intro-scenes,
+.villa-intro-scenes img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.villa-intro-scenes { z-index: 0; }
+.villa-intro-scenes img { object-fit: cover; object-position: var(--villa-intro-focus, center); }
+@media (max-width: 760px) {
+  .villa-intro-scenes [data-scene="olive"] { --villa-intro-focus: 62% center; }
+  .villa-intro-scenes [data-scene="pool"] { --villa-intro-focus: 60% center; }
+}
+.villa-intro-logo {
+  position: relative;
+  z-index: 1;
+  width: var(--villa-intro-logo-size);
+  max-height: calc(66svh / var(--villa-scale, 1));
+  object-fit: contain;
+}
+
+
+/* Published/editor parity: removed branding images must never reappear in CSS grids. */
+[data-villa-image][hidden],
+[data-villa-added][hidden],
+[data-villa-image][data-villa-removed] {
+  display: none !important;
+}
+/* Remove otherwise empty photo groups and application cards to avoid blank holes. */
+.brand-images:not(:has(> .villa-frame:not([hidden]))):not([hidden]),
+.variants:not(:has(> .villa-frame:not([hidden]))),
+.application-images:not(:has(> .villa-frame:not([hidden]))),
+.application:has(> .application-images:not(:has(> .villa-frame:not([hidden])))) {
+  display: none !important;
+}
+
+.villa-sketch {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 100%;
+}
+.villa-sketch-drawing { display: none; }
+.villa-sketch img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] { opacity: 0; }
+.villa-sketch img[src="/Croquis%20architectural%20d%E2%80%99une%20villa%20avec%20piscine.png"] + .villa-sketch-drawing {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.villa-sketch-drawing path { stroke-width: 1.05; }
+.villa-sketch-drawing .sketch-structure path { stroke-width: 1.55; }
+.villa-sketch-drawing .sketch-detail path { stroke-width: .83; opacity: .84; }
+.villa-sketch-drawing .sketch-shading path { stroke-width: .57; opacity: .47; }
+.villa-sketch[data-drawing] path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+
+.social-action {
+  color: var(--cream);
+  background: radial-gradient(ellipse at 27% 35%, #3d291e, #201713 65%, #181311);
+  overflow: clip;
+  --social-gap: 14px;
+  --social-card: 190px;
+  --social-seconds: 30;
+}
+.social-layout {
+  --social-join-gap: clamp(26px, calc(5 * var(--villa-vw)), 64px);
+  --social-overlap: 42px;
+  display: flex;
+  gap: var(--social-join-gap);
+  align-items: flex-start;
+}
+.social-phone {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 3; /* Keep the phone above the cards as they emerge. */
+  width: min(28%, 270px);
+  padding: 5px;
+  border: 2px solid #8d7a69;
+  border-radius: 34px;
+  background: #171514;
+  box-shadow: 0 16px 28px #100a0866, inset 0 0 0 1px #28201a;
+}
+.social-phone::after {
+  position: absolute;
+  content: '';
+  top: 13px;
+  left: 50%;
+  translate: -50% 0;
+  width: 30%;
+  height: 12px;
+  border-radius: 10px;
+  background: #171514;
+  pointer-events: none;
+}
+.social-screen {
+  overflow: hidden;
+  min-height: 0;
+  border-radius: 26px;
+  background: #faf6f0;
+  color: #221913;
+  font: 12px/1.45 Arial, sans-serif;
+}
+.social-account { display: block; margin: 35px 12px 16px; font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
+.social-profile { display: flex; gap: 10px; align-items: center; padding: 0 12px; }
+.social-profile img { width: 22%; aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
+.social-screen p { padding: 12px; }
+.social-highlights { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 4px 10px 15px; text-align: center; font-size: 9px; }
+.social-highlights img { aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 1px solid #c9ab90; margin-bottom: 4px; }
+.social-profile-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; }
+.social-profile-grid img { aspect-ratio: 4 / 5; object-fit: cover; }
+.social-showcase {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  padding-top: 10px;
+}
+.social-showcase .label { color: #ddb89a; margin-bottom: 8px; }
+.social-showcase h2 { margin-bottom: clamp(14px, 3%, 25px); }
+.social-feed {
+  margin-inline-start: calc(-1 * (var(--social-join-gap) + var(--social-overlap)));
+  overflow: auto hidden;
+  padding: 2px 0 18px;
+  scrollbar-color: #9c7962 #32231b;
+}
+.social-feed[data-looping] { overflow-x: hidden; }
+.social-strip {
+  display: flex;
+  width: max-content;
+  align-items: start;
+  gap: var(--social-gap);
+  padding-inline-end: var(--social-gap);
+}
+.social-track { display: flex; width: max-content; }
+.villa-frame.social-post {
+  order: var(--social-order, var(--social-default-order));
+  flex: 0 0 auto;
+  width: var(--social-card);
+  aspect-ratio: 4 / 5;
+  border: 1px solid #e9c6a366;
+  border-radius: 4px;
+  box-shadow: 0 8px 12px #100a0829;
+}
+.social-post img { object-fit: cover; }
+.social-post:nth-of-type(even) { margin-top: 6px; }
+@media (max-width: 760px) {
+  .social-layout { --social-join-gap: 12px; --social-overlap: 16px; }
+  .social-phone { width: min(42%, 226px); padding: 3px; border-radius: 22px; }
+  .social-phone::after { height: 7px; top: 9px; }
+  .social-screen { border-radius: 16px; font-size: clamp(8px, 2.2vw, 12px); }
+  .social-account { margin: 22px 7px 9px; }
+  .social-profile { gap: 5px; padding-inline: 7px; }
+  .social-screen p { padding: 7px; }
+  .social-highlights { gap: 3px; padding: 2px 6px 9px; font-size: clamp(5px, 1.5vw, 9px); }
+  .social-showcase { padding-top: 6px; }
+  .social-showcase .label { font-size: .55rem; letter-spacing: .09em; }
+  .social-showcase h2 { font-size: clamp(1.4rem, 6vw, 2.6rem); }
+  .social-action { --social-card: clamp(115px, 35vw, 165px); }
+  .social-feed { scroll-snap-type: x proximity; }
+  .social-post { scroll-snap-align: start; }
+}
+
+/* Real Villa Tiger social posts, including the sunset reel, keep a 4:5 feed crop. */
+.social-profile-grid img, .social-profile-grid video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.social-post-video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dedicated 9:16 stories runway, reserved until real story assets are uploaded. */
+.social-stories {
+  padding-block: clamp(48px, 7vw, 100px) clamp(28px, 5vw, 70px);
+}
+.social-stories-heading {
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 22px;
+  margin-bottom: clamp(22px, 3vw, 42px);
+}
+.social-stories-heading > div { flex: 1 1 auto; min-width: 0; max-width: 100%; }
+.social-stories-heading .label { color: #ddb89a; }
+.social-stories-heading h3 {
+  width: min(100%, 100%);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  margin: 8px 0 0;
+  font-family: var(--display);
+  font-weight: normal;
+  font-size: clamp(2rem, 5.5vw, 5.4rem);
+  line-height: .96;
+  letter-spacing: -.035em;
+}
+.social-stories-note {
+  max-width: 18rem;
+  margin: 0;
+  color: #d0bba9;
+  text-align: right;
+  font: italic clamp(.85rem, 1.5vw, 1.15rem)/1.4 Georgia, serif;
+}
+.social-stories-feed {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0 18px;
+  scrollbar-color: #9c7962 #32231b;
+}
+.social-stories-feed[data-looping] { overflow-x: hidden; }
+.social-stories-strip { display: flex; align-items: start; gap: clamp(12px, 1.8vw, 25px); width: max-content; padding-inline-end: clamp(12px, 1.8vw, 25px); }
+.social-stories-track { display: flex; width: max-content; }
+.social-story, .social-story-placeholder {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(155px, 19vw, 260px);
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 18px;
+}
+.social-story img, .social-story video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.social-story-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px dashed #d2ab8c85;
+  color: #c8a48b;
+  background: linear-gradient(145deg, #563c2f45, #291d1955);
+}
+.social-story-placeholder span { font: italic 1.25rem Georgia,serif; }
+.social-story-placeholder small { font: 600 .65rem/1.4 Arial,sans-serif; letter-spacing: .28em; }
+@media (max-width: 760px) {
+  .social-stories-heading { display: block; }
+  .social-stories-heading h3 { font-size: clamp(1.6rem, 7.5vw, 3rem); }
+  .social-stories-note { text-align: left; margin-top: 14px; }
+  .social-story, .social-story-placeholder { width: clamp(145px, 45vw, 210px); border-radius: 12px; }
+  .social-stories-feed { scroll-snap-type: x proximity; }
+  .social-story { scroll-snap-align: start; }
+}

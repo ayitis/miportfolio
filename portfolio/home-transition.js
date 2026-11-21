@@ -15,6 +15,9 @@ const about = document.getElementById('about');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const narrow = matchMedia('(max-width: 700px)');
 const formedAt = verticalStage / 100;
+// On phones, hide the cover captions as soon as the gallery begins forming
+// a vertical column, rather than waiting until formation is 100% complete.
+const mobileCopyExitAt = .18;
 const exitAt = .76;
 const touchLayout = matchMedia('(max-width: 768px) and (pointer: coarse)');
 const formationDuration = 1080;
@@ -59,6 +62,9 @@ function stop() {
   group.inert = false;
   heading.style.removeProperty('opacity');
   instructions.style.removeProperty('opacity');
+  instructions.style.removeProperty('visibility');
+  hero.querySelector('.hero-subtitle')?.style.removeProperty('visibility');
+  for (const item of hero.querySelectorAll('.hero-footer > *')) item.style.removeProperty('visibility');
   hero.style.removeProperty('--photo-x');
   hero.style.removeProperty('--photo-y');
 }
@@ -202,7 +208,14 @@ function draw(progress, timestamp) {
   hero.classList.add('home-photo-panning');
   // Keep the cover copy at the start, then clear it once the mobile cards
   // become a vertical column (including the editor's 48% stage preview).
-  hero.classList.toggle('home-mobile-vertical', narrow.matches && progress >= formedAt);
+  const hideMobileCopy = narrow.matches && progress >= mobileCopyExitAt;
+  hero.classList.toggle('home-mobile-vertical', hideMobileCopy);
+  // Apply inline visibility as well: published editor styles and cached CSS can
+  // otherwise leave these cover labels visible during the mobile column.
+  for (const node of [instructions, hero.querySelector('.hero-subtitle'), ...hero.querySelectorAll('.hero-footer > *')]) {
+    if (!node) continue;
+    node.style.visibility = hideMobileCopy ? 'hidden' : '';
+  }
   const ended = progress >= 1;
   group.inert = ended;
   group.style.pointerEvents = ended ? 'none' : '';

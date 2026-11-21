@@ -808,6 +808,7 @@ const pointerUpdates = frameUpdate((page, event) => {
 
 function attach() {
   const page = preview.contentDocument;
+  if (draft.page === 'home') page.documentElement.dataset.portfolioEditorPreview = '';
   const style = page.createElement('style');
   style.textContent = `
     [data-editor-text] { pointer-events: auto; cursor: move; user-select: none; touch-action: none; }
@@ -886,7 +887,7 @@ function attach() {
     syncMobileScrollFields();
     event.preventDefault();
     event.stopImmediatePropagation();
-    node.setPointerCapture(event.pointerId);
+    try { node.setPointerCapture(event.pointerId); } catch { /* Pointer tracking still works on the page. */ }
   }, true);
   page.addEventListener('pointermove', event => {
     if (!mobileScrollDrag || mobileScrollDrag.pointer !== event.pointerId) return;
@@ -896,12 +897,14 @@ function attach() {
       move.x + (event.clientX - move.startX) / scale,
       move.y + (event.clientY - move.startY) / scale, move);
     event.preventDefault();
+    event.stopImmediatePropagation();
   }, true);
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
     page.addEventListener(type, event => {
       if (mobileScrollDrag?.pointer !== event.pointerId) return;
       mobileScrollDrag = null;
       actions.closeGroup();
+      event.stopImmediatePropagation();
     }, true);
   }
 

@@ -127,6 +127,7 @@ box.addEventListener('pointerleave', () => {
   if (!gesture) schedulePlayback();
 });
 box.addEventListener('pointerdown', event => {
+  suppressNextClick = false;
   if (!event.isPrimary || event.button !== 0 || isColumnScene() || editorPreview) return;
   const animation = carouselAnimation();
   if (!animation || motionReduced.matches) return;

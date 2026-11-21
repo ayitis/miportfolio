@@ -3,8 +3,8 @@ import { horizontalGallery, verticalGallery } from './home-gallery-layout.js';
 // Keep these keys stable when changing the HTML. Both copies of each carousel
 // card share a key, so the same change appears throughout the animation.
 export const targets = [
-  [horizontalGallery, 'Galería de proyectos — Carrusel horizontal', '.hero .marquee', { text: false }],
-  [verticalGallery, 'Galería de proyectos — Cinta vertical', '[data-column-region]', { text: false }],
+  [horizontalGallery, 'Galería de proyectos - Carrusel horizontal', '.hero .marquee', { text: false }],
+  [verticalGallery, 'Galería de proyectos - Cinta vertical', '[data-column-region]', { text: false }],
   ['nav.work', 'Menú · Work', '.menu a[href="#work"]'],
   ['nav.about', 'Menú · About', '.menu a[href="#about"]'],
   ['nav.contact', 'Menú · Contact', '.menu a[href="#contact"]'],

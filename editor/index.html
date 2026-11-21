@@ -244,6 +244,21 @@
           </div>
           <label for="column-stage">Progreso del scroll <output id="column-progress">0 %</output></label>
           <input type="range" id="column-stage" min="0" max="100" value="0">
+          <div class="mobile-scroll-tools">
+            <button type="button" id="mobile-scroll-mode">Editar escena de scroll móvil</button>
+            <p>Selecciona Móvil y un momento de la transición. Arrastra los textos encima de las tarjetas o ajusta sus coordenadas aquí. Estos cambios solo afectan al scroll móvil, no a la portada inicial ni al escritorio.</p>
+            <label for="mobile-scroll-text">Texto durante la animación
+              <select id="mobile-scroll-text">
+                <option value="gallery.scroll-instructions">DRAG OR CLICK TO EXPLORE</option>
+                <option value="gallery.scroll-title">SELECTED PROJECTS</option>
+              </select>
+            </label>
+            <div class="pair">
+              <label>Horizontal (px) <input type="number" id="mobile-scroll-x" min="-4000" max="4000" step="1" value="0"></label>
+              <label>Vertical (px) <input type="number" id="mobile-scroll-y" min="-4000" max="4000" step="1" value="0"></label>
+            </div>
+            <button type="button" id="mobile-scroll-reset">Centrar ajustes de este texto</button>
+          </div>
         </details>
         <details class="alignment-tools">
           <summary>Guías de alineación</summary>

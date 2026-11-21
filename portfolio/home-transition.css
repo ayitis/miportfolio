@@ -40,3 +40,40 @@ html[data-about-direct] #about { min-height: 100vh; min-height: 100dvh; }
 .home-scrubbing .project img { transform: none; transition: none; }
 .home-photo-panning .hero-bg,
 .home-photo-panning .hero-person-depth { background-position: var(--photo-x) var(--photo-y); }
+
+/* On phones, keep the hero pinned to the actual small viewport and place both
+   labels together above the carousel. Old mobile editor coordinates displaced
+   the instruction by 281px; never apply that offset to the public mobile UI. */
+@media (max-width: 700px) {
+  html[data-home-scroll] .home-scroll > .hero {
+    min-height: 0;
+  }
+
+  html[data-home-scroll] .gallery-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 0 5vw 12px;
+    font-size: 10px;
+    line-height: 1.35;
+    letter-spacing: .08em;
+  }
+
+  html[data-home-scroll] .gallery-header > span {
+    translate: 0 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0;
+    white-space: normal !important;
+    overflow-wrap: normal;
+  }
+
+  html[data-home-scroll] .gallery-header > :first-child {
+    text-align: left !important;
+  }
+
+  html[data-home-scroll] .gallery-header > :last-child {
+    text-align: right !important;
+  }
+}

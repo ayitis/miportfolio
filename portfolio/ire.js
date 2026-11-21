@@ -74,7 +74,7 @@ function drawBook(position) {
   const to = spread(Math.min(index + 1, final));
   const flip = fraction > 0 && index < final && !reduced.matches;
   const selected = fraction < .5 ? from : to;
-  const label = `${selected.filter(Boolean).join('–')} / ${total}`;
+  const label = `${selected.filter(Boolean).join('-')} / ${total}`;
   if (count.value !== label) count.value = label;
   leaf.hidden = !flip;
   if (flip) {

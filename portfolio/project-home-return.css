@@ -30,3 +30,6 @@
 @media (prefers-reduced-motion: reduce) {
   .project-home-return a { transition: none; }
 }
+
+/* Both closing actions share the same understated treatment; no additional section. */
+.project-home-return { gap: clamp(8px, 4vw, 65px); flex-wrap: wrap; }

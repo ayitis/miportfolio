@@ -26,9 +26,9 @@ export const targets = [
 
 for (const [project, name, href] of [
   ['nuptias', 'NUPTIAS', 'nuptias.html'],
-  ['carnage', 'Maison Carnage', 'project.html?name=carnage'],
+  ['carnage', 'Maison Carnage', 'maison-carnage.html'],
   ['ayam', 'AYAM', 'ayam.html'],
-  ['yves', 'Yves Rocher', 'project.html?name=yves'],
+  ['yves', 'Yves Rocher', 'yves-rocher.html'],
   ['villa', 'Villa Tiger', 'villa-tiger.html'],
 ]) {
   const card = `.project[href="${href}"] .card-info`;

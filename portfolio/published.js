@@ -107,6 +107,8 @@ showPublishedDesign().catch((error) => {
     document.body.append(warning);
   }
 }).finally(() => {
+  // First visible paint is always the hydrated design (or the safe fallback).
+  window.portfolioRelease?.();
   // Only show Villa Tiger once the real published design has rendered.
   // Editor previews also unlock immediately after this module initializes.
   // On read failure, allow the existing visible warning/fallback instead of

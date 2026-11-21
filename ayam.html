@@ -1,6 +1,36 @@
 <!doctype html>
 <html lang="en" data-design-page="ayam">
 <head>
+<!-- Avoid flashing the unhydrated, older HTML while the live portfolio design loads. -->
+<script>
+(function () {
+  if (window.parent !== window && new URLSearchParams(location.search).has('editor-preview')) return;
+  var root = document.documentElement;
+  root.setAttribute('data-portfolio-boot', '');
+  var release = function () { root.removeAttribute('data-portfolio-boot'); };
+  window.portfolioRelease = release;
+  // Fail open if the API or a script is slow/blocked. Navigation never stays locked.
+  window.setTimeout(release, 2200);
+  window.addEventListener('pageshow', function (event) { if (event.persisted) release(); });
+})();
+</script>
+<style>
+html[data-portfolio-boot] { background: #f5f2eb; }
+html[data-portfolio-boot] body { visibility: hidden; }
+html[data-portfolio-boot]::after {
+  content: 'AYA ARBAOUI  /  SELECTED WORK';
+  position: fixed; inset: 0; z-index: 2147483647;
+  display: grid; place-items: center;
+  color: #171717; background: #f5f2eb;
+  font: 600 11px/1.5 Helvetica, Arial, sans-serif;
+  letter-spacing: .21em; text-align: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-portfolio-boot]::after { animation: none; }
+}
+</style>
+<link rel="modulepreload" href="/portfolio/published.js">
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="AYAM — final degree project by Aya Arbaoui: fashion collection, fashion film, campaign imagery and IRE magazine.">

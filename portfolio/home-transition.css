@@ -77,3 +77,14 @@ html[data-about-direct] #about { min-height: 100vh; min-height: 100dvh; }
     text-align: right !important;
   }
 }
+
+/* Dedicated mobile scroll-scene positions. The original cover labels keep
+   their existing alignment until the scroll animation actually starts. */
+@media (max-width: 700px) {
+  .hero.home-scrubbing .gallery-header > :first-child {
+    transform: translate3d(var(--mobile-scroll-title-x, 0px), var(--mobile-scroll-title-y, 0px), 0);
+  }
+  .hero.home-scrubbing .gallery-header > :last-child {
+    transform: translate3d(var(--mobile-scroll-instructions-x, 0px), var(--mobile-scroll-instructions-y, 0px), 0);
+  }
+}

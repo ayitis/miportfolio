@@ -33,6 +33,25 @@ html[data-about-direct] #about { min-height: 100vh; min-height: 100dvh; }
   overflow-wrap: anywhere;
 }
 .home-scrubbing .gallery-header > :last-child { position: relative; z-index: 1; pointer-events: none; }
+/* Inside the authenticated editor, the preview text must receive touch
+   and pointer events instead of passing them through to the moving cards. */
+html[data-portfolio-editor-preview] .home-scrubbing .gallery-header {
+  position: relative;
+  z-index: 40;
+  pointer-events: auto;
+}
+html[data-portfolio-editor-preview] .home-scrubbing .gallery-header > span {
+  position: relative;
+  z-index: 41;
+  pointer-events: auto !important;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+html[data-portfolio-editor-preview] .home-scrubbing .gallery-header > span:active {
+  cursor: grabbing;
+}
 .scroll-disciplines-source { opacity: 0; }
 .home-scrubbing .track { animation-play-state: paused !important; }
 .home-scrubbing .marquee { overflow: visible; cursor: auto; }
@@ -87,4 +106,28 @@ html[data-about-direct] #about { min-height: 100vh; min-height: 100dvh; }
   .hero.home-scrubbing .gallery-header > :last-child {
     transform: translate3d(var(--mobile-scroll-instructions-x, 0px), var(--mobile-scroll-instructions-y, 0px), 0);
   }
+}
+
+/* The editor preview intentionally does not set data-home-scroll. Mirror
+   mobile gallery heading geometry there so the edit matches the live site. */
+@media (max-width: 700px) {
+  html[data-portfolio-editor-preview] .gallery-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 0 5vw 12px;
+    font-size: 10px;
+    line-height: 1.35;
+    letter-spacing: .08em;
+  }
+  html[data-portfolio-editor-preview] .gallery-header > span {
+    translate: 0 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0;
+    white-space: normal !important;
+  }
+  html[data-portfolio-editor-preview] .gallery-header > :first-child { text-align: left !important; }
+  html[data-portfolio-editor-preview] .gallery-header > :last-child { text-align: right !important; }
 }

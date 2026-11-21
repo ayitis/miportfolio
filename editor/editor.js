@@ -456,6 +456,11 @@ const columnStage = find('column-stage');
 const mobileScrollText = find('mobile-scroll-text');
 const mobileScrollX = find('mobile-scroll-x');
 const mobileScrollY = find('mobile-scroll-y');
+const mobileScrollContent = find('mobile-scroll-content');
+const mobileScrollIds = {
+  'gallery.scroll-title': 'gallery.title',
+  'gallery.scroll-instructions': 'gallery.instructions',
+};
 let mobileScrollDrag = null;
 
 function syncMobileScrollFields() {
@@ -463,9 +468,16 @@ function syncMobileScrollFields() {
   find('mobile-scroll-reset').disabled = !enabled;
   mobileScrollX.disabled = !enabled;
   mobileScrollY.disabled = !enabled;
+  mobileScrollContent.disabled = !enabled;
+  for (const button of document.querySelectorAll('[data-mobile-scroll-nudge]')) button.disabled = !enabled;
   const settings = draft.mobile[mobileScrollText.value] ?? {};
-  mobileScrollX.value = settings.x ?? 0;
-  mobileScrollY.value = settings.y ?? 0;
+  // Never reset an input while the visitor is typing its next coordinate.
+  if (document.activeElement !== mobileScrollX) mobileScrollX.value = settings.x ?? 0;
+  if (document.activeElement !== mobileScrollY) mobileScrollY.value = settings.y ?? 0;
+  const contentId = mobileScrollIds[mobileScrollText.value];
+  if (document.activeElement !== mobileScrollContent) {
+    mobileScrollContent.value = draft.content[contentId]?.text ?? editable.get(contentId)?.[0]?.text ?? '';
+  }
 }
 
 function updateMobileScrollPosition(id, x, y, group) {
@@ -529,15 +541,43 @@ find('mobile-scroll-mode').addEventListener('click', () => {
 });
 mobileScrollText.addEventListener('change', syncMobileScrollFields);
 for (const [input, axis] of [[mobileScrollX, 'x'], [mobileScrollY, 'y']]) {
-  input.addEventListener('input', () => {
+  // Commit complete coordinates, not partially typed numbers like '-' or '12'.
+  input.addEventListener('change', () => {
     if (workspace.inert || view !== 'mobile' || draft.page !== 'home' || !input.validity.valid) return;
     const settings = draft.mobile[mobileScrollText.value] ?? {};
     updateMobileScrollPosition(mobileScrollText.value,
       axis === 'x' ? Number(input.value || 0) : settings.x ?? 0,
       axis === 'y' ? Number(input.value || 0) : settings.y ?? 0, input);
+    status.textContent = 'Posición actualizada en la vista previa. Guarda el borrador cuando termines.';
   });
   input.addEventListener('blur', () => actions.closeGroup());
 }
+for (const button of document.querySelectorAll('[data-mobile-scroll-nudge]')) {
+  button.addEventListener('click', () => {
+    if (workspace.inert || view !== 'mobile' || draft.page !== 'home') return;
+    const id = mobileScrollText.value;
+    const { x = 0, y = 0 } = draft.mobile[id] ?? {};
+    const direction = button.dataset.mobileScrollNudge;
+    updateMobileScrollPosition(id,
+      x + (direction === 'left' ? -10 : direction === 'right' ? 10 : 0),
+      y + (direction === 'up' ? -10 : direction === 'down' ? 10 : 0));
+    status.textContent = 'Texto desplazado. Guarda el borrador para conservar la posición.';
+  });
+}
+mobileScrollContent.addEventListener('change', () => {
+  if (workspace.inert || draft.page !== 'home' || view !== 'mobile' || !mobileScrollContent.validity.valid) return;
+  const id = mobileScrollIds[mobileScrollText.value];
+  if (!id) return;
+  const original = editable.get(id)?.[0]?.text ?? '';
+  const value = mobileScrollContent.value === original ? undefined : mobileScrollContent.value;
+  if (value === undefined) delete draft.content[id];
+  else draft.content[id] = { ...draft.content[id], text: value };
+  applyElementText(editable, id, draft);
+  syncColumn();
+  markDirty();
+  status.textContent = 'Texto actualizado en la vista previa. Guarda el borrador cuando termines.';
+});
+mobileScrollContent.addEventListener('blur', () => actions.closeGroup());
 find('mobile-scroll-reset').addEventListener('click', () => {
   if (view !== 'mobile' || draft.page !== 'home') return;
   updateMobileScrollPosition(mobileScrollText.value, 0, 0);

@@ -131,3 +131,16 @@ html[data-portfolio-editor-preview] .home-scrubbing .gallery-header > span:activ
   html[data-portfolio-editor-preview] .gallery-header > :first-child { text-align: left !important; }
   html[data-portfolio-editor-preview] .gallery-header > :last-child { text-align: right !important; }
 }
+
+/* Keep the mobile vertical gallery visually clean. Do not hide these texts
+   at the beginning of the cover or on the desktop experience. */
+@media (max-width: 700px) {
+  .hero.home-mobile-vertical .gallery-header > :last-child,
+  .hero.home-mobile-vertical .hero-footer,
+  .hero.home-mobile-vertical .hero-subtitle,
+  .hero.home-mobile-vertical .scroll-disciplines {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
